@@ -83,6 +83,55 @@ done
 # ------------------------------------------------------------------------------
 header "Symlinking dotfiles via Stow"
 cd "$DOTFILES"
+
+# Detect any existing symlinks at the target paths that stow doesn't own.
+# This happens when dotfiles were previously set up manually with `ln -s`
+# using absolute paths. Stow only recognises the relative symlinks it creates
+# itself, so it refuses to overwrite absolute ones even when they point to the
+# right place. On a fresh machine this is never an issue; on a machine with a
+# prior manual setup you'll see "existing target is not owned by stow" errors.
+STOW_TARGETS=(
+    "$HOME/.zshrc"
+    "$HOME/.zprofile"
+    "$HOME/.gitconfig"
+    "$HOME/.p10k.zsh"
+    "$HOME/.tmux.conf"
+    "$HOME/.config/ghostty/config"
+    "$HOME/.config/karabiner/karabiner.json"
+    "$HOME/.config/nvim"
+)
+
+CONFLICTING=()
+for t in "${STOW_TARGETS[@]}"; do
+    if [[ -L "$t" ]]; then
+        target_dest=$(readlink "$t")
+        # absolute symlinks start with /
+        if [[ "$target_dest" == /* ]]; then
+            CONFLICTING+=("$t")
+        fi
+    fi
+done
+
+if [[ ${#CONFLICTING[@]} -gt 0 ]]; then
+    echo ""
+    warn "The following paths are absolute symlinks not managed by Stow:"
+    for t in "${CONFLICTING[@]}"; do
+        echo "      $t -> $(readlink "$t")"
+    done
+    echo ""
+    echo -e "    Stow needs to replace these with its own relative symlinks."
+    echo -e "    This is safe — all files still live in $DOTFILES."
+    echo -e "    Remove them and let Stow re-create them?"
+    read -p "    [y/N]: " -n 1 -r; echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        for t in "${CONFLICTING[@]}"; do
+            rm -rf "$t" && info "Removed $t"
+        done
+    else
+        warn "Skipped removal. Stow will likely fail — re-run manually when ready."
+    fi
+fi
+
 stow --target="$HOME" --restow .
 ok "All dotfiles linked."
 
