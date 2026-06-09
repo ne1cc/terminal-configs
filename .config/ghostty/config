@@ -10,7 +10,7 @@ adjust-cell-height = 3
 grapheme-width-method = unicode
 
 # --- Window Canvas & Compositing Geometries ---
-background-opacity = 0.75
+background-opacity = 0.78
 background-blur-radius = 20
 window-padding-x = 12
 window-padding-y = 12
