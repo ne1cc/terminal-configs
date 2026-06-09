@@ -1,0 +1,7 @@
+# Clear default bindings for ctrl+tab
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
+
+# Map preferred keys to Ghostty's native tab actions (Show Next Tab / Show Previous Tab)
+keybind = super+shift+]=next_tab
+keybind = super+shift+[=previous_tab
