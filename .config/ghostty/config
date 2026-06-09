@@ -37,5 +37,5 @@ macos-option-as-alt = true
 command = "/opt/homebrew/bin/tmux new-session -A -s main"
 
 # Pass Ctrl+Tab / Ctrl+Shift+Tab to tmux as F13/F14 (avoids extended-key conflicts)
-keybind = ctrl+tab=unbind
-keybind = ctrl+shift+tab=unbind
+keybind = ctrl+tab=text:\x1b[1001~
+keybind = ctrl+shift+tab=text:\x1b[1002~
