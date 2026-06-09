@@ -13,7 +13,9 @@ terminal-configs/
 ├── .p10k.zsh            # Powerlevel10k prompt aesthetic settings
 ├── .tmux.conf           # tmux prefix binds, mouse scrolling, & pane joining utilities
 ├── .zshrc               # Shell aliases, custom audit logs, & OMZ initialization
+├── Brewfile             # Homebrew package, cask, font, and extension manifest
 └── install.sh           # Safe symlinking automation script (with backup system)
+
 ```
 
 ---
@@ -28,16 +30,18 @@ Open Terminal and run:
 xcode-select --install
 ```
 
-### Step 2: Install Homebrew & CLI Packages
+### Step 2: Install Homebrew & Restore Packages
 Install Homebrew:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Once Homebrew is active, install the package ecosystem:
+Once Homebrew is active, you can restore all apps, CLI tools, fonts, and VS Code extensions using the included [Brewfile](file:///Users/alex/terminal-configs/Brewfile):
 ```bash
-brew install neovim tmux git-delta glow coreutils rsync
+brew bundle --file=~/terminal-configs/Brewfile
 ```
+*(Alternatively, the `install.sh` script will prompt you to run this automatically).*
+
 
 ### Step 3: Install Oh My Zsh & Powerlevel10k
 Install Oh My Zsh:

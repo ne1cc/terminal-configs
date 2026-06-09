@@ -69,10 +69,28 @@ link_file "$SCRIPT_DIR/.config/ghostty/config" "$HOME/.config/ghostty/config"
 # 4. Neovim Config
 link_file "$SCRIPT_DIR/.config/nvim" "$HOME/.config/nvim"
 
+# 5. Homebrew Bundle Installation
+if command -v brew >/dev/null 2>&1; then
+    echo -e "\n${BLUE}${BOLD}==>${NC} ${BOLD}Homebrew detected!${NC}"
+    echo -e "    Would you like to install/restore all packages from the Brewfile now?"
+    read -p "    [y/N]: " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "  ${CYAN}→${NC} Running: brew bundle --file=\"$SCRIPT_DIR/Brewfile\""
+        brew bundle --file="$SCRIPT_DIR/Brewfile"
+    else
+        echo -e "  ${YELLOW}!${NC} Skipping package installation. You can run it manually later via:"
+        echo -e "    ${CYAN}brew bundle --file=\"$SCRIPT_DIR/Brewfile\"${NC}"
+    fi
+else
+    echo -e "\n${YELLOW}[!] Homebrew is not installed.${NC}"
+    echo -e "    Install it from ${CYAN}https://brew.sh/${NC} then run:"
+    echo -e "    ${CYAN}brew bundle --file=\"$SCRIPT_DIR/Brewfile\"${NC}"
+fi
+
 echo -e "\n${GREEN}${BOLD}✓ Setup Complete!${NC}"
 echo -e "${CYAN}Please restart your terminal session or run:${NC} source ~/.zshrc"
-echo -e "\n${BLUE}${BOLD}Note:${NC} Ensure you have installed the required dependencies on your new Mac:"
-echo -e "  - Homebrew: ${CYAN}https://brew.sh/${NC}"
-echo -e "  - Neovim, Tmux, Delta, Glow, etc: ${CYAN}brew install neovim tmux git-delta glow${NC}"
+echo -e "\n${BLUE}${BOLD}Note:${NC} Ensure you have installed other environment details if not already done:"
 echo -e "  - Oh My Zsh: ${CYAN}sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"${NC}"
 echo -e "  - Powerlevel10k theme: ${CYAN}git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/Applications/powerlevel10k${NC}"
+
