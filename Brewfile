@@ -1,34 +1,73 @@
-# Play, record, convert, and stream select audio and video codecs
+# ==============================================================================
+# Brewfile — full system package manifest
+# Run: brew bundle --file=Brewfile
+# ==============================================================================
+
+# Third-party taps (must be declared before the formulae that use them)
+tap "antoniorodr/memo"
+tap "koekeishiya/formulae"
+tap "steipete/tap"
+tap "yakitrak/yakitrak"
+
+# ------------------------------------------------------------------------------
+# CLI / Dev Tools
+# ------------------------------------------------------------------------------
+brew "cmake"
 brew "ffmpeg"
-# GitHub command-line tool
+brew "fnm"               # fast Node.js version manager
+brew "gallery-dl"
+brew "gemini-cli"
 brew "gh"
-# Syntax-highlighting pager for git and diff output
+brew "git"
 brew "git-delta"
-# Render markdown on the CLI
-brew "glow"
-# Easy, fast, and beautiful database client for the terminal
-brew "harlequin"
-# Improved top (interactive process viewer)
+brew "glow"              # markdown renderer
+brew "gnupg"
+brew "harlequin"         # TUI database client
 brew "htop"
-# Atlas CLI enables you to manage your MongoDB Atlas
 brew "mongodb-atlas-cli"
-# Ambitious Vim-fork focused on extensibility and agility
+brew "mpv"
+brew "mupdf"
+brew "mysql-client"
 brew "neovim"
-# Search tool like grep and The Silver Searcher
+brew "ninja"
+brew "node@22"
+brew "nsh"
+brew "openai-whisper"
+brew "pipx"
+brew "postgresql@16"
+brew "pyenv"
 brew "ripgrep"
-# Organize software neatly under a single directory tree (e.g. /usr/local)
+brew "rustup"
 brew "stow"
-# Terminal multiplexer
+brew "summarize"
+brew "testdisk"
 brew "tmux"
-# UI toolkit for building applications for mobile, web and desktop
+brew "uv"               # fast Python package manager
+
+# From custom taps
+brew "antoniorodr/memo/memo"
+brew "koekeishiya/formulae/yabai"
+brew "steipete/tap/imsg"
+brew "yakitrak/yakitrak/obsidian-cli"
+
+# ------------------------------------------------------------------------------
+# GUI Apps (Casks)
+# ------------------------------------------------------------------------------
+cask "adze"
+cask "antigravity-cli"
 cask "flutter"
 cask "font-agave-nerd-font"
-# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
 cask "ghostty"
-# Customise mouse behavior
 cask "linearmouse"
-# Replacement for Docker Desktop
+cask "mark-text"
 cask "orbstack"
+
+# ------------------------------------------------------------------------------
+# VS Code / Cursor Extensions
+# ------------------------------------------------------------------------------
 vscode "ms-azuretools.vscode-containers"
 vscode "ms-vscode-remote.remote-containers"
 vscode "saoudrizwan.claude-dev"
+vscode "vscodevim.vim"

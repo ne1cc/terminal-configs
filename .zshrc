@@ -24,6 +24,16 @@ plugins=(git)
 # Source Oh My Zsh engine
 source $ZSH/oh-my-zsh.sh
 
+# Export NVM directory and load NVM if installed
+export NVM_DIR="$HOME/.nvm"
+# Systematically load NVM and its bash completions if they exist
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    source "$NVM_DIR/nvm.sh"
+fi
+
+if [ -s "$NVM_DIR/bash_completion" ]; then
+    source "$NVM_DIR/bash_completion"
+fi
 # Source Powerlevel10k theme engine explicitly
 source ~/Applications/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
