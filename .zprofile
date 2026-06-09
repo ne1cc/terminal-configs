@@ -1,10 +1,10 @@
-
 eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 
+# Dotfiles repo location — update this if you ever move the repo
+export DOTFILES="$HOME/Github/terminal-configs"
 
-# Added by Antigravity CLI installer
-export PATH="/Users/alex/.local/bin:$PATH"
+# Custom scripts (bin/ in the dotfiles repo, stow'd to ~/bin)
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # Added by OrbStack: command-line tools and integration
-# This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
