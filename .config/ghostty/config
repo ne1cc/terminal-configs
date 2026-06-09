@@ -33,22 +33,9 @@ confirm-close-surface = false
 # --- Keyboard Pass-Through Integration ---
 macos-option-as-alt = true
 
-# --- Low-Latency Native Multiplexing Keybinds ---
-keybind = cmd+d=new_split:right
-keybind = cmd+shift+d=new_split:down
-keybind = cmd+h=goto_split:left
-keybind = cmd+l=goto_split:right
-keybind = cmd+k=goto_split:top
-keybind = cmd+j=goto_split:bottom
-unfocused-split-opacity = 0.85
-
 # Auto-attach or create tmux session on launch
 command = "/opt/homebrew/bin/tmux new-session -A -s main"
 
-# Remove native tab navigation to let key sequences pass to tmux
-keybind = ctrl+tab=text:\x1b[27;5;9~
-keybind = ctrl+shift+tab=text:\x1b[27;6;9~
-
-# Map preferred keys to Ghostty's native tab actions
-keybind = super+shift+]=next_tab
-keybind = super+shift+[=previous_tab
+# Pass Ctrl+Tab / Ctrl+Shift+Tab to tmux as F13/F14 (avoids extended-key conflicts)
+keybind = ctrl+tab=text:\x1b[25~
+keybind = ctrl+shift+tab=text:\x1b[26~
