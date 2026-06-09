@@ -28,6 +28,7 @@ fi
 # Ensure necessary directories exist
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.config/ghostty"
+mkdir -p "$HOME/.config/karabiner"
 
 # Backup and symlink function
 link_file() {
@@ -59,17 +60,25 @@ echo -e "${BLUE}${BOLD}==>${NC} ${BOLD}Creating symlinks:${NC}"
 # 1. Shell Configs
 link_file "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
 link_file "$SCRIPT_DIR/.p10k.zsh" "$HOME/.p10k.zsh"
+link_file "$SCRIPT_DIR/.zprofile" "$HOME/.zprofile"
 
-# 2. Tmux Config
+# 2. Git Config
+link_file "$SCRIPT_DIR/.gitconfig" "$HOME/.gitconfig"
+
+# 3. Tmux Config
 link_file "$SCRIPT_DIR/.tmux.conf" "$HOME/.tmux.conf"
 
-# 3. Ghostty Terminal Config
+# 4. Ghostty Terminal Config
 link_file "$SCRIPT_DIR/.config/ghostty/config" "$HOME/.config/ghostty/config"
 
-# 4. Neovim Config
+# 5. Neovim Config
 link_file "$SCRIPT_DIR/.config/nvim" "$HOME/.config/nvim"
 
-# 5. Homebrew Bundle Installation
+# 6. Karabiner Config
+link_file "$SCRIPT_DIR/.config/karabiner/karabiner.json" "$HOME/.config/karabiner/karabiner.json"
+
+
+# 7. Homebrew Bundle Installation
 if command -v brew >/dev/null 2>&1; then
     echo -e "\n${BLUE}${BOLD}==>${NC} ${BOLD}Homebrew detected!${NC}"
     echo -e "    Would you like to install/restore all packages from the Brewfile now?"
