@@ -1,7 +1,54 @@
-# Clear default bindings for ctrl+tab
+# =============================================================================
+# HARDENED GHOSTTY PRODUCTION PROFILE (macOS MONOSPACE OPTIMIZED)
+# =============================================================================
+
+# --- Typography & Core Rendering ---
+font-family = "JetBrains Mono"
+font-size = 13
+font-thicken = true
+adjust-cell-height = 3
+grapheme-width-method = unicode
+
+# --- Window Canvas & Compositing Geometries ---
+background-opacity = 0.95
+background-blur-radius = 20
+window-padding-x = 12
+window-padding-y = 12
+window-save-state = default
+
+# --- macOS-Specific Window Frame & Tab Optimization ---
+window-theme = dark
+macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
+window-padding-balance = true
+
+# --- Input Mechanics & Automation ---
+cursor-style = block
+cursor-style-blink = true
+mouse-hide-while-typing = true
+copy-on-select = true
+shell-integration-features = no-cursor
+confirm-close-surface = false
+
+# --- Keyboard Pass-Through Integration ---
+macos-option-as-alt = true
+
+# --- Low-Latency Native Multiplexing Keybinds ---
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+h=goto_split:left
+keybind = cmd+l=goto_split:right
+keybind = cmd+k=goto_split:top
+keybind = cmd+j=goto_split:bottom
+unfocused-split-opacity = 0.85
+
+# Auto-attach or create tmux session on launch
+command = "/opt/homebrew/bin/tmux attach || /opt/homebrew/bin/tmux new"
+
+# Remove native tab navigation to let key sequences pass to tmux
 keybind = ctrl+tab=unbind
 keybind = ctrl+shift+tab=unbind
 
-# Map preferred keys to Ghostty's native tab actions (Show Next Tab / Show Previous Tab)
+# Map preferred keys to Ghostty's native tab actions
 keybind = super+shift+]=next_tab
 keybind = super+shift+[=previous_tab
