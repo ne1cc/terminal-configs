@@ -43,7 +43,7 @@ keybind = cmd+j=goto_split:bottom
 unfocused-split-opacity = 0.85
 
 # Auto-attach or create tmux session on launch
-command = "/opt/homebrew/bin/tmux attach || /opt/homebrew/bin/tmux new"
+command = "/opt/homebrew/bin/tmux new-session -A -s main"
 
 # Remove native tab navigation to let key sequences pass to tmux
 keybind = ctrl+tab=unbind
