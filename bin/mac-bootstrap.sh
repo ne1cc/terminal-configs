@@ -139,9 +139,15 @@ ok "All dotfiles linked."
 # 7. fnm / Node
 # ------------------------------------------------------------------------------
 header "Node.js (fnm)"
-command -v fnm >/dev/null 2>&1 \
-    && ok "fnm installed. Run 'fnm install --lts' if needed." \
-    || warn "fnm not found — should have installed via Brewfile."
+if command -v fnm >/dev/null 2>&1; then
+    ok "fnm already installed."
+    info "Installing Node.js LTS..."
+    fnm install --lts
+    fnm default $(fnm list-remote | grep -E "v[0-9]+\.[0-9]+\.[0-9]+" | tail -1)
+else
+    warn "fnm not found — should have installed via Brewfile."
+    warn "To install manually: brew install fnm"
+fi
 
 echo -e "\n${GREEN}${BOLD}✓ Bootstrap complete!${NC}"
 echo ""
