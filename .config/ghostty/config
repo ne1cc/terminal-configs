@@ -10,7 +10,9 @@ adjust-cell-height = 3
 grapheme-width-method = unicode
 
 # --- Window Canvas & Compositing Geometries ---
-background-opacity = 0.78
+# Enable macOS native vibrancy material processing for glass-like vibrancy effect
+macos-window-effect = vibrancy
+background-opacity = 0.88
 background-blur-radius = 20
 window-padding-x = 12
 window-padding-y = 12

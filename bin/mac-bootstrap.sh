@@ -144,4 +144,12 @@ command -v fnm >/dev/null 2>&1 \
     || warn "fnm not found — should have installed via Brewfile."
 
 echo -e "\n${GREEN}${BOLD}✓ Bootstrap complete!${NC}"
-echo -e "${CYAN}Restart Ghostty or run:${NC} source ~/.zshrc"
+echo ""
+echo -e "${CYAN}→ Ghostty Configuration:${NC}"
+echo "  • macOS vibrancy effect enabled (native glass-like backdrop blending)"
+echo "  • Vibrancy samples wallpaper colors dynamically for bright, readable terminal"
+echo "  • If you experience GPU lag with vibrancy, switch to 'blur' mode in ~/.config/ghostty/config"
+echo ""
+echo -e "${CYAN}→ Next steps:${NC}"
+echo "  1. Fully quit and relaunch Ghostty (Cmd+Q)"
+echo "  2. Run: source ~/.zshrc"
