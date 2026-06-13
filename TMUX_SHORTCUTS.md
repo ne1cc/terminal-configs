@@ -38,6 +38,8 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + x` | Kill active pane immediately (no confirmation prompt) | Active Window |
 | `Prefix + G` | Kill all other panes in current window except the active one | Active Window |
 | `Prefix + y` | **Toggle pane synchronization** (parallel keystrokes) | Active Window |
+| `Prefix + <` | Move active pane to the **previous window** | Active Session |
+| `Prefix + >` | Move active pane to the **next window** | Active Session |
 
 ### Windows & Sessions
 
@@ -50,8 +52,6 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + D` | Detach all other clients connected to the current session | Active Session |
 | `Prefix + W` | Open high-information interactive tree (process, PID, activity) | Tmux Server |
 | `Prefix + r` | **Reload `.tmux.conf` configuration file** + display toast | Tmux Server |
-| `Prefix + <` | Swap/move active window to the **left** (repeatable key) | Active Session |
-| `Prefix + >` | Swap/move active window to the **right** (repeatable key) | Active Session |
 
 ### Copy Mode (vi-mode)
 
