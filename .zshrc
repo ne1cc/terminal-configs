@@ -50,6 +50,10 @@ export TERM="${TERM:-xterm-256color}"
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 [[ -d "$HOME/bin" ]]        && export PATH="$HOME/bin:$PATH"
 
+# Claude Code Agent Teams (Experimental Multi-Agent Orchestrator)
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+
 # ==============================================================================
 # 6. TMUX UTILITIES
 # ==============================================================================
