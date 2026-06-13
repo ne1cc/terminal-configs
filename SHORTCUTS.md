@@ -33,8 +33,8 @@
 | `Prefix + ↓` | Swap pane down |
 | `Prefix + ↑` | Swap pane up |
 | `Prefix + →` | Swap pane right |
-| `Prefix + M` | Move pane — pick target from tree |
-| `Prefix + j` | Join pane — pick from interactive tree |
+| `Prefix + M` | Join marked pane horizontally (horizontal split) |
+| `Prefix + g` | Join pane — pick from interactive tree (was `j`) |
 | `Prefix + S` | Join pane — prompt for source window number |
 | `Prefix + z` | Zoom/unzoom current pane (fullscreen toggle) |
 | `Prefix + x` | Kill current pane |
@@ -107,5 +107,5 @@
 ### Level up
 - [ ] Name sessions per project: `tmux new-session -s myproject`
 - [ ] Use `Prefix + s` to switch between project sessions without losing state
-- [ ] Learn `Prefix + M` and `Prefix + j` to rearrange panes across windows
+- [ ] Learn `Prefix + M` (join marked) and `Prefix + g` to rearrange panes across windows
 - [ ] Read `man tmux` for the target syntax (`:`, `.`, `+`, `-` notation)
