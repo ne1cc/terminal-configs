@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Claude Code Configuration
+- Unified global [CLAUDE.md](file:///home/alexander/Github/terminal-configs/claude-code/CLAUDE.md) incorporating the MSTSPAT (Minimal, Self-documenting, Type-exact, Secure, Performant, Accessible, and Testable) code quality standard, mandatory `<thinking>` planning tags, Stack Preferences (TypeScript/Next.js/bun, Python/uv), and Pacific Time timezone settings.
+- Integrated custom Claude Code slash commands [plan.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/plan.md), [cook.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/cook.md), [continue.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/continue.md), and [release.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/release.md) under `claude-code/commands/`.
+- Updated [install.sh](file:///home/alexander/Github/terminal-configs/install.sh) and [bin/mac-bootstrap.sh](file:///home/alexander/Github/terminal-configs/bin/mac-bootstrap.sh) to automatically symlink CLAUDE.md and the commands to `~/.claude/` and `~/.claude/commands/`, with safe timestamped backup rotation for pre-existing configurations.
+
 ### Added — `.tmux.conf`
 - `default-terminal "tmux-256color"` + `terminal-overrides` for true 24-bit color inside tmux
 - `escape-time 0` to eliminate the 500ms ESC delay (fixes sluggish input in neovim)

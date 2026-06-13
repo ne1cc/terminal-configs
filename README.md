@@ -14,6 +14,10 @@ terminal-configs/
 ├── .tmux.conf           # tmux prefix binds, mouse scrolling, & pane joining utilities
 ├── .zshrc               # Shell aliases, custom audit logs, & OMZ initialization
 ├── Brewfile             # Homebrew package, cask, font, and extension manifest
+├── claude-code/
+│   ├── CLAUDE.md        # Unified global instructions (merged MSTSPAT standards)
+│   └── commands/        # Custom slash commands (/plan, /cook, /continue, /release)
+├── install.sh           # Safe symlinking automation script (with backup system)
 └── setup.sh             # Portable, idempotent installer with conflict backups
 
 ```
@@ -96,3 +100,13 @@ repository folder to your home directory. To restore packages too, run:
 ### ✍️ Neovim (`.config/nvim`)
 * Customized AstroNvim structure.
 * Extensible Lua plugins, including `mason.lua` (LSP/DAP manager), `harpoon.lua` (quick file switching), and `none-ls.lua` (formatting/linting).
+
+### 🤖 Claude Code Workflows (Configuration as Code)
+* Integrates a version-controlled global [CLAUDE.md](file:///home/alexander/Github/terminal-configs/claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
+* Custom global slash commands in [commands/](file:///home/alexander/Github/terminal-configs/claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
+  * `/plan` — Strategic Planning: Discovers requirements, mapping dependencies, and creating/updating the `TODO.md` roadmap.
+  * `/cook` — Focused Implementation: Executes tasks from `TODO.md` in dependency order, enforcing code quality standards.
+  * `/continue` — Intelligent Resumption: Inspects git status and `TODO.md` progress to resume work cleanly.
+  * `/release` — Production Preparation: Orchestrates lints, formatting, test suites, builds, semantic versioning, and git tags/push.
+* Enforces the **MSTSPAT** code quality standard: Minimal, Self-documenting, Type-exact, Secure, Performant, Accessible, and Testable code.
+* Mandates structured architectural planning using `<thinking>` tags and strict execution validation checks.

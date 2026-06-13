@@ -86,6 +86,41 @@ cd "$DOTFILES"
 stow --target="$HOME" --restow .
 ok "All dotfiles linked."
 
+# ==============================================================================
+# Setup Claude Code global configurations (since ~/.claude is ignored by Stow)
+# ==============================================================================
+CLAUDE_DIR="$HOME/.claude"
+CLAUDE_CMD_DIR="$CLAUDE_DIR/commands"
+
+info "Setting up global Claude Code configurations..."
+mkdir -p "$CLAUDE_CMD_DIR"
+
+# Link global CLAUDE.md
+GLOBAL_CLAUDE_DEST="$CLAUDE_DIR/CLAUDE.md"
+if [ -f "$GLOBAL_CLAUDE_DEST" ] && [ ! -L "$GLOBAL_CLAUDE_DEST" ]; then
+    BACKUP="$GLOBAL_CLAUDE_DEST.backup_$(date +%Y%m%d_%H%M%S)"
+    warn "Backing up existing global CLAUDE.md to $BACKUP"
+    mv "$GLOBAL_CLAUDE_DEST" "$BACKUP"
+fi
+ln -sf "$DOTFILES/claude-code/CLAUDE.md" "$GLOBAL_CLAUDE_DEST"
+ok "Symlinked global CLAUDE.md"
+
+# Link slash commands
+for cmd in "$DOTFILES/claude-code/commands"/*.md; do
+    cmd_name=$(basename "$cmd")
+    if [ "$cmd_name" != "README.md" ]; then
+        dest="$CLAUDE_CMD_DIR/$cmd_name"
+        if [ -f "$dest" ] && [ ! -L "$dest" ]; then
+            BACKUP="$dest.backup_$(date +%Y%m%d_%H%M%S)"
+            warn "Backing up existing command $cmd_name to $BACKUP"
+            mv "$dest" "$BACKUP"
+        fi
+        ln -sf "$cmd" "$dest"
+        ok "Symlinked command: /$cmd_name"
+    fi
+done
+
+
 # ------------------------------------------------------------------------------
 # 7. fnm / Node
 # ------------------------------------------------------------------------------
