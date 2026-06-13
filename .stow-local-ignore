@@ -1,4 +1,15 @@
 ^install\.sh$
 ^Brewfile$
 ^README\.md$
+^CHANGELOG\.md$
+^SHORTCUTS\.md$
+^TMUX_SHORTCUTS\.md$
+^TMUX_LOGGING_SETUP\.md$
 ^\.gitignore$
+^\.git$
+
+# Machine-local, hand-maintained — never stow these:
+^\.gitconfig$
+^\.claude$
+^\.tmux$
+nvim
