@@ -40,6 +40,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + y` | **Toggle pane synchronization** (parallel keystrokes) | Active Window |
 | `Prefix + <` | Move active pane to the **previous window** | Active Session |
 | `Prefix + >` | Move active pane to the **next window** | Active Session |
+| `Prefix + B` | **Toggle pane borders visibility** (status bar toggle) | Active Window |
 
 ### Windows & Sessions
 
@@ -72,6 +73,9 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Ctrl + a` | FZF-pick existing worktree in popup, open window running Claude | Active Session |
 | `Prefix + Ctrl + x` | FZF-pick worktree in popup to force-remove (directory + branch) | Active Session |
 | `Prefix + Ctrl + g` | Centered floating **git status popup** (Enter to dismiss) | Active Pane |
+| `Prefix + a` | **Open/re-attach to persistent Claude popup session** | Active Session |
+| `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
+| `Prefix + F` | **Fuzzy-find file path** & copy to system clipboard (via popup) | Active Pane |
 
 ### Advanced Logging & Archiving
 
