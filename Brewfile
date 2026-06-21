@@ -55,6 +55,7 @@ brew "yakitrak/yakitrak/obsidian-cli"
 # ------------------------------------------------------------------------------
 cask "adze"
 cask "antigravity-cli"
+cask "easyfind"
 cask "flutter"
 cask "font-agave-nerd-font"
 cask "font-jetbrains-mono"
