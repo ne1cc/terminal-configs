@@ -525,6 +525,7 @@ if command -v bat >/dev/null; then
 fi
 
 # gb: Interactive Git Branch Switcher with Log Preview
+unalias gb 2>/dev/null
 gb() {
   local branch
   branch=$(git branch --color=always | fzf --ansi --no-multi --preview-window right:65% --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%h %ad %s" {1}') &&
