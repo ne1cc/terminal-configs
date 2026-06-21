@@ -3,7 +3,7 @@ return {
   ---@type AstroUIConfig
   opts = {
     -- Declare your active colorscheme palette 
-    colorscheme = "catppuccin-mocha",
+    colorscheme = "monokai-pro",
     
     -- Change structural UI window border wrappers to thin elegant graphics
     borders = {

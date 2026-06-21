@@ -69,6 +69,16 @@ else
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
 fi
 
+# Ensure Oh My Zsh custom themes directory exists and symlink powerlevel10k
+OMZ_CUSTOM_THEMES="$HOME/.oh-my-zsh/custom/themes"
+mkdir -p "$OMZ_CUSTOM_THEMES"
+if [[ ! -L "$OMZ_CUSTOM_THEMES/powerlevel10k" && ! -d "$OMZ_CUSTOM_THEMES/powerlevel10k" ]]; then
+    ln -s "$P10K_DIR" "$OMZ_CUSTOM_THEMES/powerlevel10k"
+    ok "Symlinked powerlevel10k to $OMZ_CUSTOM_THEMES/powerlevel10k."
+else
+    ok "Symlink/directory for powerlevel10k already exists."
+fi
+
 # ------------------------------------------------------------------------------
 # 5. Required directories
 # ------------------------------------------------------------------------------

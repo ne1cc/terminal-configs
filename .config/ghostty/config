@@ -9,17 +9,19 @@ font-thicken = true
 adjust-cell-height = 3
 grapheme-width-method = unicode
 
-# --- Window Canvas & Compositing Geometries ---
-# Translucent background with blur for glass-like effect
-background-opacity = 0.88
-background-blur-radius = 20
+# --- Window Canvas & High-Transparency Compositing ---
+# Lower opacity (0.20) yields maximum clarity for background details.
+# Disabling blur ensures background stars/objects remain perfectly crisp.
+background = #1a1a1a
+background-opacity = 0.12
+background-blur-radius = 0
 window-padding-x = 12
 window-padding-y = 12
-window-save-state = default
+window-save-state = always
 
 # --- macOS-Specific Window Frame & Tab Optimization ---
 window-theme = dark
-macos-titlebar-style = hidden
+macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 window-padding-balance = true
 
@@ -32,11 +34,21 @@ shell-integration-features = no-cursor
 confirm-close-surface = false
 
 # --- Keyboard Pass-Through Integration ---
+# Passes meta-keys seamlessly to underlying multiplexers (tmux/Neovim)
 macos-option-as-alt = true
 
-# Auto-attach or create tmux session on launch
+# --- Low-Latency Native Multiplexing Keybinds ---
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+h=goto_split:left
+keybind = cmd+l=goto_split:right
+keybind = cmd+k=goto_split:top
+keybind = cmd+j=goto_split:bottom
+unfocused-split-opacity = 0.85
+
+# Ghostty config
 command = "/opt/homebrew/bin/tmux new-session -A -s main"
 
-# Pass Ctrl+Tab / Ctrl+Shift+Tab to tmux as F13/F14 (avoids extended-key conflicts)
+# Send explicit escape sequences to allow ctrl+tab and ctrl+shift+tab to pass through to tmux on macOS
 keybind = ctrl+tab=esc:[27;5;9~
 keybind = ctrl+shift+tab=esc:[27;6;9~

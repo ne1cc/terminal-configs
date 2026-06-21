@@ -353,3 +353,137 @@ wt-rm() {
   local dir; dir=$(git worktree list | awk -v b="[$branch]" '$NF==b {print $1}')
   git worktree remove --force "$dir" && git branch -d "$branch"
 }
+
+# ==============================================================================
+# CLAUDE CODE 10X DEVELOPER EXTENSIONS
+# ==============================================================================
+
+# cco: Standard Claude Code wrapper to pass arguments
+cco() {
+  claude "$@"
+}
+
+# cinit: Generate a starter CLAUDE.md file
+cinit() {
+  if [[ -f CLAUDE.md ]]; then
+    echo "CLAUDE.md already exists."
+    return 0
+  fi
+  cat << 'EOF' > CLAUDE.md
+# CLAUDE.md
+
+## Build and Test Commands
+- Build: `npm run build` or equivalent
+- Test: `npm test` or equivalent
+
+## Style Guidelines
+- Maintain consistent code style and formatting.
+- Keep lines concise and documented.
+EOF
+  echo "✓ Created starter CLAUDE.md"
+}
+
+# cbug: Send the current clipboard contents (e.g. error/stacktrace) to Claude to debug
+cbug() {
+  local clipboard=""
+  if [[ "$OSTYPE" == darwin* ]]; then
+    clipboard=$(pbpaste)
+  elif command -v xclip >/dev/null; then
+    clipboard=$(xclip -selection clipboard -o)
+  elif command -v xsel >/dev/null; then
+    clipboard=$(xsel --clipboard --output)
+  fi
+
+  if [[ -z "$clipboard" ]]; then
+    echo "Clipboard is empty."
+    return 1
+  fi
+
+  echo "Sending clipboard to Claude for debugging..."
+  claude -p "I am encountering this error/issue. Please diagnose and provide a solution:
+$clipboard"
+}
+
+# creview: Ask Claude to review unstaged or staged git changes
+creview() {
+  local diff
+  diff=$(git diff)
+  if [[ -z "$diff" ]]; then
+    diff=$(git diff --cached)
+  fi
+  if [[ -z "$diff" ]]; then
+    echo "No unstaged or staged changes to review."
+    return 0
+  fi
+  echo "Reviewing changes with Claude..."
+  claude -p "Please review these git changes. Identify potential bugs, edge cases, style issues, or optimizations:
+$diff"
+}
+
+# cplan: Ask Claude to create a detailed implementation plan for a task
+cplan() {
+  if [[ -z "$*" ]]; then
+    echo "Usage: cplan <task description>"
+    return 1
+  fi
+  claude -p "Please create a detailed step-by-step implementation plan for the following task: $*"
+}
+
+# cdoc: Ask Claude to document a file
+cdoc() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: cdoc <filename>"
+    return 1
+  fi
+  if [[ ! -f "$1" ]]; then
+    echo "File not found: $1"
+    return 1
+  fi
+  echo "Generating documentation for $1..."
+  claude -p "Please write high-quality documentation, comments, and docstrings for this file:
+$(cat "$1")"
+}
+
+# ctest: Ask Claude to write tests for a file
+ctest() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: ctest <filename>"
+    return 1
+  fi
+  if [[ ! -f "$1" ]]; then
+    echo "File not found: $1"
+    return 1
+  fi
+  echo "Generating unit tests for $1..."
+  claude -p "Please write comprehensive unit tests for this file:
+$(cat "$1")"
+}
+
+# cgc: Generate a conventional commit message from git diff and commit
+cgc() {
+  local diff
+  diff=$(git diff --cached)
+  if [[ -z "$diff" ]]; then
+    diff=$(git diff)
+  fi
+  if [[ -z "$diff" ]]; then
+    echo "No changes to commit."
+    return 0
+  fi
+  echo "Analyzing diff and generating commit message..."
+  local msg
+  msg=$(claude -p "Generate a short, concise conventional commit message for the following diff. Output ONLY the commit message itself, nothing else:
+$diff")
+  
+  if [[ -n "$msg" ]]; then
+    echo -e "\nProposed commit message:\n$msg\n"
+    echo -n "Commit with this message? [y/N] "
+    read -r -k 1 reply
+    echo ""
+    if [[ "$reply" =~ ^[Yy]$ ]]; then
+      git commit -m "$msg"
+    fi
+  else
+    echo "Failed to generate commit message."
+  fi
+}
