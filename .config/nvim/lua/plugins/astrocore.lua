@@ -1,38 +1,84 @@
+if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+
+-- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
+-- Configuration documentation can be found with `:h astrocore`
+-- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
+--       as this provides autocomplete and documentation while editing
+
+---@type LazySpec
 return {
   "AstroNvim/astrocore",
-  ---@type AstroCoreConfig
+  ---@type AstroCoreOpts
   opts = {
-    -- Configure global Vim settings and flags
-    options = {
-      opt = {
-        relativenumber = true, -- Enable relative line numbers for rapid vertical motion
-        number = true,         -- Show the precise line number on the active cursor line
-        spell = false,         -- Global spellchecking off by default
-        signcolumn = "yes",    -- Keep the gutter open to prevent code layouts from shifting left/right
-        scrolloff = 8,         -- Lock cursor context by maintaining 8 lines visible below/above screen boundary
+    -- Configure core features of AstroNvim
+    features = {
+      large_buf = { size = 1024 * 256, lines = 10000 }, -- set global limits for large files for disabling features like treesitter
+      autopairs = true, -- enable autopairs at start
+      cmp = true, -- enable completion at start
+      diagnostics = { virtual_text = true, virtual_lines = false }, -- diagnostic settings on startup
+      highlighturl = true, -- highlight URLs at start
+      notifications = true, -- enable notifications at start
+    },
+    -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
+    diagnostics = {
+      virtual_text = true,
+      underline = true,
+    },
+    -- passed to `vim.filetype.add`
+    filetypes = {
+      -- see `:h vim.filetype.add` for usage
+      extension = {
+        foo = "fooscript",
       },
-      g = {
-        mapleader = " ",      -- Map the Leader key to the Spacebar globally
-        maplocalleader = ",", -- Map local leader definitions to a comma
+      filename = {
+        [".foorc"] = "fooscript",
+      },
+      pattern = {
+        [".*/etc/foo/.*"] = "fooscript",
       },
     },
-
-    -- Master Mappings Config: Modal keybindings separated by Normal (n), Visual (v), and Terminal (t) modes
+    -- vim options can be configured here
+    options = {
+      opt = { -- vim.opt.<key>
+        relativenumber = true, -- sets vim.opt.relativenumber
+        number = true, -- sets vim.opt.number
+        spell = false, -- sets vim.opt.spell
+        signcolumn = "yes", -- sets vim.opt.signcolumn to yes
+        wrap = false, -- sets vim.opt.wrap
+      },
+      g = { -- vim.g.<key>
+        -- configure global vim variables (vim.g)
+        -- NOTE: `mapleader` and `maplocalleader` must be set in the AstroNvim opts or before `lazy.setup`
+        -- This can be found in the `lua/lazy_setup.lua` file
+      },
+    },
+    -- Mappings can be configured through AstroCore as well.
+    -- NOTE: keycodes follow the casing in the vimdocs. For example, `<Leader>` must be capitalized
     mappings = {
+      -- first key is the mode
       n = {
-        -- Quickly manage and step through open buffers in your top bar
-        ["L"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next Buffer" },
-        ["H"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous Buffer" },
-        
-        -- Custom horizontal/vertical splitting mappings that load the active buffer directly
-        ["<leader>sh"] = { ":split<cr>", desc = "Horizontal split" },
-        ["<leader>sv"] = { ":vsplit<cr>", desc = "Vertical split" },
+        -- second key is the lefthand side of the map
 
-        -- Fast window pane focus navigation using traditional arrow orientations
-        ["<C-Up>"]    = { "<C-w>k", desc = "Focus Window Above" },
-        ["<C-Down>"]  = { "<C-w>j", desc = "Focus Window Below" },
-        ["<C-Left>"]  = { "<C-w>h", desc = "Focus Window Left" },
-        ["<C-Right>"] = { "<C-w>l", desc = "Focus Window Right" },
+        -- navigate buffer tabs
+        ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
+        ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
+
+        -- mappings seen under group name "Buffer"
+        ["<Leader>bd"] = {
+          function()
+            require("astroui.status.heirline").buffer_picker(
+              function(bufnr) require("astrocore.buffer").close(bufnr) end
+            )
+          end,
+          desc = "Close buffer from tabline",
+        },
+
+        -- tables with just a `desc` key will be registered with which-key if it's installed
+        -- this is useful for naming menus
+        -- ["<Leader>b"] = { desc = "Buffers" },
+
+        -- setting a mapping to false will disable it
+        -- ["<C-S>"] = false,
       },
     },
   },
