@@ -43,6 +43,12 @@ brew "summarize"
 brew "testdisk"
 brew "tmux"
 brew "uv"               # fast Python package manager
+brew "zoxide"
+brew "fzf"
+brew "eza"
+brew "bat"
+brew "fd"
+brew "direnv"
 
 # From custom taps
 brew "antoniorodr/memo/memo"

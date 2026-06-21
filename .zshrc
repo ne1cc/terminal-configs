@@ -487,3 +487,55 @@ $diff")
     echo "Failed to generate commit message."
   fi
 }
+
+# ==============================================================================
+# MODERN DEV TOOLS & FUZZY WORKFLOWS
+# ==============================================================================
+
+# Zoxide (Smart cd) Hook
+if command -v zoxide >/dev/null; then
+  eval "$(zoxide init zsh)"
+fi
+
+# Direnv Hook
+if command -v direnv >/dev/null; then
+  eval "$(direnv hook zsh)"
+fi
+
+# FZF Shell Integration & Patched Command Defaults
+if command -v fzf >/dev/null; then
+  source <(fzf --zsh)
+  export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --inline-info"
+  if command -v fd >/dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  fi
+fi
+
+# Modern CLI Replacements Aliases
+if command -v eza >/dev/null; then
+  alias ls='eza --icons --git-repos-detail --group-directories-first'
+  alias ll='eza -l --icons --git-repos-detail --group-directories-first'
+  alias la='eza -la --icons --git-repos-detail --group-directories-first'
+  alias tree='eza --tree --icons'
+fi
+
+if command -v bat >/dev/null; then
+  alias cat='bat --style=header,grid,snip --theme=ansi'
+fi
+
+# gb: Interactive Git Branch Switcher with Log Preview
+gb() {
+  local branch
+  branch=$(git branch --color=always | fzf --ansi --no-multi --preview-window right:65% --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%h %ad %s" {1}') &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# gshow: Interactive Git Commit History Diff Browser
+gshow() {
+  git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+      --preview 'f(v)={ set -- $(echo "$v" | grep -o "[a-f0-9]\{7,\}"); [ $# -eq 0 ] || git show --color=always "$1"; }; f {}' \
+      --header "Enter to view commit details" \
+      --bind "enter:execute(git show --color=always {1} | less -R)"
+}
