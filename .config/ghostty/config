@@ -46,8 +46,8 @@ keybind = cmd+k=goto_split:top
 keybind = cmd+j=goto_split:bottom
 unfocused-split-opacity = 0.85
 
-# Ghostty config
-command = "/opt/homebrew/bin/tmux new-session -A -s main"
+# Auto-attach or create tmux session on launch (force UTF-8 with -u)
+command = "/opt/homebrew/bin/tmux -u new-session -A -s main"
 
 # Send explicit escape sequences to allow ctrl+tab and ctrl+shift+tab to pass through to tmux on macOS
 keybind = ctrl+tab=esc:[27;5;9~
