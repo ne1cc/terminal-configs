@@ -45,8 +45,8 @@ This pipeline follows Dagster's **Software-Defined Asset (SDA)** paradigm. Inste
 
 1. **Ingestion** — Python generates 50k synthetic users with variant assignment and pre-experiment covariates, writes to `stg_raw_events`.
 2. **Staging** — dbt view selects and validates raw columns.
-3. **Marts** — dbt table enriches with `is_treatment` flag for downstream consumers.
-4. **Analytics** — Python reads the mart, performs SRM chi-square check, applies CUPED variance reduction, runs Welch's t-test, and logs all statistics as Dagster output metadata.
+3. **Marts** — dbt table enriches with `is_treatment` flag consumed by the analytics asset.
+4. **Analytics** — Python reads the mart (read-only), performs SRM chi-square check, applies CUPED variance reduction, runs Welch's t-test, and logs all statistics as Dagster output metadata.
 
 ## Key Decisions
 
@@ -54,5 +54,11 @@ This pipeline follows Dagster's **Software-Defined Asset (SDA)** paradigm. Inste
 |----------|-----------|
 | DuckDB over Postgres | Zero-infrastructure; entire pipeline runs from a laptop clone |
 | `CREATE OR REPLACE TABLE` | Idempotent re-materialization without manual cleanup |
-| CUPED adjustment | Reduces variance ~40% vs. naive t-test, detecting smaller lifts |
+| CUPED adjustment | Reduces variance ~16% (rho^2 where rho≈0.4), detecting smaller lifts |
 | Metadata on asset (not table) | Statistical summaries are ephemeral; Dagster UI is the dashboard |
+| Local RNG (`default_rng`) | Avoids mutating global NumPy state; safe for concurrent asset execution |
+| Context-managed connections | Guarantees cleanup on failure; prevents file-lock leaks |
+| Read-only connection for analytics | Avoids unnecessary write locks; allows concurrent readers |
+| Explicit `con.register()` | Makes DataFrame-to-SQL binding visible; refactor-safe vs. replacement scan |
+| Named threshold constants | `SRM_ALPHA` and `SIGNIFICANCE_ALPHA` as single source of truth for decision rules |
+| Consume `is_treatment` from dbt | Group identity defined once in SQL; Python avoids stringly-typed filtering |

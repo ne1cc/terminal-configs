@@ -7,6 +7,13 @@ The analytics asset (`ab_test_summary_metrics`) implements two industry-standard
 1. **Sample Ratio Mismatch (SRM) detection**
 2. **CUPED variance reduction**
 
+Thresholds are defined as module-level constants in `assets.py`:
+
+```python
+SRM_ALPHA = 0.01
+SIGNIFICANCE_ALPHA = 0.05
+```
+
 ---
 
 ## SRM Check
@@ -20,15 +27,15 @@ Detects whether the randomization mechanism is broken. If variant assignment dev
 Pearson's chi-square goodness-of-fit test on observed variant counts.
 
 ```
-H₀: P(control) = P(treatment) = 0.5
+H0: P(control) = P(treatment) = 0.5
 ```
 
 ### Decision Rule
 
 | p-value | Interpretation |
 |---------|----------------|
-| > 0.01 | Randomization healthy — proceed |
-| ≤ 0.01 | SRM detected — results untrustworthy |
+| > `SRM_ALPHA` (0.01) | Randomization healthy — proceed |
+| <= `SRM_ALPHA` (0.01) | SRM detected — results untrustworthy |
 
 ### Implementation
 
@@ -48,17 +55,17 @@ Reduces variance in the metric of interest by leveraging a pre-experiment covari
 ### Formula
 
 ```
-Y_cuped = Y - θ · (X - E[X])
+Y_cuped = Y - theta * (X - E[X])
 
 where:
   Y = converted (binary outcome)
   X = pre_exp_purchases (covariate)
-  θ = Cov(Y, X) / Var(X)
+  theta = Cov(Y, X) / Var(X)
 ```
 
 ### Expected Variance Reduction
 
-With a correlation of ~0.4 between purchases and conversion, CUPED reduces variance by approximately 1 - ρ² ≈ 16%. In practice with this synthetic data, the reduction is sufficient to detect the 3.5pp lift at p < 0.05 with 50k users.
+With a correlation of ~0.4 between purchases and conversion, CUPED reduces variance by rho^2 ≈ 16% (remaining variance is 1 - rho^2 ≈ 84% of the original). In practice with this synthetic data, the reduction is sufficient to detect the 3.5pp lift at p < 0.05 with 50k users.
 
 ### Implementation
 
@@ -75,24 +82,26 @@ df["converted_cuped"] = df["converted"] - theta * (
 
 ### Method
 
-Welch's t-test (unequal variances) on the CUPED-adjusted metric between control and treatment groups.
+Welch's t-test (unequal variances) on the CUPED-adjusted metric between control and treatment groups. Groups are identified via the dbt-modeled `is_treatment` column.
 
 ```
-H₀: μ_control = μ_treatment
-H₁: μ_control ≠ μ_treatment  (two-sided)
+H0: mu_control = mu_treatment
+H1: mu_control != mu_treatment  (two-sided)
 ```
 
 ### Decision Rule
 
 | p-value | Interpretation |
 |---------|----------------|
-| < 0.05 | Statistically significant lift detected |
-| ≥ 0.05 | No significant difference |
+| < `SIGNIFICANCE_ALPHA` (0.05) | Statistically significant lift detected |
+| >= `SIGNIFICANCE_ALPHA` (0.05) | No significant difference |
 
 ### Implementation
 
 ```python
-t_stat, p_val = stats.ttest_ind(control, treatment, equal_var=False)
+control = df.loc[~df["is_treatment"].astype(bool), "converted_cuped"]
+treatment = df.loc[df["is_treatment"].astype(bool), "converted_cuped"]
+_, p_val = stats.ttest_ind(control, treatment, equal_var=False)
 ```
 
 ---
@@ -102,10 +111,25 @@ t_stat, p_val = stats.ttest_ind(control, treatment, equal_var=False)
 | Key | Type | Description |
 |-----|------|-------------|
 | `srm_p_value` | float | Chi-square p-value for randomization check |
-| `srm_passed` | bool | True if p > 0.01 |
+| `srm_passed` | bool | True if p > `SRM_ALPHA` |
 | `cuped_p_value` | float | Welch's t-test p-value on adjusted metric |
-| `statistically_significant` | bool | True if p < 0.05 |
+| `statistically_significant` | bool | True if p < `SIGNIFICANCE_ALPHA` |
 | `sample_size` | int | Total users in experiment |
+
+---
+
+## Data Generation Parameters
+
+The ingestion asset uses a local NumPy generator (`default_rng(42)`) for reproducibility:
+
+| Parameter | Distribution | Value |
+|-----------|-------------|-------|
+| `variant` | Categorical | 50/50 control/treatment |
+| `pre_exp_purchases` | Poisson | lambda = 1.2 |
+| `converted` (control) | Bernoulli | p = 0.12 |
+| `converted` (treatment) | Bernoulli | p = 0.155 (lift = +3.5pp) |
+
+Conversion probabilities are applied via a single vectorized `rng.binomial(1, probs)` call using a per-user probability array, avoiding redundant RNG draws.
 
 ---
 
