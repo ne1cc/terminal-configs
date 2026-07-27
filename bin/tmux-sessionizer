@@ -5,11 +5,13 @@
 # Originally inspired by The Primeagen
 # ==============================================================================
 
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    # Find active repository folders to fuzzy search
-    selected=$(find ~/Github ~/Github/2026 -mindepth 1 -maxdepth 2 -type d 2>/dev/null | fzf)
+    # Find top-level project root directories, filtering out hidden dirs (.git, .idea)
+    selected=$( (tmux list-sessions -F "#{session_name}" 2>/dev/null; find ~/Github ~/Alex/Recruiting ~/Developer ~/Scripts -maxdepth 2 -type d ! -path '*/.*' 2>/dev/null) | fzf --reverse --header "🚀 Select Project or Session" --prompt "Switch to > ")
 fi
 
 if [[ -z $selected ]]; then

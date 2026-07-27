@@ -50,6 +50,8 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + X` | Kill active window immediately (no confirmation prompt) | Active Session |
 | `Prefix + N` | Create a new named session (prompts for name) | Tmux Server |
 | `Prefix + $` | Rename current session (prompts for name) | Active Session |
+| `Prefix + S` | **Save tmux session state** (tmux-resurrect) + display toast | Active Session |
+| `Prefix + R` | **Restore tmux session state** (tmux-resurrect) + display toast | Active Session |
 | `Prefix + D` | Detach all other clients connected to the current session | Active Session |
 | `Prefix + W` | Open high-information interactive tree (process, PID, activity) | Tmux Server |
 | `Prefix + r` | **Reload `.tmux.conf` configuration file** + display toast | Tmux Server |
@@ -75,7 +77,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Ctrl + g` | Centered floating **git status popup** (Enter to dismiss) | Active Pane |
 | `Prefix + a` | **Open/re-attach to persistent Claude popup session** | Active Session |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
-| `Prefix + F` | **Fuzzy-find file path** & copy to system clipboard (via popup) | Active Pane |
+| `Prefix + f` | **Fuzzy Project Switcher** (popup modal to search git repos & switch sessions) | Active Session |
 
 ### Advanced Logging & Archiving
 
