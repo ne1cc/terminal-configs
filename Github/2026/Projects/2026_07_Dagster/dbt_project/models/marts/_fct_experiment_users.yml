@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: fct_experiment_users
+    description: "Fact table of experiment users with treatment flag"
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+      - name: variant
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["control", "treatment"]
+      - name: pre_exp_purchases
+        tests:
+          - not_null
+      - name: converted
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_treatment
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]

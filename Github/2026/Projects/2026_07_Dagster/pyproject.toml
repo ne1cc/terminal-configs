@@ -14,6 +14,9 @@ dependencies = [
     "scipy",
 ]
 
+[tool.setuptools.packages.find]
+include = ["ab_testing_dagster*"]
+
 [tool.dagster]
 module_name = "ab_testing_dagster.definitions"
 code_location_name = "ab_testing_dagster"

@@ -42,6 +42,8 @@ The dbt profile lives at `dbt_project/profiles.yml` and defaults to a local `dev
 export DBT_DUCKDB_PATH=/tmp/my_experiment.duckdb
 ```
 
+> **Note:** This env var only affects the dbt adapter. The Python assets (`raw_experiment_events`, `ab_test_summary_metrics`) use the `DB_PATH` constant in `assets.py`, which is hardcoded to `dbt_project/dev.duckdb`. If you override the dbt path, update `DB_PATH` to match — otherwise the Python and dbt layers will read/write different databases.
+
 ## Verifying the Install
 
 ```bash

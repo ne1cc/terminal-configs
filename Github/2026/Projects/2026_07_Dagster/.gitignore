@@ -1,0 +1,10 @@
+.venv/
+*.duckdb
+*.duckdb.wal
+dbt_project/target/
+dbt_project/logs/
+.tmp_dagster_home_*/
+__pycache__/
+*.egg-info/
+dist/
+build/

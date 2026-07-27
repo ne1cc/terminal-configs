@@ -58,7 +58,7 @@ dagster-daemon run
 ## Viewing Results
 
 1. Open http://localhost:3000
-2. Navigate to **Assets** → select `ab_test_summary_metrics`
+2. Navigate to **Assets** -> select `ab_test_summary_metrics`
 3. Click the latest materialization event
 4. Inspect **Output Metadata** for SRM and CUPED statistics
 
@@ -72,7 +72,7 @@ dagster-daemon run
 | `Table stg_raw_events does not exist` | Ingestion asset not materialized | Materialize `raw_experiment_events` first |
 | `SRM check failed` | Randomization bug (unlikely with seed=42) | Verify no filtering before variant assignment |
 | Port 3000 in use | Another Dagster instance running | `dagster dev -p 3001` |
-| DuckDB lock error | Concurrent connections | Ensure only one process writes at a time |
+| DuckDB lock error | Concurrent write connections | Analytics uses `read_only=True`; ensure only one writer at a time |
 
 ---
 
@@ -97,7 +97,7 @@ rm -rf ~/.dagster/
 .
 ├── ab_testing_dagster/
 │   ├── __init__.py
-│   ├── assets.py            # All asset definitions
+│   ├── assets.py            # All asset definitions + constants
 │   └── definitions.py       # Dagster Definitions entrypoint
 ├── dbt_project/
 │   ├── dbt_project.yml      # dbt project config
