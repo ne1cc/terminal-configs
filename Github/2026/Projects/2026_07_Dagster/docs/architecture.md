@@ -39,14 +39,20 @@ This pipeline follows Dagster's **Software-Defined Asset (SDA)** paradigm. Inste
 | `raw_experiment_events` | ingestion | python | DuckDB table `stg_raw_events` |
 | `stg_experiment_users` | dbt | dbt | DuckDB view |
 | `fct_experiment_users` | dbt | dbt | DuckDB table |
-| `ab_test_summary_metrics` | analytics | python | Metadata-only (no table) |
+| `ab_test_summary_metrics` | analytics | python | Metadata-only (conversion) |
+| `ab_test_revenue_metrics` | analytics | python | Metadata-only (revenue) |
+| `ab_test_segment_metrics` | analytics | python | Metadata-only (by quartile) |
+| `ab_test_sequential_metrics` | sequential | python | Metadata-only (early stopping) |
 
 ## Data Flow
 
-1. **Ingestion** — Python generates 50k synthetic users with variant assignment and pre-experiment covariates, writes to `stg_raw_events`.
-2. **Staging** — dbt view selects and validates raw columns.
-3. **Marts** — dbt table enriches with `is_treatment` flag consumed by the analytics asset.
-4. **Analytics** — Python reads the mart (read-only), performs SRM chi-square check, applies CUPED variance reduction, runs Welch's t-test, and logs all statistics as Dagster output metadata.
+1. **Ingestion** — Python generates 50k synthetic users with variant assignment, pre-experiment covariates, revenue, and enrollment day; writes to `stg_raw_events`.
+2. **Staging** — dbt view selects and validates raw columns (including `revenue`, `arrived_at`).
+3. **Marts** — dbt table enriches with `is_treatment` flag consumed by all analytics assets.
+4. **Analytics (conversion)** — CUPED-adjusted Welch's t-test with CI, Cohen's h, lift %, and power.
+5. **Analytics (revenue)** — CUPED-adjusted revenue-per-user with Cohen's d, CI, and power.
+6. **Analytics (segments)** — Per-quartile conversion analysis by pre-experiment purchase volume.
+7. **Sequential** — Always-valid inference (mSPRT) over daily cumulative looks for early stopping.
 
 ## Key Decisions
 

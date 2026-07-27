@@ -7,10 +7,13 @@ from pathlib import Path
 from dagster import asset, AssetExecutionContext, AssetCheckResult, asset_check
 from dagster_dbt import DbtCliResource, dbt_assets, DbtProject
 
+from .stats_utils import srm_p_value, cuped_adjust, welch_test, mean_diff_ci, cohens_h, posthoc_power
+
 DBT_PROJECT_DIR = Path(__file__).joinpath("..", "..", "dbt_project").resolve()
 DB_PATH = DBT_PROJECT_DIR / "dev.duckdb"
 SRM_ALPHA = 0.01
 SIGNIFICANCE_ALPHA = 0.05
+EXPERIMENT_DAYS = 28
 
 dbt_project = DbtProject(project_dir=DBT_PROJECT_DIR)
 dbt_project.prepare_if_dev()
@@ -32,6 +35,12 @@ def raw_experiment_events():
 
     probs = np.where(users["variant"] == "treatment", 0.12 + 0.035, 0.12)
     users["converted"] = rng.binomial(1, probs)
+
+    base_revenue = rng.lognormal(mean=2.5, sigma=0.8, size=n_users)
+    treatment_mult = np.where(users["variant"] == "treatment", 1.15, 1.0)
+    users["revenue"] = users["converted"] * base_revenue * treatment_mult
+
+    users["arrived_at"] = rng.integers(1, EXPERIMENT_DAYS + 1, size=n_users)
 
     with duckdb.connect(str(DB_PATH)) as con:
         con.register("users_df", users)
@@ -58,27 +67,32 @@ def ab_test_summary_metrics(context: AssetExecutionContext):
             " FROM fct_experiment_users"
         ).df()
 
-    observed = df["variant"].value_counts()
-    _, srm_p_value = stats.chisquare(observed)
+    srm_p = srm_p_value(df["variant"].value_counts())
 
-    theta = (
-        df["converted"].cov(df["pre_exp_purchases"])
-        / df["pre_exp_purchases"].var()
-    )
-    df["converted_cuped"] = df["converted"] - theta * (
-        df["pre_exp_purchases"] - df["pre_exp_purchases"].mean()
-    )
+    df["converted_cuped"] = cuped_adjust(df, "converted")
 
     control = df.loc[~df["is_treatment"].astype(bool), "converted_cuped"]
     treatment = df.loc[df["is_treatment"].astype(bool), "converted_cuped"]
-    _, p_val = stats.ttest_ind(control, treatment, equal_var=False)
+    test = welch_test(control, treatment)
+    ci_lower, ci_upper = mean_diff_ci(control, treatment, SIGNIFICANCE_ALPHA)
+
+    p_control = df.loc[~df["is_treatment"].astype(bool), "converted"].mean()
+    p_treatment = df.loc[df["is_treatment"].astype(bool), "converted"].mean()
+    lift_pct = (p_treatment - p_control) / p_control * 100 if p_control > 0 else 0.0
+    h = cohens_h(p_treatment, p_control)
+    power = posthoc_power(test["diff"], len(control), len(treatment), SIGNIFICANCE_ALPHA)
 
     context.add_output_metadata({
-        "srm_p_value": float(srm_p_value),
-        "srm_passed": bool(srm_p_value > SRM_ALPHA),
-        "cuped_p_value": float(p_val),
-        "statistically_significant": bool(p_val < SIGNIFICANCE_ALPHA),
+        "srm_p_value": srm_p,
+        "srm_passed": bool(srm_p > SRM_ALPHA),
+        "cuped_p_value": test["p_value"],
+        "statistically_significant": bool(test["p_value"] < SIGNIFICANCE_ALPHA),
         "sample_size": len(df),
+        "lift_pct": float(lift_pct),
+        "ci_lower": ci_lower,
+        "ci_upper": ci_upper,
+        "cohens_h": h,
+        "power_estimate": power,
     })
 
 

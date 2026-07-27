@@ -13,19 +13,19 @@ The pipeline is fully scaffolded and running locally:
 
 ## Phase 1: Validate & Harden (This Week)
 
-- [ ] Materialize all assets in the Dagster UI and verify metadata output
-- [ ] Add dbt tests (`not_null`, `accepted_values`, `unique`) to staging and marts
-- [ ] Add a Dagster asset check for SRM — fail materialization if `srm_p_value <= SRM_ALPHA`
-- [ ] Add a `.gitignore` (`.venv/`, `*.duckdb`, `dbt_project/target/`, `.tmp_dagster_home_*`)
-- [ ] Pin dependency versions in `pyproject.toml` after confirming the working set
+- [x] Materialize all assets in the Dagster UI and verify metadata output
+- [x] Add dbt tests (`not_null`, `accepted_values`, `unique`) to staging and marts
+- [x] Add a Dagster asset check for SRM — fail materialization if `srm_p_value <= SRM_ALPHA`
+- [x] Add a `.gitignore` (`.venv/`, `*.duckdb`, `dbt_project/target/`, `.tmp_dagster_home_*`)
+- [x] Pin dependency versions in `pyproject.toml` after confirming the working set
 
 ## Phase 2: Extend the Analytics (Week 2)
 
-- [ ] Add segment-level analysis (e.g., by `pre_exp_purchases` quartile)
-- [ ] Implement sequential testing (always-valid p-values) for early stopping
-- [ ] Add a second metric asset (e.g., revenue per user) to show multi-metric support
-- [ ] Compute confidence intervals and effect size (Cohen's h) alongside p-values
-- [ ] Log richer metadata: lift %, CI bounds, power estimate
+- [x] Add segment-level analysis (e.g., by `pre_exp_purchases` quartile)
+- [x] Implement sequential testing (always-valid p-values) for early stopping
+- [x] Add a second metric asset (e.g., revenue per user) to show multi-metric support
+- [x] Compute confidence intervals and effect size (Cohen's h) alongside p-values
+- [x] Log richer metadata: lift %, CI bounds, power estimate
 
 ## Phase 3: Production Patterns (Week 3)
 

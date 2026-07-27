@@ -5,3 +5,6 @@ sources:
     schema: main
     tables:
       - name: stg_raw_events
+        meta:
+          dagster:
+            asset_key: "raw_experiment_events"

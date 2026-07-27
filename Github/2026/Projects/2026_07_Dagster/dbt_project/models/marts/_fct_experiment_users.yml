@@ -21,6 +21,12 @@ models:
           - not_null
           - accepted_values:
               values: [0, 1]
+      - name: revenue
+        tests:
+          - not_null
+      - name: arrived_at
+        tests:
+          - not_null
       - name: is_treatment
         tests:
           - not_null

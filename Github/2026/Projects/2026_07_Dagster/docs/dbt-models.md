@@ -29,7 +29,9 @@ select
     user_id,
     variant,
     pre_exp_purchases,
-    converted
+    converted,
+    revenue,
+    arrived_at
 from {{ source('main', 'stg_raw_events') }}
 ```
 
@@ -41,7 +43,7 @@ from {{ source('main', 'stg_raw_events') }}
 
 - **Materialization:** table
 - **Path:** `models/marts/fct_experiment_users.sql`
-- **Purpose:** Enriched fact table consumed by the analytics asset. Adds a binary `is_treatment` flag.
+- **Purpose:** Enriched fact table consumed by the analytics assets. Adds a binary `is_treatment` flag.
 
 ```sql
 select
@@ -49,6 +51,8 @@ select
     variant,
     pre_exp_purchases,
     converted,
+    revenue,
+    arrived_at,
     case
         when variant = 'treatment' then 1
         else 0
