@@ -1,0 +1,19 @@
+[project]
+name = "ab-testing-dagster"
+version = "0.1.0"
+description = "A/B testing pipeline orchestrated with Dagster, dbt, and DuckDB"
+requires-python = ">=3.10"
+dependencies = [
+    "dagster",
+    "dagster-webserver",
+    "dagster-dbt",
+    "dbt-duckdb",
+    "duckdb",
+    "pandas",
+    "numpy",
+    "scipy",
+]
+
+[tool.dagster]
+module_name = "ab_testing_dagster.definitions"
+code_location_name = "ab_testing_dagster"
