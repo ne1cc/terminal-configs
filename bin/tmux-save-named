@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+name="$1"
+if [[ -z "$name" ]]; then
+    exit 0
+fi
+
+~/.tmux/plugins/tmux-resurrect/scripts/save.sh
+
+if [[ -f ~/.tmux/resurrect/last ]]; then
+    cp ~/.tmux/resurrect/last ~/.tmux/resurrect/snapshot-${name}.txt
+    tmux display-message "✓ Saved named backup: snapshot-${name}.txt"
+else
+    tmux display-message "❌ Save failed"
+fi
