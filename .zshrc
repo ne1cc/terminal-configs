@@ -267,6 +267,16 @@ alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
 
+# tmux window "stash" helpers — shell-level companions to Prefix+M-s / Prefix+M-r
+# in .tmux.conf. Move the current window to a background "stash" session
+# without closing it, then fuzzy-pick it back later.
+alias tmux-stash='tmux move-window -t stash:'
+tmux-unstash() {
+  local win
+  win=$(tmux list-windows -t stash -F '#I: #W' 2>/dev/null | fzf --reverse --header='Unstash window') || return
+  tmux move-window -s "stash:${win%%:*}" -t "$(tmux display-message -p '#S'):"
+}
+
 # ==============================================================================
 # 11. GIT POST-COMMIT AUDIT HOOK INSTALLER
 # ==============================================================================
@@ -540,3 +550,9 @@ gshow() {
       --header "Enter to view commit details" \
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
+
+# Taskwarrior daily kanban board
+alias dailyboard="taskwarrior-tui -r dailykanban"
+
+# kimi-code
+export PATH="/Users/alex/.kimi-code/bin:$PATH"
