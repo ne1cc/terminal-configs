@@ -1,0 +1,2 @@
+load_from:
+  - python_module: ab_testing_dagster.definitions
