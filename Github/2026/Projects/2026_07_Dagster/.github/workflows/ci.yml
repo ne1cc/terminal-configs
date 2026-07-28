@@ -21,6 +21,11 @@ jobs:
           uv venv
           uv pip install -e ".[dev]"
 
+      - name: Generate dbt manifest
+        run: |
+          source .venv/bin/activate
+          cd dbt_project && dbt parse --profiles-dir .
+
       - name: Run tests
         run: |
           source .venv/bin/activate
