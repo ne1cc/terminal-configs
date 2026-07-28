@@ -24,6 +24,14 @@ ln -sfn "$REPO_DIR/.config/nvim" "$CONFIG_DIR/nvim"
 ln -sfn "$REPO_DIR/.config/ghostty" "$CONFIG_DIR/ghostty"
 ln -sfn "$REPO_DIR/.config/alacritty" "$CONFIG_DIR/alacritty"
 
+echo "==> Linking ~/bin Scripts..."
+mkdir -p "$HOME/bin"
+for script in "$REPO_DIR/bin/"*; do
+  if [ -f "$script" ]; then
+    ln -sf "$script" "$HOME/bin/$(basename "$script")"
+  fi
+done
+
 # OS-Specific Configs
 if [[ "$(uname)" == "Darwin" ]]; then
   echo "==> macOS detected: Linking Karabiner..."
