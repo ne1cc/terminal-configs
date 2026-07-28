@@ -23,6 +23,7 @@ echo "==> Linking ~/.config Folders..."
 ln -sfn "$REPO_DIR/.config/nvim" "$CONFIG_DIR/nvim"
 ln -sfn "$REPO_DIR/.config/ghostty" "$CONFIG_DIR/ghostty"
 ln -sfn "$REPO_DIR/.config/alacritty" "$CONFIG_DIR/alacritty"
+ln -sfn "$REPO_DIR/.config/lazygit" "$CONFIG_DIR/lazygit"
 
 echo "==> Linking ~/bin Scripts..."
 mkdir -p "$HOME/bin"

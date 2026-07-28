@@ -1,0 +1,77 @@
+# ==============================================================================
+# LAZYGIT CONFIGURATION — TOKYO NIGHT PALETTE + AI WORKFLOW (AGY/CLAUDE/CODEX/QODER)
+# Managed via GNU Stow / setup.sh: ~/Github/2026/terminal-configs → $HOME
+# ==============================================================================
+
+gui:
+  showIcons: true
+  nerdFontsVersion: "3"
+  theme:
+    activeBorderColor:
+      - '#7dcfff'
+      - bold
+    inactiveBorderColor:
+      - '#565f89'
+    selectedLineBgColor:
+      - '#2d3149'
+    cherryPickedCommitBgColor:
+      - '#bb9af7'
+    cherryPickedCommitFgColor:
+      - '#7dcfff'
+    unstagedChangesColor:
+      - '#f7768e'
+    defaultFgColor:
+      - '#a9b1d6'
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  overrideGpg: true
+
+os:
+  editCommand: 'nvim'
+
+customCommands:
+  # --- AI Commit Generator (Antigravity agy) ---
+  - key: 'a'
+    description: 'Generate conventional commit message with Antigravity (agy)'
+    command: 'agy "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
+    context: 'files'
+    subprocess: true
+
+  # --- AI Code Review / Analysis (Claude CLI) ---
+  - key: 'C'
+    description: 'Run Claude AI diff review on staged changes'
+    command: 'git diff --staged | claude "Review this git diff for potential bugs, edge cases, and performance issues."'
+    context: 'files'
+    subprocess: true
+
+  # --- AI Code Explanation (Codex CLI) ---
+  - key: 'X'
+    description: 'Analyze commit or branch changes with OpenAI Codex'
+    command: 'codex "Analyze the git changes on branch {{.SelectedLocalBranch.Name}} and explain the architecture impact."'
+    context: 'localBranches'
+    subprocess: true
+
+  # --- AI Qoder Audit (qodercli) ---
+  - key: 'Q'
+    description: 'Run Qoder AI audit on staged code changes'
+    command: 'git diff --staged | qodercli "Audit these code changes"'
+    context: 'files'
+    subprocess: true
+
+  # --- GitHub CLI Integration ---
+  - key: 'P'
+    description: 'Create GitHub Pull Request with gh --fill'
+    command: 'gh pr create --fill'
+    context: 'global'
+    loadingText: 'Creating GitHub Pull Request...'
+    subprocess: true
+
+  - key: 'O'
+    description: 'Checkout GitHub PR for selected branch'
+    command: 'gh pr checkout {{.SelectedLocalBranch.Name}}'
+    context: 'localBranches'
+    loadingText: 'Checking out PR...'
+    subprocess: true
