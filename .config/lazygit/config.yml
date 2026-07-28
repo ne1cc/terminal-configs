@@ -24,9 +24,9 @@ gui:
       - '#a9b1d6'
 
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
   overrideGpg: true
 
 os:
@@ -38,28 +38,28 @@ customCommands:
     description: 'Generate conventional commit message with Antigravity (agy)'
     command: 'agy "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
     context: 'files'
-    subprocess: true
+    output: terminal
 
   # --- AI Code Review / Analysis (Claude CLI) ---
   - key: 'C'
     description: 'Run Claude AI diff review on staged changes'
     command: 'git diff --staged | claude "Review this git diff for potential bugs, edge cases, and performance issues."'
     context: 'files'
-    subprocess: true
+    output: terminal
 
   # --- AI Code Explanation (Codex CLI) ---
   - key: 'X'
     description: 'Analyze commit or branch changes with OpenAI Codex'
     command: 'codex "Analyze the git changes on branch {{.SelectedLocalBranch.Name}} and explain the architecture impact."'
     context: 'localBranches'
-    subprocess: true
+    output: terminal
 
   # --- AI Qoder Audit (qodercli) ---
   - key: 'Q'
     description: 'Run Qoder AI audit on staged code changes'
     command: 'git diff --staged | qodercli "Audit these code changes"'
     context: 'files'
-    subprocess: true
+    output: terminal
 
   # --- GitHub CLI Integration ---
   - key: 'P'
@@ -67,11 +67,11 @@ customCommands:
     command: 'gh pr create --fill'
     context: 'global'
     loadingText: 'Creating GitHub Pull Request...'
-    subprocess: true
+    output: terminal
 
   - key: 'O'
     description: 'Checkout GitHub PR for selected branch'
     command: 'gh pr checkout {{.SelectedLocalBranch.Name}}'
     context: 'localBranches'
     loadingText: 'Checking out PR...'
-    subprocess: true
+    output: terminal
