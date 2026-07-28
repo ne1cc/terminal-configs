@@ -76,7 +76,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Ctrl + n` | Create git worktree branch (prompt), open window running Claude | Active Session |
 | `Prefix + Ctrl + a` | FZF-pick existing worktree in popup, open window running Claude | Active Session |
 | `Prefix + Ctrl + x` | FZF-pick worktree in popup to force-remove (directory + branch) | Active Session |
-| `Prefix + Ctrl + g` | Centered floating **git status popup** (Enter to dismiss) | Active Pane |
+| `Prefix + Ctrl + g` | Centered floating **lazygit popup frame** (q to dismiss) | Active Pane |
 | `Prefix + a` | **Open/re-attach to persistent Claude popup session** | Active Session |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
 | `Prefix + f` | **Fuzzy Project Switcher** (popup modal to search git repos & switch sessions) | Active Session |

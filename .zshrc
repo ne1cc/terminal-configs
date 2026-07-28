@@ -258,6 +258,7 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 # Git shortcuts
 alias gis='git rev-parse --is-inside-work-tree'
 alias gc='git clone'
+alias lg='lazygit'
 
 # Alacritty — quick config reload (live-reload is automatic, but this forces a check)
 alias alacritty-config='${EDITOR:-nvim} ~/.config/alacritty/alacritty.toml'
