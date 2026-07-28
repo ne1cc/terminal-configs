@@ -47,7 +47,7 @@ def tmp_db(tmp_path):
 class TestPartitionedIngestion:
     def test_single_partition_creates_table(self, tmp_path):
         db_path = tmp_path / "ingest.duckdb"
-        with patch("ab_testing_dagster.assets.DB_PATH", db_path):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", db_path):
             keys = daily_partitions.get_partition_keys()
             result = materialize([raw_experiment_events], partition_key=keys[0])
 
@@ -59,7 +59,7 @@ class TestPartitionedIngestion:
 
     def test_partition_is_idempotent(self, tmp_path):
         db_path = tmp_path / "ingest.duckdb"
-        with patch("ab_testing_dagster.assets.DB_PATH", db_path):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", db_path):
             keys = daily_partitions.get_partition_keys()
             materialize([raw_experiment_events], partition_key=keys[0])
             materialize([raw_experiment_events], partition_key=keys[0])
@@ -73,7 +73,7 @@ class TestPartitionedIngestion:
 
     def test_multiple_partitions_accumulate(self, tmp_path):
         db_path = tmp_path / "ingest.duckdb"
-        with patch("ab_testing_dagster.assets.DB_PATH", db_path):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", db_path):
             keys = daily_partitions.get_partition_keys()
             for k in keys[:3]:
                 materialize([raw_experiment_events], partition_key=k)
@@ -90,7 +90,7 @@ class TestPartitionedIngestion:
 
 class TestRevenueMetrics:
     def test_materializes_with_significant_result(self, tmp_db):
-        with patch("ab_testing_dagster.analytics.DB_PATH", tmp_db):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", tmp_db):
             result = materialize([ab_test_revenue_metrics])
 
         assert result.success
@@ -102,7 +102,7 @@ class TestRevenueMetrics:
 
 class TestSegmentMetrics:
     def test_materializes_with_segments(self, tmp_db):
-        with patch("ab_testing_dagster.analytics.DB_PATH", tmp_db):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", tmp_db):
             result = materialize([ab_test_segment_metrics])
 
         assert result.success
@@ -113,7 +113,7 @@ class TestSegmentMetrics:
 
 class TestSequentialMetrics:
     def test_materializes_and_detects_effect(self, tmp_db):
-        with patch("ab_testing_dagster.analytics.DB_PATH", tmp_db):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", tmp_db):
             result = materialize([ab_test_sequential_metrics])
 
         assert result.success
@@ -123,7 +123,7 @@ class TestSequentialMetrics:
         assert meta["final_always_valid_p"].value < 0.05
 
     def test_confidence_interval_excludes_zero(self, tmp_db):
-        with patch("ab_testing_dagster.analytics.DB_PATH", tmp_db):
+        with patch("ab_testing_dagster.db.DUCKDB_PATH", tmp_db):
             result = materialize([ab_test_sequential_metrics])
 
         meta = result.get_asset_materialization_events()[0].materialization.metadata

@@ -1,0 +1,15 @@
+ab_testing:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DBT_DUCKDB_PATH', 'dev.duckdb') }}"
+    postgres:
+      type: postgres
+      host: "{{ env_var('PG_HOST', 'localhost') }}"
+      port: "{{ env_var('PG_PORT', '5432') | int }}"
+      user: "{{ env_var('PG_USER', 'dagster') }}"
+      password: "{{ env_var('PG_PASSWORD', 'dagster') }}"
+      dbname: "{{ env_var('PG_DBNAME', 'ab_testing') }}"
+      schema: public
+      threads: 4

@@ -1,4 +1,3 @@
-import duckdb
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
@@ -20,9 +19,10 @@ from dagster import (
 from dagster_dbt import DbtCliResource, dbt_assets, DbtProject
 
 from .stats_utils import srm_p_value, cuped_adjust, welch_test, mean_diff_ci, cohens_h, posthoc_power
+from .db import get_connection, read_sql, write_dataframe, DUCKDB_PATH, WAREHOUSE
 
 DBT_PROJECT_DIR = Path(__file__).joinpath("..", "..", "dbt_project").resolve()
-DB_PATH = DBT_PROJECT_DIR / "dev.duckdb"
+DB_PATH = DUCKDB_PATH
 SRM_ALPHA = 0.01
 SIGNIFICANCE_ALPHA = 0.05
 EXPERIMENT_DAYS = 28
@@ -68,15 +68,24 @@ def raw_experiment_events(context: AssetExecutionContext):
 
     users["arrived_at"] = day_number
 
-    with duckdb.connect(str(DB_PATH)) as con:
-        con.execute(
-            "CREATE TABLE IF NOT EXISTS stg_raw_events ("
-            "user_id INTEGER, variant VARCHAR, pre_exp_purchases INTEGER,"
-            "converted INTEGER, revenue DOUBLE, arrived_at INTEGER)"
-        )
-        con.execute("DELETE FROM stg_raw_events WHERE arrived_at = ?", [day_number])
-        con.register("users_df", users)
-        con.execute("INSERT INTO stg_raw_events SELECT * FROM users_df")
+    with get_connection() as con:
+        if WAREHOUSE == "postgres":
+            cur = con.cursor()
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS stg_raw_events ("
+                "user_id INTEGER, variant VARCHAR, pre_exp_purchases INTEGER,"
+                "converted INTEGER, revenue DOUBLE PRECISION, arrived_at INTEGER)"
+            )
+            cur.execute("DELETE FROM stg_raw_events WHERE arrived_at = %s", (day_number,))
+            cur.close()
+        else:
+            con.execute(
+                "CREATE TABLE IF NOT EXISTS stg_raw_events ("
+                "user_id INTEGER, variant VARCHAR, pre_exp_purchases INTEGER,"
+                "converted INTEGER, revenue DOUBLE, arrived_at INTEGER)"
+            )
+            con.execute("DELETE FROM stg_raw_events WHERE arrived_at = ?", [day_number])
+        write_dataframe(con, users, "stg_raw_events")
 
 
 @dbt_assets(manifest=dbt_project.manifest_path)
@@ -91,11 +100,12 @@ def my_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
 )
 def ab_test_summary_metrics(context: AssetExecutionContext):
     """Pulls modeled dbt mart data, checks for SRM, and runs CUPED-adjusted t-test."""
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute(
+    with get_connection(read_only=True) as con:
+        df = read_sql(
+            con,
             "SELECT variant, converted, pre_exp_purchases, is_treatment"
-            " FROM fct_experiment_users"
-        ).df()
+            " FROM fct_experiment_users",
+        )
 
     srm_p = srm_p_value(df["variant"].value_counts())
 
@@ -129,10 +139,8 @@ def ab_test_summary_metrics(context: AssetExecutionContext):
 @asset_check(asset=ab_test_summary_metrics, blocking=True)
 def srm_check():
     """Fails the pipeline if sample ratio mismatch is detected."""
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute(
-            "SELECT variant FROM fct_experiment_users"
-        ).df()
+    with get_connection(read_only=True) as con:
+        df = read_sql(con, "SELECT variant FROM fct_experiment_users")
 
     observed = df["variant"].value_counts()
     _, p_value = stats.chisquare(observed)

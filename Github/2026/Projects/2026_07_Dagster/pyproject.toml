@@ -16,6 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest~=9.1"]
+postgres = ["dbt-postgres~=1.10", "psycopg2-binary~=2.9"]
 
 [tool.setuptools.packages.find]
 include = ["ab_testing_dagster*"]

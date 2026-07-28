@@ -1,10 +1,10 @@
-import duckdb
 import numpy as np
 import pandas as pd
 
 from dagster import asset, AssetExecutionContext, AssetCheckResult, asset_check
 
-from .assets import DB_PATH, SRM_ALPHA, SIGNIFICANCE_ALPHA, EXPERIMENT_DAYS
+from .assets import SRM_ALPHA, SIGNIFICANCE_ALPHA, EXPERIMENT_DAYS
+from .db import get_connection, read_sql
 from .stats_utils import (
     srm_p_value,
     cuped_adjust,
@@ -28,11 +28,12 @@ N_QUARTILES = 4
 )
 def ab_test_revenue_metrics(context: AssetExecutionContext):
     """CUPED-adjusted revenue-per-user analysis with Cohen's d."""
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute(
+    with get_connection(read_only=True) as con:
+        df = read_sql(
+            con,
             "SELECT variant, revenue, pre_exp_purchases, is_treatment"
-            " FROM fct_experiment_users"
-        ).df()
+            " FROM fct_experiment_users",
+        )
 
     srm_p = srm_p_value(df["variant"].value_counts())
 
@@ -67,8 +68,8 @@ def ab_test_revenue_metrics(context: AssetExecutionContext):
 
 @asset_check(asset=ab_test_revenue_metrics, blocking=True)
 def srm_check_revenue():
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute("SELECT variant FROM fct_experiment_users").df()
+    with get_connection(read_only=True) as con:
+        df = read_sql(con, "SELECT variant FROM fct_experiment_users")
 
     p = srm_p_value(df["variant"].value_counts())
     return AssetCheckResult(
@@ -84,11 +85,12 @@ def srm_check_revenue():
 )
 def ab_test_segment_metrics(context: AssetExecutionContext):
     """Conversion analysis segmented by pre-experiment purchase quartile."""
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute(
+    with get_connection(read_only=True) as con:
+        df = read_sql(
+            con,
             "SELECT variant, converted, pre_exp_purchases, is_treatment"
-            " FROM fct_experiment_users"
-        ).df()
+            " FROM fct_experiment_users",
+        )
 
     srm_p = srm_p_value(df["variant"].value_counts())
 
@@ -127,8 +129,8 @@ def ab_test_segment_metrics(context: AssetExecutionContext):
 
 @asset_check(asset=ab_test_segment_metrics, blocking=True)
 def srm_check_segments():
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute("SELECT variant FROM fct_experiment_users").df()
+    with get_connection(read_only=True) as con:
+        df = read_sql(con, "SELECT variant FROM fct_experiment_users")
 
     p = srm_p_value(df["variant"].value_counts())
     return AssetCheckResult(
@@ -144,11 +146,12 @@ def srm_check_segments():
 )
 def ab_test_sequential_metrics(context: AssetExecutionContext):
     """Always-valid inference via Gaussian-mixture mSPRT over daily looks."""
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute(
+    with get_connection(read_only=True) as con:
+        df = read_sql(
+            con,
             "SELECT variant, converted, arrived_at, is_treatment"
-            " FROM fct_experiment_users"
-        ).df()
+            " FROM fct_experiment_users",
+        )
 
     srm_p = srm_p_value(df["variant"].value_counts())
 
@@ -183,8 +186,8 @@ def ab_test_sequential_metrics(context: AssetExecutionContext):
 
 @asset_check(asset=ab_test_sequential_metrics, blocking=True)
 def srm_check_sequential():
-    with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = con.execute("SELECT variant FROM fct_experiment_users").df()
+    with get_connection(read_only=True) as con:
+        df = read_sql(con, "SELECT variant FROM fct_experiment_users")
 
     p = srm_p_value(df["variant"].value_counts())
     return AssetCheckResult(
