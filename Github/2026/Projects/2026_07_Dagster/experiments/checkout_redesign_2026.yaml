@@ -1,0 +1,21 @@
+experiment:
+  name: "checkout_redesign_2026"
+  owner: "growth-team"
+  start_date: "2026-07-01"
+  duration_days: 28
+  mde: 0.035
+  alpha: 0.05
+  target_power: 0.80
+  srm_alpha: 0.01
+  primary_metric: conversion_rate
+  guardrail_metrics:
+    - revenue_per_user
+  guardrail_margin: 0.01
+  segments:
+    - pre_exp_purchases_quartile
+  sequential:
+    tau: 0.01
+    alpha: 0.05
+  revenue:
+    daily_users: 50000
+    implementation_cost: 50000

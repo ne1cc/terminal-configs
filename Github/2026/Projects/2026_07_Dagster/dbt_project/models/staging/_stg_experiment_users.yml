@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_experiment_users
+    description: "Staged experiment user records from raw telemetry"
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+      - name: variant
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["control", "treatment"]
+      - name: pre_exp_purchases
+        tests:
+          - not_null
+      - name: converted
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: revenue
+        tests:
+          - not_null
+      - name: arrived_at
+        tests:
+          - not_null

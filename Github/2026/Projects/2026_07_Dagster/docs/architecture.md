@@ -32,6 +32,21 @@ This pipeline follows Dagster's **Software-Defined Asset (SDA)** paradigm. Inste
 │  └─────────────────────────┘  └──────────────────┘  │ _metrics  │ │
 │                                                     │ (mSPRT)   │ │
 │                                                     └───────────┘ │
+│                    │                         │                │     │
+│                    └─────────────────────────┼────────────────┘     │
+│                                              ▼                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    decision group                            │   │
+│  │                                                             │   │
+│  │  experiment_decision (ship/hold/kill + guardrail_check)     │   │
+│  │  revenue_impact (annualized $ delta + CI + payback)         │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                              │                                      │
+│                              ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    reporting group                           │   │
+│  │  experiment_report (Jinja2 markdown → reports/)             │   │
+│  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 │  ┌─────────────────────────────────────────────────────────────┐   │
 │  │  daily_schedule (cron 0 6 * * *)  │  new_data_sensor (mtime)│   │
@@ -53,6 +68,9 @@ This pipeline follows Dagster's **Software-Defined Asset (SDA)** paradigm. Inste
 | `ab_test_revenue_metrics` | analytics | python | Metadata-only (revenue) | No |
 | `ab_test_segment_metrics` | analytics | python | Metadata-only (by quartile) | No |
 | `ab_test_sequential_metrics` | sequential | python | Metadata-only (early stopping) | No |
+| `experiment_decision` | decision | python | Metadata-only (ship/hold/kill verdict) | No |
+| `revenue_impact` | decision | python | Metadata-only (annualized $ projection) | No |
+| `experiment_report` | reporting | python | Markdown file (`reports/latest_experiment_report.md`) | No |
 
 ## Scheduling and Automation
 

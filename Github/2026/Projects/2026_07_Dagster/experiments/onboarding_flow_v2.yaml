@@ -1,0 +1,23 @@
+experiment:
+  name: "onboarding_flow_v2"
+  owner: "activation-team"
+  start_date: "2026-07-01"
+  duration_days: 28
+  mde: 0.02
+  alpha: 0.05
+  target_power: 0.80
+  srm_alpha: 0.01
+  primary_metric: conversion_rate
+  guardrail_metrics:
+    - revenue_per_user
+  guardrail_margin: 0.02
+  segments:
+    - pre_exp_purchases_quartile
+  sequential:
+    tau: 0.01
+    alpha: 0.05
+  revenue:
+    daily_users: 30000
+    implementation_cost: 25000
+  notifications:
+    slack_channel: "#activation-experiments"

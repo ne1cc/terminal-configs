@@ -40,6 +40,7 @@ jobs:
           from dagster import materialize
           from ab_testing_dagster.assets import raw_experiment_events, daily_partitions, my_dbt_assets, ab_test_summary_metrics
           from ab_testing_dagster.analytics import ab_test_revenue_metrics, ab_test_segment_metrics, ab_test_sequential_metrics
+          from ab_testing_dagster.decision_assets import experiment_decision, revenue_impact, experiment_report
           from dagster_dbt import DbtCliResource
           from ab_testing_dagster.assets import dbt_project
 
@@ -49,7 +50,7 @@ jobs:
               assert r.success, f'Ingestion failed on {k}'
 
           r = materialize(
-              [my_dbt_assets, ab_test_summary_metrics, ab_test_revenue_metrics, ab_test_segment_metrics, ab_test_sequential_metrics],
+              [my_dbt_assets, ab_test_summary_metrics, ab_test_revenue_metrics, ab_test_segment_metrics, ab_test_sequential_metrics, experiment_decision, revenue_impact, experiment_report],
               resources={'dbt': DbtCliResource(project_dir=dbt_project)},
           )
           assert r.success, 'Full pipeline failed'

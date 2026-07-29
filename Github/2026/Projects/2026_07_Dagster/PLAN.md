@@ -43,6 +43,45 @@ The pipeline is fully scaffolded and running locally:
 - [ ] Publish as a Dagster project template or blog post
 - [ ] Tag a `v1.0` release
 
+## Phase 5: Decision Intelligence Layer (Week 5)
+
+- [x] Experiment config as YAML with Pydantic validation (`experiment.yaml`)
+- [x] Metric registry for declarative metric definitions
+- [x] Decision engine: deterministic ship/hold/kill with auditable reasoning
+- [x] Guardrail framework: one-sided non-inferiority test + blocking asset check
+- [x] Revenue impact projection: annualized $ delta with CI and payback period
+- [x] Automated experiment report (Jinja2 markdown template)
+- [x] Unit tests for decision engine and guardrails (14 new tests)
+- [x] CI smoke test updated to include decision assets
+
+## Phase 6: Multi-Experiment Platform (Week 6)
+
+- [x] Experiment registry: auto-discovers YAML configs in `experiments/` directory
+- [x] `list_experiments()` / `get_experiment(name)` API for programmatic access
+- [x] Per-experiment notifications config (Slack channel, webhook URL)
+- [x] Second example experiment (`onboarding_flow_v2.yaml`) proving multi-experiment support
+
+## Phase 7: Alerting & Notifications (Week 6)
+
+- [x] Slack webhook integration (`notifications.py`) with formatted decision alerts
+- [x] Fires on SHIP/KILL verdicts only (configurable via `should_alert`)
+- [x] Integrated into `experiment_decision` asset — zero-config when webhook URL is set
+- [x] Alert payload includes verdict, confidence, reasons, and revenue projection
+
+## Phase 8: Thompson Sampling Bandits (Week 6)
+
+- [x] Beta-Bernoulli Thompson sampling implementation (`bandits.py`)
+- [x] Fixed-split comparison baseline for regret analysis
+- [x] Dagster asset (`thompson_sampling_simulation`) with convergence metadata
+- [x] Unit tests: best-arm identification, convergence, regret reduction, determinism
+
+## Phase 9: Infrastructure as Code (Week 6)
+
+- [x] Terraform: ECS Fargate cluster, ECR, RDS Postgres, Secrets Manager, CloudWatch
+- [x] Security groups with least-privilege (RDS only accessible from ECS tasks)
+- [x] GitHub Actions deploy workflow (OIDC auth, tag-triggered, image validation)
+- [x] Environment-aware (staging vs production) with deletion protection
+
 ---
 
 ## Stretch Goals
