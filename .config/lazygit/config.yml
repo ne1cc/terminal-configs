@@ -78,3 +78,16 @@ customCommands:
     context: 'localBranches'
     loadingText: 'Checking out PR...'
     output: terminal
+
+  # --- Clipboard Tools ---
+  - key: '<ctrl-y>'
+    description: 'Copy full contents of selected file to clipboard'
+    command: 'cat {{.SelectedFile.Name}} | pbcopy'
+    context: 'files'
+    loadingText: 'Copying file contents...'
+
+  - key: '<alt-y>'
+    description: 'Copy diff patch of selected file to clipboard'
+    command: 'git diff {{.SelectedFile.Name}} | pbcopy'
+    context: 'files'
+    loadingText: 'Copying file diff...'
