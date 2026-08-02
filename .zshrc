@@ -6,6 +6,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Detect WL (Windows Subsystem for Linux)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    export IS_WSL=1
+fi
+
 # ==============================================================================
 # 2. OH MY ZSH INITIALIZATION & CONFIGURATION
 # ==============================================================================
@@ -70,10 +75,9 @@ rename-pane() {
 
 # Auto-attach or create a persistent 'main' tmux session when launching
 # Alacritty directly (mirrors Ghostty's command = tmux new-session -A -s main).
-# Uncomment to enable:
-# if [[ -z "$TMUX" ]] && command -v tmux >/dev/null; then
-#     exec tmux new-session -A -s main
-# fi
+if [[ -z "$TMUX" ]] && command -v tmux >/dev/null; then
+    exec tmux new-session -A -s main
+fi
 
 # ==============================================================================
 # 7. CLIPBOARD COMPATIBILITY (Linux xclip / macOS pbcopy shim)
@@ -87,6 +91,9 @@ if [[ "$OSTYPE" != darwin* ]]; then
     elif command -v xsel >/dev/null; then
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
+    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null; then
+        alias pbcopy='clip.exe'
+        alias pbpaste='powershell.exe -NoProfile -Command "Get-Clipboard"'
     fi
 fi
 
@@ -106,6 +113,20 @@ copylast() {
         echo "Error: No previous command found in history."
     fi
 }
+
+# Cross-platform 'open' command: macOS has it natively, Linux uses xdg-open, WSL uses cmd.exe
+if [[ "$OSTYPE" != darwin* ]] && ! command -v open >/dev/null; then
+    open() {
+        if command -v xdg-open >/dev/null; then
+            xdg-open "$@" &>/dev/null &
+        elif [[ -n "${IS_WSL:-}" ]] && command -v cmd.exe >/dev/null; then
+            cmd.exe /c start "" "$@" &>/dev/null &
+        else
+            echo "open: no handler found for $1" >&2
+            return 1
+        fi
+    }
+fi
 
 # ==============================================================================
 # 8. REFACTORED ANTIGRAVITY AUDIT ENGINE WITH AUTOMATED POST-HOOKS
@@ -572,4 +593,15 @@ gshow() {
       --header "Enter to view commit details" \
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
-export PATH="/usr/local/mysql/bin:$PATH"
+[[ -d "/usr/local/mysql/bin" ]] && export PATH="/usr/local/mysql/bin:$PATH"
+
+# ==============================================================================
+# KEYBINDINGS
+# ==============================================================================
+# Map standard emacs keys explicitly alongside vi mode shortcuts
+bindkey '^A' beginning-of-line
+bindkey '^K' kill-line
+bindkey '^E' end-of-line
+bindkey '\ek' kill-line
+bindkey '^[k' kill-line
+

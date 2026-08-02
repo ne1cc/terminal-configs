@@ -35,3 +35,19 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Auto-restore persistence.nvim session on startup
+local restore_group = vim.api.nvim_create_augroup("PersistenceAutoRestore", { clear = true })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = restore_group,
+  nested = true,
+  callback = function()
+    -- Only auto-restore if Neovim was launched without path arguments or stdin piping
+    local is_empty_args = vim.fn.argc() == 0
+    local is_not_stdin = not vim.g.started_by_firenvim and vim.fn.line2byte(1) == -1
+
+    if is_empty_args and is_not_stdin then
+      require("persistence").load()
+    end
+  end,
+})

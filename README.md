@@ -14,7 +14,7 @@ terminal-configs/
 ├── .tmux.conf           # tmux prefix binds, mouse scrolling, & pane joining utilities
 ├── .zshrc               # Shell aliases, custom audit logs, & OMZ initialization
 ├── Brewfile             # Homebrew package, cask, font, and extension manifest
-└── install.sh           # Safe symlinking automation script (with backup system)
+└── setup.sh             # Portable, idempotent installer with conflict backups
 
 ```
 
@@ -54,18 +54,23 @@ Clone the Powerlevel10k prompt theme:
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/Applications/powerlevel10k
 ```
 
-### Step 4: Clone & Run the Install Script
+### Step 4: Clone & Run the Portable Setup Script
 Clone this repository to your new machine:
 ```bash
 git clone <YOUR_REPOSITORY_URL> ~/terminal-configs
 cd ~/terminal-configs
 ```
 
-Execute the installer:
+Link the configuration and install tmux/Neovim plugins:
 ```bash
-./install.sh
+./setup.sh
 ```
-The script will automatically detect any existing configurations, create timestamped backups (e.g., `~/.zshrc.backup_YYYYMMDD_HHMMSS`), and establish clean symlinks from the repository folder to your home directory.
+The script detects macOS, Linux, and WSL; moves conflicting files to
+`~/.terminal-configs-backups/<timestamp>`; and establishes symlinks from the
+repository folder to your home directory. To restore packages too, run:
+```bash
+./setup.sh --install-packages
+```
 
 ---
 
