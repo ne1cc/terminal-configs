@@ -1,1 +1,40 @@
-/Users/alexandersun/Github/terminal-configs/bin/tmux-sessionizer
+#!/usr/bin/env bash
+
+# ==============================================================================
+# tmux-sessionizer — fuzzy finder for switching projects/sessions instantly
+# Originally inspired by The Primeagen
+# ==============================================================================
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    # Find top-level project root directories, filtering out hidden dirs (.git, .idea)
+    selected=$( (tmux list-sessions -F "#{session_name}" 2>/dev/null; find ~/Github/core ~/Github/data ~/Github/msba ~/Github/playground ~/Github/config -maxdepth 2 -type d ! -path '*/.*' 2>/dev/null) | fzf --reverse --header "🚀 Select Project or Session" --prompt "Switch to > ")
+fi
+
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+selected_name=$(basename "$selected" | tr . _)
+tmux_running=$(pgrep tmux)
+session_existed=$(tmux has-session -t="$selected_name" 2>/dev/null && echo 1 || echo 0)
+
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s "$selected_name" -c "$selected"
+    exit 0
+fi
+
+if [[ $session_existed -eq 0 ]]; then
+    tmux new-session -ds "$selected_name" -c "$selected"
+    # Brand new session for this project — drop straight into the editor.
+    tmux send-keys -t "$selected_name" 'nvim .' Enter
+fi
+
+if [[ -z $TMUX ]]; then
+    tmux attach-session -t "$selected_name"
+else
+    tmux switch-client -t "$selected_name"
+fi
