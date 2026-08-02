@@ -143,7 +143,7 @@ Inside Lazygit (`Prefix + Ctrl + g` or `lg` in terminal):
 
 | Key | Context | Action / Tool Executed | Description |
 |---|---|---|---|
-| **`a`** | `files` | **Antigravity (`agy`)** | Generates conventional commit message from staged changes |
+| **`<alt-a>`** | `files` | **Antigravity (`agy`)** | Generates conventional commit message from staged changes |
 | **`C`** | `files` | **Claude CLI (`claude`)** | Passes staged diff to Claude for bug/performance review |
 | **`X`** | `localBranches` | **OpenAI Codex (`codex`)** | Analyzes branch changes to explain architectural impact |
 | **`Q`** | `files` | **Qoder (`qodercli`)** | Passes staged diff into `qodercli` for automated code audit |

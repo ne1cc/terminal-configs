@@ -37,7 +37,7 @@ os:
 
 customCommands:
   # --- AI Commit Generator (Antigravity agy) ---
-  - key: 'a'
+  - key: '<alt-a>'
     description: 'Generate conventional commit message with Antigravity (agy)'
     command: 'agy -p "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
     context: 'files'
