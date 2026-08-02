@@ -301,14 +301,59 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 alias gis='git rev-parse --is-inside-work-tree'
 alias gc='git clone'
 alias lg='lazygit'
+alias gs='git status -sb'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gl='git log --oneline --graph --decorate -n 20'
+alias gaa='git add -A'
 
-# Alacritty — quick config reload (live-reload is automatic, but this forces a check)
-alias alacritty-config='${EDITOR:-nvim} ~/.config/alacritty/alacritty.toml'
+# Directory Navigation & Quick Jumps
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias mkdir='mkdir -p'
+
+# Data Engineering & Quick Inspection
+alias headcsv='head -n 20'
+alias tailcsv='tail -n 20'
+alias prettyjson='python3 -m json.tool'
+alias duck='duckdb'
+
+# Docker & Container Shortcuts
+alias d='docker'
+alias dc='docker compose'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlogs='docker logs -f --tail=100'
 
 # tmux shortcuts
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+
+# Developer & Data Project Scaffolding Utilities
+mkpy() {
+    local proj="${1:-my_python_project}"
+    mkdir -p "$proj"/{src/"$proj",tests,data/{raw,processed},notebooks,scripts}
+    touch "$proj"/{README.md,.env,.gitignore,requirements.txt,src/"$proj"/__init__.py,src/"$proj"/main.py,tests/__init__.py}
+    echo -e "python-version = \"3.11\"\n__pycache__/\n*.pyc\n.env\n.venv/\ndata/\n.pytest_cache/\n.ipynb_checkpoints/" > "$proj/.gitignore"
+    echo -e "# $proj\n\nGenerated Python/Data engineering project repository." > "$proj/README.md"
+    echo "print('Project $proj initialized successfully!')" > "$proj/src/$proj/main.py"
+    (cd "$proj" && git init >/dev/null 2>&1 && echo "✓ Initialized git repo in $proj")
+    echo "✓ Created Python project scaffold: $proj/"
+}
+
+mkts() {
+    local proj="${1:-my_ts_project}"
+    mkdir -p "$proj"/{src,tests,dist}
+    touch "$proj"/{README.md,.env,.gitignore,src/index.ts}
+    echo -e "node_modules/\ndist/\n.env\n*.log" > "$proj/.gitignore"
+    echo -e "# $proj\n\nGenerated TypeScript project repository." > "$proj/README.md"
+    echo "console.log('Project $proj initialized successfully!');" > "$proj/src/index.ts"
+    (cd "$proj" && git init >/dev/null 2>&1 && echo "✓ Initialized git repo in $proj")
+    echo "✓ Created TypeScript project scaffold: $proj/"
+}
 
 # ==============================================================================
 # 11. GIT POST-COMMIT AUDIT HOOK INSTALLER
