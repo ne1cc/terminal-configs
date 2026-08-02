@@ -18,6 +18,7 @@ ln -sf "$REPO_DIR/.zprofile" "$HOME/.zprofile"
 ln -sf "$REPO_DIR/.p10k.zsh" "$HOME/.p10k.zsh"
 ln -sf "$REPO_DIR/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$REPO_DIR/.gitconfig" "$HOME/.gitconfig"
+ln -sf "$REPO_DIR/.taskrc" "$HOME/.taskrc"
 
 echo "==> Linking ~/.config Folders..."
 ln -sfn "$REPO_DIR/.config/nvim" "$CONFIG_DIR/nvim"

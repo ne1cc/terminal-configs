@@ -527,6 +527,16 @@ if command -v eza >/dev/null; then
   alias tree='eza --tree --icons'
 fi
 
+# Taskwarrior Ergonomic Aliases
+if command -v task >/dev/null; then
+  alias t='task'
+  alias ta='task add'
+  alias tl='task list'
+  alias tn='task next'
+  alias tui='taskwarrior-tui'
+  alias tdev='task project:dev list'
+fi
+
 if command -v bat >/dev/null; then
   alias cat='bat --style=header,grid,snip --theme=ansi'
 fi

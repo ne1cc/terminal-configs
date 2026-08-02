@@ -49,6 +49,8 @@ brew "eza"
 brew "bat"
 brew "fd"
 brew "direnv"
+brew "task"
+brew "taskwarrior-tui"
 
 # From custom taps
 brew "antoniorodr/memo/memo"
