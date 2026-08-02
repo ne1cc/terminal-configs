@@ -86,8 +86,26 @@ customCommands:
     context: 'files'
     loadingText: 'Copying file contents...'
 
+  - key: '<ctrl-y>'
+    description: 'Copy full contents of selected file to clipboard'
+    command: 'cat {{.SelectedCommitFile.Name}} | pbcopy'
+    context: 'commitFiles'
+    loadingText: 'Copying file contents...'
+
   - key: '<alt-y>'
-    description: 'Copy diff patch of selected file to clipboard'
+    description: 'Copy unstaged diff patch of selected file'
     command: 'git diff {{.SelectedFile.Name}} | pbcopy'
     context: 'files'
     loadingText: 'Copying file diff...'
+
+  - key: '<alt-y>'
+    description: 'Copy staged/commit diff patch of selected file'
+    command: 'git diff --staged {{.SelectedFile.Name}} | pbcopy'
+    context: 'files'
+    loadingText: 'Copying staged file diff...'
+
+  - key: '<alt-y>'
+    description: 'Copy patch of commit file'
+    command: 'git show {{.SelectedLocalCommit.Hash}} -- {{.SelectedCommitFile.Name}} | pbcopy'
+    context: 'commitFiles'
+    loadingText: 'Copying commit file diff...'

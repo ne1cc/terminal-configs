@@ -149,8 +149,8 @@ Inside Lazygit (`Prefix + Ctrl + g` or `lg` in terminal):
 | **`Q`** | `files` | **Qoder (`qodercli`)** | Passes staged diff into `qodercli` for automated code audit |
 | **`N`** | `global` | **GitHub CLI (`gh`)** | Creates GitHub Pull Request (`gh pr create --fill`) |
 | **`O`** | `localBranches` | **GitHub CLI (`gh`)** | Checks out GitHub PR for selected branch (`gh pr checkout`) |
-| **`<ctrl-y>`** | `files` | **macOS Clipboard (`pbcopy`)** | Copies full contents of selected file to system clipboard |
-| **`<alt-y>`** | `files` | **macOS Clipboard (`pbcopy`)** | Copies git diff / patch of selected file to system clipboard |
+| **`<ctrl-y>`** | `files` / `commitFiles` | **macOS Clipboard (`pbcopy`)** | Copies full contents of selected file to system clipboard |
+| **`<alt-y>`** | `files` / `commitFiles` | **macOS Clipboard (`pbcopy`)** | Copies git diff / patch of selected file to system clipboard |
 | **`q`** | Global | Close Lazygit | Exit TUI and return to tmux / shell |
 
 ---
