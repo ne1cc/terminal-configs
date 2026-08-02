@@ -557,10 +557,13 @@ fi
 
 # Modern CLI Replacements Aliases
 if command -v eza >/dev/null; then
+  alias l='eza -la --icons --git-repos --group-directories-first'
   alias ls='eza --icons --git-repos --group-directories-first'
   alias ll='eza -l --icons --git-repos --group-directories-first'
   alias la='eza -la --icons --git-repos --group-directories-first'
   alias tree='eza --tree --icons'
+else
+  alias l='ls -lah'
 fi
 
 # Taskwarrior Ergonomic Aliases
