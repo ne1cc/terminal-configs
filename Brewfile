@@ -73,6 +73,7 @@ cask "ghostty"
 cask "linearmouse"
 cask "mark-text"
 cask "orbstack"
+cask "tableplus"
 
 # ------------------------------------------------------------------------------
 # VS Code / Cursor Extensions
