@@ -86,6 +86,12 @@ if [[ "$OSTYPE" != darwin* ]]; then
     fi
 fi
 
+# Copy last command output (stdout + stderr) to clipboard
+copylast() {
+    eval "$(fc -ln -1)" 2>&1 | pbcopy
+}
+
+
 # ==============================================================================
 # 8. REFACTORED ANTIGRAVITY AUDIT ENGINE WITH AUTOMATED POST-HOOKS
 # ==============================================================================
@@ -542,3 +548,5 @@ gshow() {
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
 export PATH="/usr/local/mysql/bin:$PATH"
+
+
