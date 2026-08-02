@@ -18,8 +18,8 @@ All tmux shortcuts require pressing the prefix `Ctrl + Space` first, unless desi
 | `Ctrl + \` | **(No Prefix)** | Jump to last-focused pane/split (passes through to Neovim) |
 | `Ctrl + Tab` | **(No Prefix)** | Cycle to next pane |
 | `Ctrl + Shift + Tab` | **(No Prefix)** | Cycle to previous pane |
-| `Shift + Left Arrow` | **(No Prefix)** | Switch to previous tmux window |
-| `Shift + Right Arrow` | **(No Prefix)** | Switch to next tmux window |
+| `Shift + Left Arrow` / `Ctrl + PageUp` | **(No Prefix)** | Switch to previous tmux window |
+| `Shift + Right Arrow` / `Ctrl + PageDown` | **(No Prefix)** | Switch to next tmux window |
 | `Prefix + \`` | Prefix | Jump to last active window |
 
 ### B. Splitting & Window Layout

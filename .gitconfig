@@ -10,6 +10,18 @@
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = !gh auth git-credential
+[core]
+	pager = delta
+
+[interactive]
+	singleKey = true
+
+[delta]
+	navigate = true
+	light = false
+	side-by-side = true
+	line-numbers = true
+
 [alias]
 	co = checkout
 	sw = switch
@@ -17,3 +29,4 @@
 	br = branch
 	st = status -sb
 	cm = commit -m
+

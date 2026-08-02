@@ -102,7 +102,6 @@ copylast() {
     local last_cmd
     last_cmd=$(fc -ln -1 2>/dev/null)
     if [[ -z "$last_cmd" ]]; then
-        # Fallback if history hasn't been read in subshell
         last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
     fi
 
@@ -113,6 +112,7 @@ copylast() {
         echo "Error: No previous command found in history."
     fi
 }
+
 
 # Cross-platform 'open' command: macOS has it natively, Linux uses xdg-open, WSL uses cmd.exe
 if [[ "$OSTYPE" != darwin* ]] && ! command -v open >/dev/null; then
@@ -576,6 +576,15 @@ fi
 if command -v bat >/dev/null; then
   alias cat='bat --style=header,grid,snip --theme=ansi'
 fi
+
+if command -v duf >/dev/null; then
+  alias df='duf'
+fi
+
+if command -v dust >/dev/null; then
+  alias du='dust'
+fi
+
 
 # gb: Interactive Git Branch Switcher with Log Preview
 unalias gb 2>/dev/null
