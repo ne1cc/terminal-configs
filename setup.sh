@@ -12,6 +12,23 @@ echo "=========================================="
 
 mkdir -p "$CONFIG_DIR"
 
+echo "==> Generating OS-Specific ~/.taskrc..."
+# Detect Taskwarrior theme path dynamically across macOS (ARM/Intel) & Linux
+THEME_PATH=""
+if [ -f "/opt/homebrew/share/doc/task/rc/dark-256.theme" ]; then
+  THEME_PATH="/opt/homebrew/share/doc/task/rc/dark-256.theme"
+elif [ -f "/usr/local/share/doc/task/rc/dark-256.theme" ]; then
+  THEME_PATH="/usr/local/share/doc/task/rc/dark-256.theme"
+elif [ -f "/usr/share/doc/task/rc/dark-256.theme" ]; then
+  THEME_PATH="/usr/share/doc/task/rc/dark-256.theme"
+fi
+
+if [ -n "$THEME_PATH" ]; then
+  sed "s|__THEME_PATH__|$THEME_PATH|g" "$REPO_DIR/.taskrc.template" > "$REPO_DIR/.taskrc"
+else
+  sed "/__THEME_PATH__/d" "$REPO_DIR/.taskrc.template" > "$REPO_DIR/.taskrc"
+fi
+
 echo "==> Linking Home Directory Dotfiles..."
 ln -sf "$REPO_DIR/.zshrc" "$HOME/.zshrc"
 ln -sf "$REPO_DIR/.zprofile" "$HOME/.zprofile"

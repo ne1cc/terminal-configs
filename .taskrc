@@ -1,10 +1,7 @@
 # ~/.taskrc - Cross-platform Taskwarrior Config
 
 # --- Visual Theme & Output ---
-# Theme detection logic across macOS Homebrew & Linux distribution paths
 include /opt/homebrew/share/doc/task/rc/dark-256.theme
-include /usr/share/doc/task/rc/dark-256.theme
-
 default.command=next                             # Running 'task' without args displays priority list
 column.padding=2                                 # Clean layout alignment
 
