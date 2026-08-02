@@ -38,6 +38,10 @@ export NVM_DIR="$HOME/.nvm"
 # 5. ENVIRONMENT & PATH
 # ==============================================================================
 
+# Default Editor: Neovim
+export EDITOR="nvim"
+export VISUAL="nvim"
+
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
 
@@ -90,7 +94,6 @@ fi
 copylast() {
     eval "$(fc -ln -1)" 2>&1 | pbcopy
 }
-
 
 # ==============================================================================
 # 8. REFACTORED ANTIGRAVITY AUDIT ENGINE WITH AUTOMATED POST-HOOKS
@@ -558,5 +561,3 @@ gshow() {
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
 export PATH="/usr/local/mysql/bin:$PATH"
-
-

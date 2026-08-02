@@ -147,7 +147,7 @@ Inside Lazygit (`Prefix + Ctrl + g` or `lg` in terminal):
 | **`C`** | `files` | **Claude CLI (`claude`)** | Passes staged diff to Claude for bug/performance review |
 | **`X`** | `localBranches` | **OpenAI Codex (`codex`)** | Analyzes branch changes to explain architectural impact |
 | **`Q`** | `files` | **Qoder (`qodercli`)** | Passes staged diff into `qodercli` for automated code audit |
-| **`P`** | `global` | **GitHub CLI (`gh`)** | Creates GitHub Pull Request (`gh pr create --fill`) |
+| **`N`** | `global` | **GitHub CLI (`gh`)** | Creates GitHub Pull Request (`gh pr create --fill`) |
 | **`O`** | `localBranches` | **GitHub CLI (`gh`)** | Checks out GitHub PR for selected branch (`gh pr checkout`) |
 | **`q`** | Global | Close Lazygit | Exit TUI and return to tmux / shell |
 

@@ -31,12 +31,15 @@ git:
 
 os:
   editCommand: 'nvim'
+  edit: 'nvim {{filename}}'
+  editAtLine: 'nvim +{{line}} {{filename}}'
+  editAtLineDIReg: 'nvim +{{line}} {{filename}}'
 
 customCommands:
   # --- AI Commit Generator (Antigravity agy) ---
   - key: 'a'
     description: 'Generate conventional commit message with Antigravity (agy)'
-    command: 'agy "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
+    command: 'agy -p "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
     context: 'files'
     output: terminal
 
@@ -47,7 +50,7 @@ customCommands:
     context: 'files'
     output: terminal
 
-  # --- AI Code Explanation (Codex CLI) ---
+  # --- AI Code Explanation (OpenAI Codex CLI) ---
   - key: 'X'
     description: 'Analyze commit or branch changes with OpenAI Codex'
     command: 'codex "Analyze the git changes on branch {{.SelectedLocalBranch.Name}} and explain the architecture impact."'
@@ -62,7 +65,7 @@ customCommands:
     output: terminal
 
   # --- GitHub CLI Integration ---
-  - key: 'P'
+  - key: 'N'
     description: 'Create GitHub Pull Request with gh --fill'
     command: 'gh pr create --fill'
     context: 'global'
