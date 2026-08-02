@@ -17,3 +17,4 @@ confirmation=no                                  # Disable prompt confirmations 
 urgency.due.coefficient=12.0
 urgency.project.coefficient=5.0
 urgency.user.tag.coefficient=3.0
+news.version=3.4.2
