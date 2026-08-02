@@ -92,7 +92,19 @@ fi
 
 # Copy last command output (stdout + stderr) to clipboard
 copylast() {
-    eval "$(fc -ln -1)" 2>&1 | pbcopy
+    local last_cmd
+    last_cmd=$(fc -ln -1 2>/dev/null)
+    if [[ -z "$last_cmd" ]]; then
+        # Fallback if history hasn't been read in subshell
+        last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
+    fi
+
+    if [[ -n "$last_cmd" ]]; then
+        eval "$last_cmd" 2>&1 | pbcopy
+        echo "Copied output of: '$last_cmd'"
+    else
+        echo "Error: No previous command found in history."
+    fi
 }
 
 # ==============================================================================
