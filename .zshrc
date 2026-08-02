@@ -17,7 +17,8 @@ fi
 export ZSH="$HOME/.oh-my-zsh"
 
 # Powerlevel10k — OMZ loads this from custom/themes/powerlevel10k/
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""
 
 # Disable auto-setting terminal title (tmux owns this)
 DISABLE_AUTO_TITLE="true"
@@ -26,18 +27,10 @@ plugins=(git)
 
 [[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
-# ==============================================================================
-# 3. NVM (Node Version Manager)
-# ==============================================================================
-export NVM_DIR="$HOME/.nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]]          && source "$NVM_DIR/nvm.sh"
-[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-
-# ==============================================================================
-# 4. POWERLEVEL10K CONFIG
-# ==============================================================================
-# OMZ loads the theme via ZSH_THEME above. This just loads your p10k settings.
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+# Starship Prompt Initialization
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
 
 # ==============================================================================
 # 5. ENVIRONMENT & PATH
