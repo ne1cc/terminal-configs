@@ -6,6 +6,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Detect WL (Windows Subsystem for Linux)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    export IS_WSL=1
+fi
+
 # ==============================================================================
 # 2. OH MY ZSH INITIALIZATION & CONFIGURATION
 # ==============================================================================
@@ -70,10 +75,9 @@ rename-pane() {
 
 # Auto-attach or create a persistent 'main' tmux session when launching
 # Alacritty directly (mirrors Ghostty's command = tmux new-session -A -s main).
-# Uncomment to enable:
-# if [[ -z "$TMUX" ]] && command -v tmux >/dev/null; then
-#     exec tmux new-session -A -s main
-# fi
+if [[ -z "$TMUX" ]] && command -v tmux >/dev/null; then
+    exec tmux new-session -A -s main
+fi
 
 # ==============================================================================
 # 7. CLIPBOARD COMPATIBILITY (Linux xclip / macOS pbcopy shim)
@@ -87,6 +91,9 @@ if [[ "$OSTYPE" != darwin* ]]; then
     elif command -v xsel >/dev/null; then
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
+    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null; then
+        alias pbcopy='clip.exe'
+        alias pbpaste='powershell.exe -NoProfile -Command "Get-Clipboard"'
     fi
 fi
 
@@ -95,7 +102,6 @@ copylast() {
     local last_cmd
     last_cmd=$(fc -ln -1 2>/dev/null)
     if [[ -z "$last_cmd" ]]; then
-        # Fallback if history hasn't been read in subshell
         last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
     fi
 
@@ -106,6 +112,21 @@ copylast() {
         echo "Error: No previous command found in history."
     fi
 }
+
+
+# Cross-platform 'open' command: macOS has it natively, Linux uses xdg-open, WSL uses cmd.exe
+if [[ "$OSTYPE" != darwin* ]] && ! command -v open >/dev/null; then
+    open() {
+        if command -v xdg-open >/dev/null; then
+            xdg-open "$@" &>/dev/null &
+        elif [[ -n "${IS_WSL:-}" ]] && command -v cmd.exe >/dev/null; then
+            cmd.exe /c start "" "$@" &>/dev/null &
+        else
+            echo "open: no handler found for $1" >&2
+            return 1
+        fi
+    }
+fi
 
 # ==============================================================================
 # 8. REFACTORED ANTIGRAVITY AUDIT ENGINE WITH AUTOMATED POST-HOOKS
@@ -280,14 +301,59 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 alias gis='git rev-parse --is-inside-work-tree'
 alias gc='git clone'
 alias lg='lazygit'
+alias gs='git status -sb'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gl='git log --oneline --graph --decorate -n 20'
+alias gaa='git add -A'
 
-# Alacritty — quick config reload (live-reload is automatic, but this forces a check)
-alias alacritty-config='${EDITOR:-nvim} ~/.config/alacritty/alacritty.toml'
+# Directory Navigation & Quick Jumps
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias mkdir='mkdir -p'
+
+# Data Engineering & Quick Inspection
+alias headcsv='head -n 20'
+alias tailcsv='tail -n 20'
+alias prettyjson='python3 -m json.tool'
+alias duck='duckdb'
+
+# Docker & Container Shortcuts
+alias d='docker'
+alias dc='docker compose'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlogs='docker logs -f --tail=100'
 
 # tmux shortcuts
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+
+# Developer & Data Project Scaffolding Utilities
+mkpy() {
+    local proj="${1:-my_python_project}"
+    mkdir -p "$proj"/{src/"$proj",tests,data/{raw,processed},notebooks,scripts}
+    touch "$proj"/{README.md,.env,.gitignore,requirements.txt,src/"$proj"/__init__.py,src/"$proj"/main.py,tests/__init__.py}
+    echo -e "python-version = \"3.11\"\n__pycache__/\n*.pyc\n.env\n.venv/\ndata/\n.pytest_cache/\n.ipynb_checkpoints/" > "$proj/.gitignore"
+    echo -e "# $proj\n\nGenerated Python/Data engineering project repository." > "$proj/README.md"
+    echo "print('Project $proj initialized successfully!')" > "$proj/src/$proj/main.py"
+    (cd "$proj" && git init >/dev/null 2>&1 && echo "✓ Initialized git repo in $proj")
+    echo "✓ Created Python project scaffold: $proj/"
+}
+
+mkts() {
+    local proj="${1:-my_ts_project}"
+    mkdir -p "$proj"/{src,tests,dist}
+    touch "$proj"/{README.md,.env,.gitignore,src/index.ts}
+    echo -e "node_modules/\ndist/\n.env\n*.log" > "$proj/.gitignore"
+    echo -e "# $proj\n\nGenerated TypeScript project repository." > "$proj/README.md"
+    echo "console.log('Project $proj initialized successfully!');" > "$proj/src/index.ts"
+    (cd "$proj" && git init >/dev/null 2>&1 && echo "✓ Initialized git repo in $proj")
+    echo "✓ Created TypeScript project scaffold: $proj/"
+}
 
 # ==============================================================================
 # 11. GIT POST-COMMIT AUDIT HOOK INSTALLER
@@ -536,10 +602,13 @@ fi
 
 # Modern CLI Replacements Aliases
 if command -v eza >/dev/null; then
+  alias l='eza -la --icons --git-repos --group-directories-first'
   alias ls='eza --icons --git-repos --group-directories-first'
   alias ll='eza -l --icons --git-repos --group-directories-first'
   alias la='eza -la --icons --git-repos --group-directories-first'
   alias tree='eza --tree --icons'
+else
+  alias l='ls -lah'
 fi
 
 # Taskwarrior Ergonomic Aliases
@@ -555,6 +624,15 @@ fi
 if command -v bat >/dev/null; then
   alias cat='bat --style=header,grid,snip --theme=ansi'
 fi
+
+if command -v duf >/dev/null; then
+  alias df='duf'
+fi
+
+if command -v dust >/dev/null; then
+  alias du='dust'
+fi
+
 
 # gb: Interactive Git Branch Switcher with Log Preview
 unalias gb 2>/dev/null
@@ -572,4 +650,15 @@ gshow() {
       --header "Enter to view commit details" \
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
-export PATH="/usr/local/mysql/bin:$PATH"
+[[ -d "/usr/local/mysql/bin" ]] && export PATH="/usr/local/mysql/bin:$PATH"
+
+# ==============================================================================
+# KEYBINDINGS
+# ==============================================================================
+# Map standard emacs keys explicitly alongside vi mode shortcuts
+bindkey '^A' beginning-of-line
+bindkey '^K' kill-line
+bindkey '^E' end-of-line
+bindkey '\ek' kill-line
+bindkey '^[k' kill-line
+

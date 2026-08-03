@@ -6,5 +6,27 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[credential]
-	helper = osxkeychain
+[credential "https://github.com"]
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !gh auth git-credential
+[core]
+	pager = delta
+
+[interactive]
+	singleKey = true
+
+[delta]
+	navigate = true
+	light = false
+	side-by-side = true
+	line-numbers = true
+
+[alias]
+	co = checkout
+	sw = switch
+	rs = restore
+	br = branch
+	st = status -sb
+	cm = commit -m
+

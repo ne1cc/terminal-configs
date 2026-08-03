@@ -57,6 +57,9 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + D` | Detach all other clients connected to the current session | Active Session |
 | `Prefix + W` | Open high-information interactive tree (process, PID, activity) | Tmux Server |
 | `Prefix + r` | **Reload `.tmux.conf` configuration file** + display toast | Tmux Server |
+| `Prefix + Alt + a` | Break the active pane into its own tmux session and open it in **Alacritty** | Active Pane |
+| `Prefix + Alt + g` | Break the active pane into its own tmux session and open it in **Ghostty** | Active Pane |
+| `Prefix + @` | Break current window into a new tmux session in a new **Ghostty** window | Active Window |
 
 ### Copy Mode (vi-mode)
 

@@ -1,5 +1,6 @@
 ^install\.sh$
 ^Brewfile$
+^Brewfile\.linux$
 ^README\.md$
 ^CHANGELOG\.md$
 ^SHORTCUTS\.md$

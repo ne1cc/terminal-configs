@@ -2,7 +2,10 @@
 # ==============================================================================
 # install.sh — re-link dotfiles on this machine using GNU Stow
 #
-# For first-time setup on a new machine, use bin/mac-bootstrap.sh instead.
+# For first-time setup on a new machine, use the appropriate bootstrap script:
+#   macOS:  bin/mac-bootstrap.sh
+#   Linux:  bin/linux-bootstrap.sh
+#   WSL:    bin/wsl-bootstrap.sh
 # ==============================================================================
 
 set -e

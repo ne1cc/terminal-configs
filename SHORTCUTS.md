@@ -18,8 +18,8 @@ All tmux shortcuts require pressing the prefix `Ctrl + Space` first, unless desi
 | `Ctrl + \` | **(No Prefix)** | Jump to last-focused pane/split (passes through to Neovim) |
 | `Ctrl + Tab` | **(No Prefix)** | Cycle to next pane |
 | `Ctrl + Shift + Tab` | **(No Prefix)** | Cycle to previous pane |
-| `Shift + Left Arrow` | **(No Prefix)** | Switch to previous tmux window |
-| `Shift + Right Arrow` | **(No Prefix)** | Switch to next tmux window |
+| `Shift + Left Arrow` / `Ctrl + PageUp` | **(No Prefix)** | Switch to previous tmux window |
+| `Shift + Right Arrow` / `Ctrl + PageDown` | **(No Prefix)** | Switch to next tmux window |
 | `Prefix + \`` | Prefix | Jump to last active window |
 
 ### B. Splitting & Window Layout
@@ -55,6 +55,9 @@ All tmux shortcuts require pressing the prefix `Ctrl + Space` first, unless desi
 | `Prefix + y` | Prefix | Toggle pane synchronization (send keys to all panes) |
 | `Prefix + Shift + B` | Prefix | Break active pane out into its own new window |
 | `Prefix + Alt + Shift + B` | Prefix | Break active pane into a **background window** (`M-B`) |
+| `Prefix + Alt + a` | Prefix | Break active pane into a new session in **Alacritty** (`M-a`) |
+| `Prefix + Alt + g` | Prefix | Break active pane into a new session in **Ghostty** (`M-g`) |
+| `Prefix + @` | Prefix | **Break current window out into a new Ghostty process & session** |
 | `Prefix + Alt + b` | Prefix | Promote all other panes in window to background windows (`M-b`) |
 | `Prefix + Alt + j` | Prefix | Pull all panes from another window into this one (`M-j`) |
 | `Prefix + Alt + m` | Prefix | Push all panes from this window to another window (`M-m`) |

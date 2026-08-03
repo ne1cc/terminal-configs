@@ -1,1 +1,8 @@
-../../Github/2026/terminal-configs/.config/ghostty/config
+# Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
+keybind = ctrl+tab=text:\x1b[27;5;9~
+keybind = ctrl+shift+tab=text:\x1b[27;6;9~
+
+# Map preferred keys to Ghostty's native tab actions (Show Next Tab / Show Previous Tab)
+keybind = super+shift+]=next_tab
+keybind = super+shift+[=previous_tab
+
