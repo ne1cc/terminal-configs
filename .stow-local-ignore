@@ -13,3 +13,4 @@
 ^\.claude$
 ^\.tmux$
 nvim
+bin
