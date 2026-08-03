@@ -17,32 +17,7 @@ Usage: ./setup.sh [--install-packages] [--skip-plugins] [--dry-run]
 Links the portable terminal configuration into $HOME. Existing files are moved
 to ~/.terminal-configs-backups/<timestamp> before they are replaced.
 
-<<<<<<< Updated upstream
-echo "==> Generating OS-Specific ~/.taskrc..."
-# Detect Taskwarrior theme path dynamically across macOS (ARM/Intel) & Linux
-THEME_PATH=""
-if [ -f "/opt/homebrew/share/doc/task/rc/dark-256.theme" ]; then
-  THEME_PATH="/opt/homebrew/share/doc/task/rc/dark-256.theme"
-elif [ -f "/usr/local/share/doc/task/rc/dark-256.theme" ]; then
-  THEME_PATH="/usr/local/share/doc/task/rc/dark-256.theme"
-elif [ -f "/usr/share/doc/task/rc/dark-256.theme" ]; then
-  THEME_PATH="/usr/share/doc/task/rc/dark-256.theme"
-fi
-
-if [ -n "$THEME_PATH" ]; then
-  sed "s|__THEME_PATH__|$THEME_PATH|g" "$REPO_DIR/.taskrc.template" > "$REPO_DIR/.taskrc"
-else
-  sed "/__THEME_PATH__/d" "$REPO_DIR/.taskrc.template" > "$REPO_DIR/.taskrc"
-fi
-
-echo "==> Linking Home Directory Dotfiles..."
-ln -sf "$REPO_DIR/.zshrc" "$HOME/.zshrc"
-ln -sf "$REPO_DIR/.zprofile" "$HOME/.zprofile"
-ln -sf "$REPO_DIR/.p10k.zsh" "$HOME/.p10k.zsh"
-ln -sf "$REPO_DIR/.tmux.conf" "$HOME/.tmux.conf"
-ln -sf "$REPO_DIR/.gitconfig" "$HOME/.gitconfig"
-ln -sf "$REPO_DIR/.taskrc" "$HOME/.taskrc"
-=======
+Options:
   --install-packages  Run brew bundle with the platform's Brewfile.
   --skip-plugins      Do not install TPM or sync Neovim plugins.
   --dry-run           Print planned changes without modifying the machine.
