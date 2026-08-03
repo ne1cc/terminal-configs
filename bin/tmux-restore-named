@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+mkdir -p ~/.tmux/resurrect
+files=$(ls -t ~/.tmux/resurrect/*.txt 2>/dev/null)
+
+if [[ -z "$files" ]]; then
+    echo "No snapshots found in ~/.tmux/resurrect/"
+    read -rp "Press Enter to exit..."
+    exit 0
+fi
+
+file=$(echo "$files" | fzf --reverse --header "Select Snapshot to Restore" --prompt "Restore > ")
+
+if [[ -n "$file" ]]; then
+    cp "$file" ~/.tmux/resurrect/last
+    ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh
+    tmux display-message "✓ Restored snapshot: $(basename "$file")"
+fi
