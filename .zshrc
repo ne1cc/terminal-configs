@@ -594,6 +594,8 @@ if command -v fzf >/dev/null; then
 fi
 
 # Modern CLI Replacements Aliases
+alias venv='uv venv && source .venv/bin/activate'
+
 if command -v eza >/dev/null; then
   alias l='eza -la --icons --git-repos --group-directories-first'
   alias ls='eza --icons --git-repos --group-directories-first'
@@ -655,3 +657,6 @@ bindkey '^E' end-of-line
 bindkey '\ek' kill-line
 bindkey '^[k' kill-line
 
+export PATH="$(npm prefix -g)/bin:$PATH"
+export PATH="$HOME/.claude/bin:$PATH"
+export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"

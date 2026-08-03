@@ -109,3 +109,16 @@ customCommands:
     command: 'git show {{.SelectedLocalCommit.Hash}} -- {{.SelectedCommitFile.Name}} | pbcopy'
     context: 'commitFiles'
     loadingText: 'Copying commit file diff...'
+
+  # --- Drop Commit Custom Command ---
+  - key: 'd'
+    context: 'commits'
+    command: 'git reset --hard {{.SelectedLocalCommit.Hash}}^'
+    description: 'Drop selected local commit (hard reset to parent)'
+    loadingText: 'Dropping commit...'
+    prompts:
+      - type: 'confirm'
+        title: 'Drop Local Commit'
+        body: 'PERMANENTLY drop local commit {{.SelectedLocalCommit.Hash}}?'
+
+
