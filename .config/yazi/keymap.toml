@@ -1,0 +1,26 @@
+[manager]
+keymap = [
+	# Navigation with Neovim / Vim keys
+	{ on = [ "k" ], run = "arrow -1", desc = "Move cursor up" },
+	{ on = [ "j" ], run = "arrow 1",  desc = "Move cursor down" },
+	{ on = [ "h" ], run = "leave",    desc = "Go back to parent directory" },
+	{ on = [ "l" ], run = "enter",    desc = "Enter child directory or open file" },
+
+	{ on = [ "g", "g" ], run = "arrow -99999999", desc = "Move to top" },
+	{ on = [ "G" ],      run = "arrow 99999999",  desc = "Move to bottom" },
+
+	{ on = [ "<C-u>" ], run = "arrow -50%", desc = "Move up half page" },
+	{ on = [ "<C-d>" ], run = "arrow 50%",  desc = "Move down half page" },
+	{ on = [ "<C-b>" ], run = "arrow -100%", desc = "Move up full page" },
+	{ on = [ "<C-f>" ], run = "arrow 100%",  desc = "Move down full page" },
+
+	# Searching / Filtering
+	{ on = [ "/" ], run = "filter --smart", desc = "Filter files" },
+	{ on = [ "s" ], run = "search fd",       desc = "Search via fd" },
+
+	# Selection / Visual Mode
+	{ on = [ "v" ], run = "visual_mode", desc = "Toggle visual selection mode" },
+
+	# Quit
+	{ on = [ "q" ], run = "quit", desc = "Exit Yazi" },
+]

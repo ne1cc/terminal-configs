@@ -1,0 +1,23 @@
+[manager]
+ratio = [ 1, 2, 4 ]
+sort_by = "alphabetical"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
+show_hidden = false
+show_symlink = true
+
+[preview]
+tab_size = 2
+max_width = 1000
+max_height = 1000
+image_filter = "triangle"
+image_quality = 75
+
+[opener]
+edit = [
+	{ run = '${EDITOR:-nvim} "$@"', desc = "Edit", block = true, for = "unix" },
+]
+open = [
+	{ run = 'open "$@"', desc = "Open", for = "macos" },
+]

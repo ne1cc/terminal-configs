@@ -593,12 +593,22 @@ if command -v direnv >/dev/null; then
 fi
 
 # FZF Shell Integration & Patched Command Defaults
-if command -v fzf >/dev/null; then
-  source <(fzf --zsh)
+if command -v fzf >/dev/null 2>&1; then
+  eval "$(fzf --zsh)"
   export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --inline-info"
-  if command -v fd >/dev/null; then
+  if command -v fd >/dev/null 2>&1; then
     export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND='fd --type d --strip-cwd-prefix --hidden --follow --exclude .git'
+
+    # Use fd inside the ** completion popup
+    _fzf_compgen_path() {
+      fd --hidden --follow --exclude ".git" . "$1"
+    }
+
+    _fzf_compgen_dir() {
+      fd --type d --hidden --follow --exclude ".git" . "$1"
+    }
   fi
 fi
 
