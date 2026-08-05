@@ -17,17 +17,24 @@ tab_size = 2
 # many pixels a preview may use, so anything lower shrinks images on this screen.
 max_width     = 6400
 max_height    = 3600
-# Rendering at full pane size costs ~1.3s per image, so debounce harder than the
-# 30ms default — holding j/k no longer spawns ImageMagick for every file skipped.
-# 100 is the maximum Yazi accepts.
-image_delay   = 100
+image_delay   = 30
+# "triangle" (bilinear) is the cheapest filter that still looks smooth when
+# scaling up, which is the direction we now scale most often.
 image_filter  = "triangle"
 image_quality = 80
 
 # Yazi's built-in image previewer only downscales, so images smaller than the
 # pane render at native size. fill-preview scales them up to fill it instead.
+# Scoped to the formats Yazi decodes natively — avif/heic/jxl and svg keep their
+# own previewers, which the `image/*` catch-all below would otherwise shadow.
 [[plugin.prepend_previewers]]
-mime = "image/*"
+mime = "image/{jpeg,png,gif,webp,bmp,tiff}"
+run  = "fill-preview"
+
+# The matching preloader is what makes it feel instant: the upscale runs ahead of
+# the cursor, so hovering a file is usually just a cache read.
+[[plugin.prepend_preloaders]]
+mime = "image/{jpeg,png,gif,webp,bmp,tiff}"
 run  = "fill-preview"
 
 [opener]

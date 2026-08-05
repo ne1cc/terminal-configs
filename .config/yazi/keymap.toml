@@ -77,15 +77,4 @@ on = "M"
 run = "plugin toggle-pane reset"
 desc = "Reset panes to the configured ratio"
 
-# --- Image size inside the preview (needs ImageMagick) ---
-# Images already fill the pane by default; these only shrink and restore.
-
-[[mgr.prepend_keymap]]
-on = "+"
-run = "plugin fill-preview 1"
-desc = "Grow the hovered image back toward pane size"
-
-[[mgr.prepend_keymap]]
-on = "-"
-run = "plugin fill-preview -1"
-desc = "Shrink the hovered image"
+# Images always fill the preview pane, so there are no zoom keys to bind.

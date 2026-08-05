@@ -1,17 +1,23 @@
 --- @since 26.1.22
 ---
---- Always render image previews at the full size of the preview pane.
+--- Render every image preview at the full size of the preview pane.
 ---
---- Yazi's built-in image previewer only ever downscales, so an image smaller
---- than the pane is drawn at its native size. This previewer uses the pane
---- itself as the base size and lets ImageMagick scale up to meet it, so every
---- photo fills the available area.
+--- Yazi's built-in image previewer only ever downscales (yazi-adapter/src/image.rs,
+--- `Image::downscale`), so an image smaller than the pane is drawn at its native
+--- size. This previewer scales those up to meet the pane instead.
 ---
---- Adapted from yazi-rs/plugins:zoom (MIT). Level 0 = fill the pane, negative
---- levels shrink it in 10% steps; there is nothing above 0 because 0 is
---- already as large as the pane can show.
+--- Speed matters more than cleverness here, so it does as little as possible:
+---
+---   * If the image is already at least as large as the pane, Yazi's own fit
+---     already fills it. Delegate straight to the built-in previewer — that path
+---     is Rust, needs no subprocess, and is backed by Yazi's own precache.
+---   * Otherwise the upscaled copy is written into Yazi's preview cache and the
+---     matching preloader builds it ahead of the cursor, so by the time you hover
+---     a file the work is usually already done and the preview is just a read.
+---
+--- Adapted from yazi-rs/plugins:zoom (MIT).
 
-local MIN_LEVEL, MAX_LEVEL = -9, 0
+local M = {}
 
 -- Yazi's `preview.image_filter` names mapped onto ImageMagick's.
 local FILTERS = {
@@ -22,134 +28,104 @@ local FILTERS = {
 	lanczos3 = "Lanczos",
 }
 
-local get = ya.sync(function(st, url) return st.last == url and st.level end)
-
-local save = ya.sync(function(st, url, new)
-	local h = cx.active.current.hovered
-	if h and h.url == url then
-		st.last, st.level = url, new
-		return true
-	end
+-- Only plain values survive the sync boundary, so unpack the Rect into a table
+-- rather than handing back the userdata itself.
+local preview_area = ya.sync(function()
+	local a = ui.area("preview")
+	return { w = a.w, h = a.h }
 end)
-
-local lock = ya.sync(function(st, url, old, new)
-	if st.last == url and st.level == old then
-		st.level = new
-		return true
-	end
-end)
-
-local move = ya.sync(function(st)
-	local h = cx.active.current.hovered
-	if not h then
-		return
-	end
-
-	if st.last ~= h.url then
-		st.last, st.level = Url(h.url), 0
-	end
-
-	return { url = h.url, level = st.level }
-end)
-
--- Records the newest temp file and hands back the one it replaced.
-local sweep = ya.sync(function(st, tmp)
-	local old = st.tmp
-	st.tmp = tmp
-	return old
-end)
-
-local function end_(job, err)
-	if not job.old_level then
-		ya.preview_widget(job, err and ui.Text(err):area(job.area):wrap(ui.Wrap.YES))
-	elseif err then
-		ya.notify { title = "Fill preview", content = tostring(err), timeout = 5, level = "error" }
-	end
-end
 
 -- Pixel size of the preview pane, capped by `preview.max_width`/`max_height`.
+-- Those caps are why images looked small before: they bound the whole pipeline,
+-- so they have to be at least as large as the pane in physical pixels.
 local function canvas(area)
 	local cw, ch = rt.term.cell_size()
-	if not cw then
+	if not cw or not area then
 		return rt.preview.max_width, rt.preview.max_height
 	end
 
-	return math.min(rt.preview.max_width, math.floor(area.w * cw)),
-		math.min(rt.preview.max_height, math.floor(area.h * ch))
+	return math.max(1, math.min(rt.preview.max_width, math.floor(area.w * cw))),
+		math.max(1, math.min(rt.preview.max_height, math.floor(area.h * ch)))
 end
 
-local function peek(_, job)
-	local url = job.file.url
-	local info, err = ya.image_info(url)
-	if not info then
-		return end_(job, Err("Failed to get image info: %s", err))
-	end
+-- Cache slot for this file at this pane width. Keying on the width means a
+-- resized pane re-renders instead of showing a stale, wrongly-sized copy.
+local function cache_of(job, w) return ya.file_cache { file = job.file, skip = w } end
 
-	local level =
-		ya.clamp(MIN_LEVEL, job.new_level or get(Url(url)) or tonumber(job.args[1]) or 0, MAX_LEVEL)
-	local sync = function()
-		if job.old_level then
-			return lock(url, job.old_level, level)
-		else
-			return save(url, level)
-		end
-	end
-
-	-- The pane is the base size, not the image, so smaller images scale *up*.
-	local max_w, max_h = canvas(job.area)
-	local new_w = math.max(1, math.floor(max_w * (1 + level * 0.1)))
-	local new_h = math.max(1, math.floor(max_h * (1 + level * 0.1)))
-
-	local tmp = os.tmpname()
-	-- WEBP keeps alpha (JPEG would black out transparent screenshots) and
-	-- `method=0` is its fastest encoder, which matters at these sizes.
+local function upscale(src, dest, w, h)
+	-- WEBP keeps alpha, which JPEG would flatten to black on transparent
+	-- screenshots, and `method=0` is its fastest encoder — worth a lot at these
+	-- pixel counts.
 	-- stylua: ignore
 	local output, err = Command("magick"):arg {
-		tostring(job.file.path),
+		tostring(src),
 		"-auto-orient", "-strip",
 		"-filter", FILTERS[rt.preview.image_filter] or "Triangle",
-		"-resize", string.format("%dx%d", new_w, new_h),
+		"-resize", string.format("%dx%d", w, h),
 		"-quality", rt.preview.image_quality,
 		"-define", "webp:method=0",
-		string.format("WEBP:%s", tmp),
+		string.format("WEBP:%s", dest),
 	}:output()
 
-	-- Every hover writes a temp file, so drop the *previous* one now that it is
-	-- no longer on screen. Sweeping the previous rather than the current file
-	-- keeps whatever is being displayed on disk, whichever adapter is in use.
-	local stale = sweep(tmp)
-	if stale then
-		fs.remove("file", Url(stale))
-	end
-
 	if not output then
-		end_(job, Err("Failed to start `magick`, error: %s", err))
+		return Err("Failed to start `magick`: %s", err)
 	elseif not output.status.success then
-		end_(job, Err("`magick` exited with error code %s: %s", output.status.code, output.stderr))
-	elseif sync() then
-		ya.image_show(Url(tmp), job.area)
-	end
-	end_(job)
-end
-
-local function entry(self, job)
-	local st = move()
-	if not st then
-		return
-	end
-
-	local motion = tonumber(job.args[1]) or 0
-	local new = ya.clamp(MIN_LEVEL, st.level + motion, MAX_LEVEL)
-	if new ~= st.level then
-		peek(self, {
-			area = ui.area("preview"),
-			args = {},
-			file = File { url = st.url, cha = Cha { mode = tonumber("100644", 8) } },
-			skip = 0,
-			new_level = new,
-			old_level = st.level,
-		})
+		return Err("`magick` exited with code %s: %s", output.status.code, output.stderr)
 	end
 end
 
-return { peek = peek, entry = entry }
+function M:peek(job)
+	local info = ya.image_info(job.file.url)
+	if not info then
+		return require("image"):peek(job)
+	end
+
+	local w, h = canvas(job.area)
+	local cache = cache_of(job, w)
+
+	-- Already big enough for Yazi to fill the pane on its own, or nowhere to
+	-- cache an upscale: nothing here beats the built-in path.
+	if info.w >= w or info.h >= h or not cache then
+		return require("image"):peek(job)
+	end
+
+	if not fs.cha(cache) then
+		local start = os.clock()
+		local err = upscale(job.file.url, cache, w, h)
+		if err then
+			return ya.preview_widget(job, ui.Text(tostring(err)):area(job.area):wrap(ui.Wrap.YES))
+		end
+		-- Only debounce when work actually happened, so cache hits stay instant.
+		ya.sleep(math.max(0, rt.preview.image_delay / 1000 + start - os.clock()))
+	end
+
+	local _, err = ya.image_show(cache, job.area)
+	ya.preview_widget(job, err)
+end
+
+function M:seek() end
+
+-- Build the upscaled copy ahead of the cursor. This is what makes hovering feel
+-- instant: the ImageMagick pass happens while you're still on another file.
+function M:preload(job)
+	local info = ya.image_info(job.file.url)
+	if not info then
+		return require("image"):preload(job)
+	end
+
+	local w, h = canvas(preview_area())
+	local cache = cache_of(job, w)
+	if info.w >= w or info.h >= h or not cache then
+		return require("image"):preload(job)
+	elseif fs.cha(cache) then
+		return true
+	end
+
+	return upscale(job.file.url, cache, w, h) == nil
+end
+
+function M:spot(job) return require("image"):spot(job) end
+
+function M:spot_base(job) return require("image"):spot_base(job) end
+
+return M
