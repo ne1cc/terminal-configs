@@ -56,8 +56,8 @@ open = [
 	{ run = 'open %s', desc = "Open", for = "macos" },
 ]
 play-in-terminal = [
-    { run = 'mpv --vo=t t "$1"', block = true, desc = "Play in terminal (CACA ASCII)" },
-    { run = 'mpv --vo=kitty "$1"', block = true, desc = "Play in terminal (Kitty graphics)" }
+    { run = 'mpv --vo=t t %s', block = true, desc = "Play in terminal (CACA ASCII)" },
+    { run = 'mpv --vo=kitty %s', block = true, desc = "Play in terminal (Kitty graphics)" }
 ]
 
 [open]

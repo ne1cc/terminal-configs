@@ -72,10 +72,17 @@ on = "e"
 run = "plugin toggle-pane min-preview"
 desc = "Show or hide the preview pane"
 
+# --- Open menu & Interactive Opener ---
+
 [[mgr.prepend_keymap]]
-on = "M"
-run = "plugin toggle-pane reset"
-desc = "Reset panes to the configured ratio"
+on   = "<C-o>"
+run  = "open --interactive"
+desc = "Open selection with interactive menu"
+
+[[mgr.prepend_keymap]]
+on   = "o"
+run  = "open --interactive"
+desc = "Open selection with interactive menu"
 
 # Images always fill the preview pane, so there are no zoom keys to bind.
 
