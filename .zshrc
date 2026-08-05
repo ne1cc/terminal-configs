@@ -292,7 +292,16 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 
 # Quick access
 alias lg="lazygit"
-alias y="yazi"
+
+# Yazi shell wrapper (changes terminal PWD on exit)
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
 
 # Open lazygit for a specific repo
 alias lgd="lazygit --path ~/dotfiles"

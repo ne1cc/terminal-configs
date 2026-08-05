@@ -106,7 +106,7 @@ for dotfile in .zshrc .zprofile .p10k.zsh .tmux.conf .gitconfig .taskrc; do
   [[ -f "$REPO_DIR/$dotfile" ]] && link_path "$REPO_DIR/$dotfile" "$HOME/$dotfile"
 done
 
-for config in nvim ghostty alacritty lazygit yazi; do
+for config in nvim ghostty alacritty lazygit yazi starship.toml; do
   link_path "$REPO_DIR/.config/$config" "$CONFIG_DIR/$config"
 done
 

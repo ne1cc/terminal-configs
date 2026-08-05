@@ -11,13 +11,13 @@ return {
   },
   opts = {
     winopts = {
-      height = 0.85,
-      width = 0.80,
-      row = 0.35,
+      height = 0.95,
+      width = 0.95,
+      row = 0.50,
       col = 0.50,
       preview = {
         layout = "flex",
-        horizontal = "right:50%",
+        horizontal = "right:70%",
       },
     },
     keymap = {

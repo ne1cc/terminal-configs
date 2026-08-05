@@ -1,23 +1,39 @@
-[manager]
-ratio = [ 1, 2, 4 ]
-sort_by = "alphabetical"
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+[mgr]
+# parent hidden, file list just wide enough for names, preview gets the rest
+ratio          = [ 0, 1, 4 ]
+sort_by        = "alphabetical"
 sort_sensitive = false
-sort_reverse = false
+sort_reverse   = false
 sort_dir_first = true
-show_hidden = false
-show_symlink = true
+show_hidden    = false
+show_symlink   = true
+scrolloff      = 5
 
 [preview]
 tab_size = 2
-max_width = 1000
-max_height = 1000
-image_filter = "triangle"
-image_quality = 75
+# Your framebuffer is 6400x3600 (3200x1800 @2x). These are a hard ceiling on how
+# many pixels a preview may use, so anything lower shrinks images on this screen.
+max_width     = 6400
+max_height    = 3600
+# Rendering at full pane size costs ~1.3s per image, so debounce harder than the
+# 30ms default — holding j/k no longer spawns ImageMagick for every file skipped.
+# 100 is the maximum Yazi accepts.
+image_delay   = 100
+image_filter  = "triangle"
+image_quality = 80
+
+# Yazi's built-in image previewer only downscales, so images smaller than the
+# pane render at native size. fill-preview scales them up to fill it instead.
+[[plugin.prepend_previewers]]
+mime = "image/*"
+run  = "fill-preview"
 
 [opener]
 edit = [
-	{ run = '${EDITOR:-nvim} "$@"', desc = "Edit", block = true, for = "unix" },
+	{ run = '${EDITOR:-nvim} %s', desc = "Edit", block = true, for = "unix" },
 ]
 open = [
-	{ run = 'open "$@"', desc = "Open", for = "macos" },
+	{ run = 'open %s', desc = "Open", for = "macos" },
 ]

@@ -57,3 +57,23 @@ if vim.fn.isdirectory("/opt/homebrew/opt/fzf") == 1 then
   vim.opt.rtp:append("/opt/homebrew/opt/fzf")
 end
 
+-- Keymap to toggle buffer modifiable state (fixes "cannot make changes modifiable is off")
+vim.keymap.set("n", "<leader>um", function()
+  vim.bo.modifiable = not vim.bo.modifiable
+  vim.notify("Buffer modifiable: " .. tostring(vim.bo.modifiable), vim.log.levels.INFO)
+end, { desc = "Toggle Buffer Modifiable" })
+
+-- Image Gallery Buffer Navigation (j/k or ]i/[i to cycle next/prev image in folder)
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = { "*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.svg" },
+  callback = function()
+    local opts = { buffer = true, silent = true }
+    vim.keymap.set("n", "j", ":bnext<CR>", opts)
+    vim.keymap.set("n", "]i", ":bnext<CR>", opts)
+    vim.keymap.set("n", "k", ":bprevious<CR>", opts)
+    vim.keymap.set("n", "[i", ":bprevious<CR>", opts)
+  end,
+})
+
+
+
