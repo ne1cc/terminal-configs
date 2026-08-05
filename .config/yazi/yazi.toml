@@ -65,7 +65,4 @@ rules = [
     { mime = "video/*", use = [ "open", "play-in-terminal" ] }
 ]
 
-# Video previewer plugin
-[[plugin.prepend_previewers]]
-mime = "video/*"
-run  = "video-preview"
+
