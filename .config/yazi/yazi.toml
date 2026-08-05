@@ -55,3 +55,19 @@ edit = [
 open = [
 	{ run = 'open %s', desc = "Open", for = "macos" },
 ]
+
+# Video previewer plugin
+[[plugin.prepend_previewers]]
+mime = "video/*"
+run  = "video-preview"
+
+[opener]
+play-in-terminal = [
+    { run = 'mpv --vo=t t "$1"', block = true, desc = "Play in terminal (CACA ASCII)" },
+    { run = 'mpv --vo=kitty "$1"', block = true, desc = "Play in terminal (Kitty graphics)" }
+]
+
+[open]
+rules = [
+    { mime = "video/*", use = [ "open", "play-in-terminal" ] }
+]
