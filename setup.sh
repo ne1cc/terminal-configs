@@ -145,6 +145,11 @@ if ! "$SKIP_PLUGINS"; then
   if command -v nvim >/dev/null 2>&1; then
     run nvim --headless '+Lazy! sync' +qa
   fi
+
+  if command -v claude >/dev/null 2>&1 && [[ -d "$HOME/.claude/skills/delegate-agy" ]]; then
+    printf '  Claude Code delegate-agy plugin is present at ~/.claude/skills/delegate-agy\n'
+  fi
 fi
 
 printf '\nDone. Backups, if any: %s\n' "$BACKUP_DIR"
+

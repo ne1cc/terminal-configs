@@ -51,3 +51,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end
   end,
 })
+
+-- Add Homebrew fzf to Neovim runtimepath if installed
+if vim.fn.isdirectory("/opt/homebrew/opt/fzf") == 1 then
+  vim.opt.rtp:append("/opt/homebrew/opt/fzf")
+end
+

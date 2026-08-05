@@ -290,10 +290,19 @@ snap() {
 alias glog='glow -p ~/.gemini_history.md'
 alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nord"'
 
+# Quick access
+alias lg="lazygit"
+alias y="yazi"
+
+# Open lazygit for a specific repo
+alias lgd="lazygit --path ~/dotfiles"
+
+# Yazi image preview protocol for Ghostty
+export YAZI_IMAGE_PROTOCOL="ghostty"
+
 # Git shortcuts
 alias gis='git rev-parse --is-inside-work-tree'
 alias gc='git clone'
-alias lg='lazygit'
 alias gs='git status -sb'
 alias gd='git diff'
 alias gds='git diff --staged'
@@ -597,10 +606,10 @@ fi
 alias venv='uv venv && source .venv/bin/activate'
 
 if command -v eza >/dev/null; then
-  alias l='eza -la --icons --git-repos --group-directories-first'
-  alias ls='eza --icons --git-repos --group-directories-first'
-  alias ll='eza -l --icons --git-repos --group-directories-first'
-  alias la='eza -la --icons --git-repos --group-directories-first'
+  alias l='eza -la --icons --group-directories-first'
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -l --icons --group-directories-first'
+  alias la='eza -la --icons --group-directories-first'
   alias tree='eza --tree --icons'
 else
   alias l='ls -lah'
