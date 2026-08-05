@@ -53,18 +53,20 @@ end
 local function cache_of(job, w) return ya.file_cache { file = job.file, skip = w } end
 
 local function upscale(src, dest, w, h)
-	-- WEBP keeps alpha, which JPEG would flatten to black on transparent
-	-- screenshots, and `method=0` is its fastest encoder — worth a lot at these
-	-- pixel counts.
+	-- JPEG on purpose, measured as the fastest option at these pixel counts
+	-- (0.78s vs 1.32s for WEBP), and it decodes faster on the way back out too.
+	-- It also has no alpha channel, which is what the iTerm2 adapter checks to
+	-- decide between its fast JPEG path and a slow PNG one. Transparency is
+	-- flattened to black explicitly rather than left to chance.
 	-- stylua: ignore
 	local output, err = Command("magick"):arg {
 		tostring(src),
 		"-auto-orient", "-strip",
 		"-filter", FILTERS[rt.preview.image_filter] or "Triangle",
 		"-resize", string.format("%dx%d", w, h),
+		"-background", "black", "-alpha", "remove", "-alpha", "off",
 		"-quality", rt.preview.image_quality,
-		"-define", "webp:method=0",
-		string.format("WEBP:%s", dest),
+		string.format("JPEG:%s", dest),
 	}:output()
 
 	if not output then

@@ -13,8 +13,19 @@ scrolloff      = 5
 
 [preview]
 tab_size = 2
-# Your framebuffer is 6400x3600 (3200x1800 @2x). These are a hard ceiling on how
-# many pixels a preview may use, so anything lower shrinks images on this screen.
+# SPEED DIAL. Your framebuffer is 6400x3600 (3200x1800 @2x) and these are a hard
+# ceiling on how many pixels a preview may use, so anything lower literally
+# shrinks the image on screen — display size is tied to pixel count.
+#
+# On Ghostty, Yazi uses the Kitty graphics protocol, which ships *uncompressed*
+# RGB. Measured throughput through tmux is ~27 MB/s, so cost is linear in pixels:
+#
+#   6400x3600 (fills pane) -> 65 MB -> ~2.4s
+#   3200x1800 (half size)  -> 16 MB -> ~0.6s
+#   2400x1350 (~40% size)  ->  9 MB -> ~0.35s
+#
+# Full size and instant are mutually exclusive on this protocol. Halve these if
+# you would rather have speed than a pane-filling image.
 max_width     = 6400
 max_height    = 3600
 image_delay   = 30

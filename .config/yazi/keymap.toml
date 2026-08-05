@@ -78,3 +78,25 @@ run = "plugin toggle-pane reset"
 desc = "Reset panes to the configured ratio"
 
 # Images always fill the preview pane, so there are no zoom keys to bind.
+
+# --- Fuzzy search integration (fzf.yazi) ---
+
+[[mgr.prepend_keymap]]
+on   = [ "f", "f" ]
+run  = "plugin fzf"
+desc = "Fuzzy search files with fzf"
+
+[[mgr.prepend_keymap]]
+on   = [ "f", "g" ]
+run  = 'plugin fzf --args="--rg"'
+desc = "Fuzzy search file contents (ripgrep + fzf)"
+
+[[mgr.prepend_keymap]]
+on   = [ "f", "s" ]
+run  = '''
+shell --block --confirm '
+  file=$(rg --line-number --no-heading --color=always "" | fzf --ansi | cut -d: -f1)
+  [ -n "$file" ] && yazi --reveal "$file"
+'
+'''
+desc = "Search file content via ripgrep + fzf"
