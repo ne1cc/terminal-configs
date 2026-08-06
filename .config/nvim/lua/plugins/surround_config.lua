@@ -1,5 +1,7 @@
 return {
   "kylechui/nvim-surround",
+  version = "*",
+  event = "VeryLazy",
   opts = {
     surrounds = {
       ["~"] = {
@@ -9,4 +11,7 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    require("nvim-surround").setup(opts)
+  end,
 }
