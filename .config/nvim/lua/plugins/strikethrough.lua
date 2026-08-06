@@ -4,8 +4,8 @@ return {
   opts = {
     mappings = {
       v = {
-        ["<Leader>~"] = { "c~~<C-r>"~~<Esc>", desc = "Strikethrough text" },
-        ["<Leader>ms"] = { "c~~<C-r>"~~<Esc>", desc = "Strikethrough text" },
+        ["<Leader>~"] = { "c~~<C-r>\"~~<Esc>", desc = "Strikethrough text" },
+        ["<Leader>ms"] = { "c~~<C-r>\"~~<Esc>", desc = "Strikethrough text" },
       },
     },
   },
