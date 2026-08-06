@@ -12,9 +12,9 @@ return {
   { import = "astrocommunity.pack.full-dadbod" },
 
   -- Community plugins
-  { import = "astrocommunity.git.lazygit" },
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.scrolling.mini-animate" },
   { import = "astrocommunity.fuzzy-finder.snacks-picker" },
   { import = "astrocommunity.recipes.picker-lsp-mappings" },
+  { import = "astrocommunity.motion.nvim-surround" },
 }
