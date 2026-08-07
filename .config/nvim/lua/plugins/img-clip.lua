@@ -8,7 +8,8 @@ return {
       file_name = "%Y-%m-%d-%H-%M-%S",
       use_absolute_path = false,
       relative_to_current_file = true,
-      template = "![$CURSOR]($FILE_PATH)",
+      url_encode_path = true,
+      template = "![$LABEL]($FILE_PATH)",
     },
   },
   keys = {
@@ -16,4 +17,3 @@ return {
     { "<leader>pi", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard", ft = "markdown" },
   },
 }
-
