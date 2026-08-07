@@ -1,6 +1,9 @@
 -- Automatically reload files changed outside of Neovim immediately
 vim.o.autoread = true
 
+-- Ensure ~/go/bin is in PATH for tools like sqls
+vim.env.PATH = vim.fn.expand("$HOME/go/bin") .. ":" .. vim.env.PATH
+
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
   pattern = "*",
   callback = function()
@@ -14,13 +17,26 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
 -- This is just pure lua so anything that doesn't
 -- fit in the normal config locations above can go here
 
--- Force transparent backgrounds across all themes (critical for Ghostty frosted glass)
+-- Force window separators, fillchars, and transparent backgrounds
+vim.opt.fillchars:append({
+  horiz = "━",
+  horizup = "┻",
+  horizdown = "┳",
+  vert = "┃",
+  vertleft = "┫",
+  vertright = "┣",
+  verthoriz = "╋",
+})
+
 vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
   callback = function()
     vim.cmd([[
       highlight Normal guibg=none ctermbg=none
       highlight NonText guibg=none ctermbg=none
       highlight NormalNC guibg=none ctermbg=none
+      highlight WinSeparator guifg=#7aa2f7 gui=bold ctermfg=blue
+      highlight VertSplit guifg=#7aa2f7 gui=bold ctermfg=blue
+      highlight TabLineFill guibg=none
     ]])
   end,
 })
@@ -63,6 +79,14 @@ vim.keymap.set("n", "<leader>um", function()
   vim.notify("Buffer modifiable: " .. tostring(vim.bo.modifiable), vim.log.levels.INFO)
 end, { desc = "Toggle Buffer Modifiable" })
 
+-- Cut content after cursor in Insert/Command Mode (Alt+K)
+vim.keymap.set({ "i", "c" }, "<A-k>", "<C-o>d$", { desc = "Cut content after cursor to clipboard" })
+vim.keymap.set({ "i", "c" }, "<A-K>", "<C-o>d$", { desc = "Cut content after cursor to clipboard" })
+
+-- Clear content after cursor in Insert Mode (Ctrl+K)
+vim.keymap.set({ "i", "c" }, "<C-k>", "<C-o>D", { desc = "Clear content after cursor" })
+vim.keymap.set({ "i", "c" }, "<C-K>", "<C-o>D", { desc = "Clear content after cursor" })
+
 -- Image Gallery Buffer Navigation (j/k or ]i/[i to cycle next/prev image in folder)
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = { "*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.svg" },
@@ -74,6 +98,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
     vim.keymap.set("n", "[i", ":bprevious<CR>", opts)
   end,
 })
+
 
 
 

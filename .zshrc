@@ -603,7 +603,34 @@ fi
 
 # FZF Shell Integration & Patched Command Defaults
 if command -v fzf >/dev/null 2>&1; then
-  eval "$(fzf --zsh)"
+  # Source fzf completion & key bindings (Homebrew & standard paths supported)
+  if [[ -d "/opt/homebrew/opt/fzf/shell" ]]; then
+    source "/opt/homebrew/opt/fzf/shell/completion.zsh" 2>/dev/null
+    source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh" 2>/dev/null
+  elif [[ -d "/usr/local/opt/fzf/shell" ]]; then
+    source "/usr/local/opt/fzf/shell/completion.zsh" 2>/dev/null
+    source "/usr/local/opt/fzf/shell/key-bindings.zsh" 2>/dev/null
+  else
+    source <(fzf --zsh) 2>/dev/null
+  fi
+
+  # Explicitly bind fzf widgets for vi mode & default keymaps
+  if zle -l fzf-history-widget 2>/dev/null; then
+    bindkey '^R' fzf-history-widget
+    bindkey -M viins '^R' fzf-history-widget
+    bindkey -M vicmd '^R' fzf-history-widget
+  fi
+  if zle -l fzf-file-widget 2>/dev/null; then
+    bindkey '^T' fzf-file-widget
+    bindkey -M viins '^T' fzf-file-widget
+    bindkey -M vicmd '^T' fzf-file-widget
+  fi
+  if zle -l fzf-cd-widget 2>/dev/null; then
+    bindkey '\ec' fzf-cd-widget
+    bindkey -M viins '\ec' fzf-cd-widget
+    bindkey -M vicmd '\ec' fzf-cd-widget
+  fi
+
   export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --inline-info"
   if command -v fd >/dev/null 2>&1; then
     export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
@@ -678,12 +705,21 @@ gshow() {
 # ==============================================================================
 # KEYBINDINGS
 # ==============================================================================
-# Map standard emacs keys explicitly alongside vi mode shortcuts
+# Map standard emacs/vi shortcuts
 bindkey '^A' beginning-of-line
-bindkey '^K' kill-line
 bindkey '^E' end-of-line
+
+# Map Alt+K to clear line after cursor (kill-line)
 bindkey '\ek' kill-line
 bindkey '^[k' kill-line
+bindkey -M viins '\ek' kill-line
+bindkey -M vicmd '\ek' kill-line
+
+# Remove Ctrl+K from kill-line (used for history navigation in vi mode)
+bindkey -r '^K'
+bindkey '^K' up-line-or-history
+bindkey -M viins '^K' up-line-or-history
+bindkey -M vicmd '^K' up-line-or-history
 
 export PATH="$(npm prefix -g)/bin:$PATH"
 export PATH="$HOME/.claude/bin:$PATH"
