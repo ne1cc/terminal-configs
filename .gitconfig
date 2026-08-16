@@ -10,6 +10,7 @@
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = !gh auth git-credential
+
 [core]
 	pager = delta
 
@@ -29,4 +30,3 @@
 	br = branch
 	st = status -sb
 	cm = commit -m
-

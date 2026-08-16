@@ -17,8 +17,7 @@ fi
 export ZSH="$HOME/.oh-my-zsh"
 
 # Powerlevel10k — OMZ loads this from custom/themes/powerlevel10k/
-# ZSH_THEME="powerlevel10k/powerlevel10k"
-ZSH_THEME=""
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Disable auto-setting terminal title (tmux owns this)
 DISABLE_AUTO_TITLE="true"
@@ -27,8 +26,11 @@ plugins=(git)
 
 [[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
-# Starship Prompt Initialization
-if command -v starship >/dev/null 2>&1; then
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Starship Prompt Initialization (fallback/alternative)
+if command -v starship >/dev/null 2>&1 && [[ "$ZSH_THEME" != "powerlevel10k/powerlevel10k" ]]; then
     eval "$(starship init zsh)"
 fi
 
@@ -82,32 +84,129 @@ fi
 
 # Provide pbcopy / pbpaste on Linux so macOS-era scripts still work
 if [[ "$OSTYPE" != darwin* ]]; then
-    if command -v xclip >/dev/null; then
+    if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-copy >/dev/null 2>&1; then
+        alias pbcopy='wl-copy'
+        alias pbpaste='wl-paste'
+    elif command -v xclip >/dev/null 2>&1; then
         alias pbcopy='xclip -selection clipboard'
         alias pbpaste='xclip -selection clipboard -o'
-    elif command -v xsel >/dev/null; then
+    elif command -v xsel >/dev/null 2>&1; then
         alias pbcopy='xsel --clipboard --input'
         alias pbpaste='xsel --clipboard --output'
-    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null; then
+    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null 2>&1; then
         alias pbcopy='clip.exe'
         alias pbpaste='powershell.exe -NoProfile -Command "Get-Clipboard"'
     fi
 fi
 
-# Copy last command output (stdout + stderr) to clipboard
+# ==============================================================================
+# LIGHTNING-FAST COPYLAST (0ms re-execution, captures actual terminal output)
+# ==============================================================================
+autoload -Uz add-zsh-hook
+
+_copylast_preexec() {
+    # Don't overwrite the last command if running copylast itself
+    if [[ "$1" =~ ^[[:space:]]*copylast([[:space:]]|$) ]]; then
+        _copylast_is_self=1
+        return
+    fi
+    _copylast_is_self=0
+    _copylast_cmd="$1"
+    if [[ -n "$TMUX" ]]; then
+        local hist=$(tmux display-message -p "#{history_size}")
+        local cy=$(tmux display-message -p "#{cursor_y}")
+        _copylast_start_abs=$(( hist + cy ))
+        tmux set-option -p @copylast_start "$_copylast_start_abs" 2>/dev/null || true
+        tmux set-option -p @copylast_cmd "$1" 2>/dev/null || true
+    fi
+}
+
+_copylast_precmd() {
+    if [[ "${_copylast_is_self:-0}" -eq 1 ]]; then
+        _copylast_is_self=0
+        return
+    fi
+    if [[ -n "$TMUX" && -n "$_copylast_start_abs" ]]; then
+        local end_hist=$(tmux display-message -p "#{history_size}")
+        local end_cy=$(tmux display-message -p "#{cursor_y}")
+        _copylast_saved_start="$_copylast_start_abs"
+        _copylast_saved_end=$(( end_hist + end_cy - 1 ))
+        _copylast_saved_cmd="${_copylast_cmd:-$(tmux show-options -p -v @copylast_cmd 2>/dev/null)}"
+        tmux set-option -p @copylast_end "$_copylast_saved_end" 2>/dev/null || true
+        unset _copylast_start_abs
+    fi
+}
+
+add-zsh-hook preexec _copylast_preexec
+add-zsh-hook precmd _copylast_precmd
+
+# Copy last command output (stdout + stderr) directly from terminal scrollback
 copylast() {
-    local last_cmd
-    last_cmd=$(fc -ln -1 2>/dev/null)
-    if [[ -z "$last_cmd" ]]; then
-        last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
+    local raw_mode=0
+    for arg in "$@"; do
+        case "$arg" in
+            -r|--raw) raw_mode=1 ;;
+            -h|--help)
+                echo "Usage: copylast [-r|--raw]"
+                echo "Copies output of previous terminal command to clipboard instantly."
+                return 0
+                ;;
+        esac
+    done
+
+    local output=""
+    local cmd="${_copylast_saved_cmd:-$(tmux show-options -p -v @copylast_cmd 2>/dev/null || true)}"
+
+    if [[ -n "$TMUX" ]]; then
+        local start_abs="${_copylast_saved_start:-$(tmux show-options -p -v @copylast_start 2>/dev/null || true)}"
+        local end_abs="${_copylast_saved_end:-$(tmux show-options -p -v @copylast_end 2>/dev/null || true)}"
+        local curr_hist=$(tmux display-message -p "#{history_size}")
+
+        if [[ -n "$start_abs" && -n "$end_abs" ]]; then
+            local s=$(( start_abs - curr_hist ))
+            local e=$(( end_abs - curr_hist ))
+
+            if (( s <= e )); then
+                local -a cap_args=(-p -J)
+                (( raw_mode == 1 )) && cap_args+=(-e)
+                output=$(tmux capture-pane "${cap_args[@]}" -S "$s" -E "$e")
+                # Trim trailing blank lines
+                output="${output%"${output##*[![:space:]]}"}"
+            else
+                echo "copylast: Last command ('${cmd:-unknown}') produced no output."
+                return 0
+            fi
+        fi
     fi
 
-    if [[ -n "$last_cmd" ]]; then
-        eval "$last_cmd" 2>&1 | pbcopy
-        echo "Copied output of: '$last_cmd'"
-    else
-        echo "Error: No previous command found in history."
+    if [[ -z "$output" ]]; then
+        echo "copylast: No output captured from last command ('${cmd:-unknown}')." >&2
+        return 1
     fi
+
+    # Fast clipboard copy (priority: pbcopy / wl-copy / xclip / xsel / clip.exe)
+    if command -v pbcopy >/dev/null 2>&1; then
+        printf "%s" "$output" | pbcopy
+    elif [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-copy >/dev/null 2>&1; then
+        printf "%s" "$output" | wl-copy
+    elif command -v xclip >/dev/null 2>&1; then
+        printf "%s" "$output" | xclip -selection clipboard
+    elif command -v xsel >/dev/null 2>&1; then
+        printf "%s" "$output" | xsel --clipboard --input
+    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null 2>&1; then
+        printf "%s" "$output" | clip.exe
+    fi
+
+    # Also emit OSC 52 sequence for remote/SSH/passthrough clipboard sync
+    if [[ -n "$TMUX" ]]; then
+        local b64
+        b64=$(printf "%s" "$output" | base64 | tr -d '\r\n')
+        printf "\033Ptmux;\033\033]52;c;%s\007\033\\" "$b64" 2>/dev/null || true
+    fi
+
+    local lines=$(printf "%s\n" "$output" | wc -l | tr -d ' ')
+    local bytes=$(printf "%s" "$output" | wc -c | tr -d ' ')
+    echo "✓ Copied output of '${cmd}' (${lines} lines, ${bytes} bytes) to clipboard"
 }
 
 
