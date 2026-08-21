@@ -45,8 +45,14 @@ export VISUAL="nvim"
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
 
-# Linuxbrew / Homebrew
-[[ -d "/home/linuxbrew/.linuxbrew" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Homebrew — macOS (Apple Silicon / Intel) and Linux (Linuxbrew)
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
 # User-local bin
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
@@ -143,11 +149,14 @@ add-zsh-hook precmd _copylast_precmd
 # Copy last command output (stdout + stderr) directly from terminal scrollback
 copylast() {
     local raw_mode=0
+    local mode=""
     for arg in "$@"; do
         case "$arg" in
             -r|--raw) raw_mode=1 ;;
+            -a|--all) mode="-a" ;;
+            [0-9]*) mode="$arg" ;;
             -h|--help)
-                echo "Usage: copylast [-r|--raw]"
+                echo "Usage: copylast [-r|--raw] [-a|--all] [N]"
                 echo "Copies output of previous terminal command to clipboard instantly."
                 return 0
                 ;;
@@ -158,24 +167,39 @@ copylast() {
     local cmd="${_copylast_saved_cmd:-$(tmux show-options -p -v @copylast_cmd 2>/dev/null || true)}"
 
     if [[ -n "$TMUX" ]]; then
-        local start_abs="${_copylast_saved_start:-$(tmux show-options -p -v @copylast_start 2>/dev/null || true)}"
-        local end_abs="${_copylast_saved_end:-$(tmux show-options -p -v @copylast_end 2>/dev/null || true)}"
-        local curr_hist=$(tmux display-message -p "#{history_size}")
+        if [[ "$mode" == "-a" ]]; then
+            output=$(tmux capture-pane -p -J -S -3000)
+        elif [[ "$mode" =~ ^[0-9]+$ ]]; then
+            output=$(tmux capture-pane -p -J -S "-$mode")
+        else
+            local start_abs="${_copylast_saved_start:-$(tmux show-options -p -v @copylast_start 2>/dev/null || true)}"
+            local end_abs="${_copylast_saved_end:-$(tmux show-options -p -v @copylast_end 2>/dev/null || true)}"
+            local curr_hist=$(tmux display-message -p "#{history_size}")
 
-        if [[ -n "$start_abs" && -n "$end_abs" ]]; then
-            local s=$(( start_abs - curr_hist ))
-            local e=$(( end_abs - curr_hist ))
+            if [[ -n "$start_abs" && -n "$end_abs" ]]; then
+                local s=$(( start_abs - curr_hist ))
+                local e=$(( end_abs - curr_hist ))
 
-            if (( s <= e )); then
-                local -a cap_args=(-p -J)
-                (( raw_mode == 1 )) && cap_args+=(-e)
-                output=$(tmux capture-pane "${cap_args[@]}" -S "$s" -E "$e")
-                # Trim trailing blank lines
-                output="${output%"${output##*[![:space:]]}"}"
-            else
-                echo "copylast: Last command ('${cmd:-unknown}') produced no output."
-                return 0
+                if (( s <= e )); then
+                    local -a cap_args=(-p -J)
+                    (( raw_mode == 1 )) && cap_args+=(-e)
+                    output=$(tmux capture-pane "${cap_args[@]}" -S "$s" -E "$e")
+                    output="${output%"${output##*[![:space:]]}"}"
+                fi
             fi
+        fi
+    fi
+
+    # Fallback when outside tmux or if hook captured nothing
+    if [[ -z "$output" ]]; then
+        local last_cmd
+        last_cmd=$(fc -ln -1 2>/dev/null)
+        if [[ -z "$last_cmd" ]]; then
+            last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
+        fi
+        if [[ -n "$last_cmd" ]]; then
+            cmd="$last_cmd"
+            output=$(eval "$last_cmd" 2>&1)
         fi
     fi
 
@@ -390,11 +414,22 @@ snap() {
 # ==============================================================================
 
 # Antigravity / audit ledger
+alias agy-yolo='agy --dangerously-skip-permissions'
+alias agyy='agy --dangerously-skip-permissions'
+alias yolo='agy --dangerously-skip-permissions'
 alias glog='glow -p ~/.gemini_history.md'
 alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nord"'
 
-# Quick access
+# Quick access & Application Openers
 alias lg="lazygit"
+alias mu="mupdf"
+alias om='open -a "One Markdown"'
+alias omd='open -a "One Markdown"'
+alias onemarkdown='open -a "One Markdown"'
+alias prev='open -a Preview'
+alias preview='open -a Preview'
+alias finder='open'
+alias of='open -R'
 
 # Yazi shell wrapper (changes terminal PWD on exit)
 function y() {
@@ -804,6 +839,137 @@ gshow() {
       --bind "enter:execute(git show --color=always {1} | less -R)"
 }
 [[ -d "/usr/local/mysql/bin" ]] && export PATH="/usr/local/mysql/bin:$PATH"
+
+# ==============================================================================
+# 12. 10X DEVELOPER WORKFLOW UTILITIES
+# ==============================================================================
+
+# --- Git Power Moves ---
+alias groot='cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"'
+alias gundo='git reset --soft HEAD~1'
+alias gwip='git add -A && git commit -m "wip: save point [skip ci]" --no-verify'
+alias gunwip='git log -n 1 --pretty=%B 2>/dev/null | grep -q "wip: save point" && git reset HEAD~1'
+alias gpristine='git reset --hard && git clean -dfx'
+alias gignored='git status --ignored -s | grep "^!!"'
+alias gauthors='git shortlog -sn --no-merges'
+
+# --- Fast Clipboard Ergonomics ---
+alias cbranch='git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d "\n" | pbcopy && echo "✓ Copied branch: $(pbpaste)"'
+alias csha='git rev-parse --short HEAD 2>/dev/null | tr -d "\n" | pbcopy && echo "✓ Copied SHA: $(pbpaste)"'
+
+cpath() {
+  local p="${1:-$PWD}"
+  local abs_path
+  abs_path=$(realpath "$p" 2>/dev/null || echo "$p")
+  printf "%s" "$abs_path" | pbcopy
+  echo "✓ Copied path: $abs_path"
+}
+
+cpfile() {
+  if [[ -f "$1" ]]; then
+    cat "$1" | pbcopy
+    local lines
+    lines=$(wc -l < "$1" | tr -d ' ')
+    echo "✓ Copied contents of $1 ($lines lines) to clipboard"
+  else
+    echo "Error: File not found: $1"
+    return 1
+  fi
+}
+
+# --- Ports, Networking & Local Development ---
+port() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: port <port_number>"
+    return 1
+  fi
+  lsof -iTCP:"$1" -sTCP:LISTEN -n -P
+}
+
+killport() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: killport <port_number>"
+    return 1
+  fi
+  local pid
+  pid=$(lsof -tiTCP:"$1" -sTCP:LISTEN)
+  if [[ -n "$pid" ]]; then
+    echo "$pid" | xargs kill -9
+    echo "✓ Killed process(es) $pid on port $1"
+  else
+    echo "No listening process found on port $1"
+  fi
+}
+
+serve() {
+  local p="${1:-8000}"
+  echo "Serving $PWD at http://localhost:$p"
+  python3 -m http.server "$p"
+}
+
+alias myip='curl -s https://ipinfo.io/json'
+
+cheat() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: cheat <topic>"
+    return 1
+  fi
+  curl -s "https://cheat.sh/$1"
+}
+
+# --- Interactive FZF Superpowers ---
+fkill() {
+  local pid
+  pid=$(ps -ef | sed 1d | fzf -m --header='[Kill Process: TAB to multi-select, ENTER to kill]' --preview 'echo {}' | awk '{print $2}')
+  if [[ -n "$pid" ]]; then
+    echo "$pid" | xargs kill -${1:-9}
+    echo "✓ Killed PID(s): $pid"
+  fi
+}
+
+fo() {
+  local file
+  file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
+}
+
+fenv() {
+  env | sort | fzf --header='[Environment Variables]'
+}
+
+# --- Smart Shell Ergonomics ---
+mcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+alias path='echo -e ${PATH//:/\\n}'
+
+extract() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: extract <archive_file>"
+    return 1
+  fi
+  if [[ -f "$1" ]]; then
+    case "$1" in
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar x "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
+      *.tar.xz)    tar xf "$1"      ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "Error: '$1' is not a valid file"
+    return 1
+  fi
+}
 
 # ==============================================================================
 # KEYBINDINGS

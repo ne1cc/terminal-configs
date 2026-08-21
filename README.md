@@ -1,77 +1,67 @@
-# 🖥️ macOS Terminal Configs & Dotfiles
+# 🖥️ macOS / Linux Terminal Configs & Dotfiles
 
-A premium, curated repository for my complete macOS terminal setup, shell environment, terminal multiplexer (tmux), GPU-accelerated terminal emulator (Ghostty), and Neovim development environment.
+A premium, curated repository for my complete terminal environment, shell configuration, terminal multiplexer (tmux), GPU-accelerated terminal emulators (Ghostty & Alacritty), file manager (Yazi), Git TUI (Lazygit), and Neovim development environment.
+
+---
+
+## 📖 Master Guides & Documentation
+* 🚀 **[Master Cheatsheet](file:///Users/alex/Github/config/terminal-configs/SHORTCUTS.md)** — Complete, exhaustive keybinding and alias reference.
+* 🗂️ **[tmux Shortcuts & Layouts](file:///Users/alex/Github/config/terminal-configs/TMUX_SHORTCUTS.md)** — Window stashing, pane joining, breakout sessions.
+* ⚡ **[Modern CLI Guide](file:///Users/alex/Github/config/terminal-configs/MODERN_CLI_GUIDE.md)** — Eza, Bat, Zoxide, FZF, Ripgrep, Duf, Dust.
+* ✍️ **[10X Neovim Session Guide](file:///Users/alex/Github/config/terminal-configs/docs/10X_NEOVIM_SESSION.md)** — Neovim workflows, buffer management, and image integration.
+* 🩺 **[LSP Shortcuts](file:///Users/alex/Github/config/terminal-configs/docs/LSP_SHORTCUTS.md)** — Code navigation, diagnostics, and formatting.
+* ✅ **[Taskwarrior Guide](file:///Users/alex/Github/config/terminal-configs/docs/TASKWARRIOR_GUIDE.md)** — Terminal task tracking workflows.
+
+---
 
 ## 📦 What's Included
 
 ```
 terminal-configs/
 ├── .config/
-│   ├── ghostty/
-│   │   └── config       # Ghostty custom keybindings & layout configuration
-│   └── nvim/            # Complete Neovim config (AstroNvim-based)
-├── .p10k.zsh            # Powerlevel10k prompt aesthetic settings
-├── .tmux.conf           # tmux prefix binds, mouse scrolling, & pane joining utilities
-├── .zshrc               # Shell aliases, custom audit logs, & OMZ initialization
-├── Brewfile             # Homebrew package, cask, font, and extension manifest
+│   ├── alacritty/       # Alacritty config (Tokyo Night, vibrancy & tmux integration)
+│   ├── ghostty/         # Ghostty GPU terminal configuration & keybinds
+│   ├── karabiner/       # Karabiner-Elements keyboard custom modifications
+│   ├── lazygit/         # Lazygit config with AI (Antigravity/Claude/Codex) workflows
+│   ├── nvim/            # Complete Neovim environment (AstroNvim-based)
+│   ├── yazi/            # Yazi terminal file manager config & plugins
+│   └── starship.toml    # Cross-shell Starship prompt configuration
+├── bin/                 # Custom CLI binaries (tmux-sessionizer, snapshot utilities)
 ├── claude-code/
 │   ├── CLAUDE.md        # Unified global instructions (merged MSTSPAT standards)
 │   └── commands/        # Custom slash commands (/plan, /cook, /continue, /release)
-├── install.sh           # Safe symlinking automation script (with backup system)
-└── setup.sh             # Portable, idempotent installer with conflict backups
-
+├── docs/                # Specialized workflow and shortcut guides
+├── .inputrc             # GNU Readline keybindings
+├── .p10k.zsh            # Powerlevel10k prompt settings
+├── .tmux.conf           # tmux prefix binds, mouse copy, popups, & stashing
+├── .zshrc               # Shell aliases, git power moves, & developer utilities
+├── Brewfile             # macOS Homebrew packages, casks, and fonts
+├── Brewfile.linux       # Linuxbrew package manifest
+├── SHORTCUTS.md         # Exhaustive master keyboard & alias reference
+├── setup.sh             # Portable, idempotent symlink installer
+└── install.sh           # Interactive bootstrap script
 ```
 
 ---
 
-## 🚀 Migration & Quick Start (New Mac)
+## 🚀 Migration & Quick Start
 
-Follow these steps to fully restore your environment on a fresh macOS installation.
+Follow these steps to fully restore your environment on a fresh machine.
 
-### Step 1: Install Xcode Command Line Tools
-Open Terminal and run:
-```bash
-xcode-select --install
-```
-
-### Step 2: Install Homebrew & Restore Packages
-Install Homebrew:
+### Step 1: Install Homebrew / Linuxbrew & Restore Packages
+On macOS:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew bundle --file=~/Github/config/terminal-configs/Brewfile
 ```
 
-Once Homebrew is active, you can restore all apps, CLI tools, fonts, and VS Code extensions using the included [Brewfile](file:///Users/alex/terminal-configs/Brewfile):
-```bash
-brew bundle --file=~/terminal-configs/Brewfile
-```
-*(Alternatively, the `install.sh` script will prompt you to run this automatically).*
-
-
-### Step 3: Install Oh My Zsh & Powerlevel10k
-Install Oh My Zsh:
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-Clone the Powerlevel10k prompt theme:
-```bash
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/Applications/powerlevel10k
-```
-
-### Step 4: Clone & Run the Portable Setup Script
-Clone this repository to your new machine:
-```bash
-git clone <YOUR_REPOSITORY_URL> ~/terminal-configs
-cd ~/terminal-configs
-```
-
-Link the configuration and install tmux/Neovim plugins:
+### Step 2: Run the Portable Setup Script
 ```bash
 ./setup.sh
 ```
-The script detects macOS, Linux, and WSL; moves conflicting files to
-`~/.terminal-configs-backups/<timestamp>`; and establishes symlinks from the
-repository folder to your home directory. To restore packages too, run:
+The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; and establishes symlinks from the repository folder to your home directory.
+
+To restore packages automatically as part of setup:
 ```bash
 ./setup.sh --install-packages
 ```
@@ -82,28 +72,22 @@ repository folder to your home directory. To restore packages too, run:
 
 ### 🐚 Zsh (`.zshrc` & `.p10k.zsh`)
 * Integrates **Powerlevel10k** and **Oh My Zsh**.
-* Includes automated custom aliases and integrations for logging tasks/commits.
-* Preconfigured tool chains like `delta` for side-by-side terminal diffs and `glow` for markdown rendering.
+* Includes developer workflow utilities: `groot`, `gwip`, `copylast`, `port`, `killport`, `serve`, `fkill`, `fo`.
+* Antigravity AI audit ledger previewers (`glog`, `gdiff`, `agya`, `agyih`).
 
 ### 🗂️ Tmux (`.tmux.conf`)
-* Remaps leader/prefix prefix key to `Ctrl+Space`.
-* Full mouse support enabled (scrolling, selecting panes).
-* Programmed mouse dragging to copy directly to the macOS system clipboard.
-* Custom joins/swaps (`Prefix + j` / `Prefix + S`) to reorganize workspace tiles easily.
-* High-information pane/window debugging views (`Prefix + W`).
-
-### ⚡ Ghostty (`.config/ghostty/config`)
-* GPU-accelerated terminal.
-* Configures tab navigation with native system shortcuts (`Cmd+Shift+]` / `Cmd+Shift+[`).
-* Unbinds default conflicting keys to pass Ctrl+Tab and Ctrl+Shift+Tab cleanly to tmux.
+* Remaps prefix key to `Ctrl + Space`.
+* Seamless pane navigation with Neovim (`Ctrl + h/j/k/l`).
+* Interactive fuzzy popups for sessionizer, windows, panes, and stashed scratchpads (`Prefix + s/w/e/f`).
+* Floating Lazygit modal (`Prefix + Ctrl + g`) and Claude assistants.
 
 ### ✍️ Neovim (`.config/nvim`)
-* Customized AstroNvim structure.
-* Extensible Lua plugins, including `mason.lua` (LSP/DAP manager), `harpoon.lua` (quick file switching), and `none-ls.lua` (formatting/linting).
+* Customized AstroNvim structure with Tokyo Night theme.
+* Inline image rendering (`3rd/image.nvim` + `img-clip.nvim`), PDF viewing (`MuPDF`), and FzfLua picker.
 
 ### 🤖 Claude Code Workflows (Configuration as Code)
-* Integrates a version-controlled global [CLAUDE.md](file:///home/alexander/Github/terminal-configs/claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
-* Custom global slash commands in [commands/](file:///home/alexander/Github/terminal-configs/claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
+* Integrates a version-controlled global [CLAUDE.md](file:///Users/alex/Github/config/terminal-configs/claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
+* Custom global slash commands in [commands/](file:///Users/alex/Github/config/terminal-configs/claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
   * `/plan` — Strategic Planning: Discovers requirements, mapping dependencies, and creating/updating the `TODO.md` roadmap.
   * `/cook` — Focused Implementation: Executes tasks from `TODO.md` in dependency order, enforcing code quality standards.
   * `/continue` — Intelligent Resumption: Inspects git status and `TODO.md` progress to resume work cleanly.

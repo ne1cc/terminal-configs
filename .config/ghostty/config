@@ -1,8 +1,26 @@
+# Auto-attach or create a persistent 'main' tmux session
+command = /opt/homebrew/bin/tmux new-session -A -s main
+
 # Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
 keybind = ctrl+tab=text:\x1b[27;5;9~
 keybind = ctrl+shift+tab=text:\x1b[27;6;9~
 
+# Ghostty split shortcuts
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
+keybind = super+h=goto_split:left
+keybind = super+l=goto_split:right
+keybind = super+k=goto_split:top
+keybind = super+j=goto_split:bottom
+
 # Map preferred keys to Ghostty's native tab actions (Show Next Tab / Show Previous Tab)
 keybind = super+shift+]=next_tab
 keybind = super+shift+[=previous_tab
+
+# Background transparency and glass blur effect
+background-opacity = 0.85
+background-blur = true
+
+# Font configuration
+font-size = 15
 

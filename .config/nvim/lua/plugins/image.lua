@@ -1,5 +1,6 @@
 return {
   "3rd/image.nvim",
+  ft = { "markdown", "vimwiki" },
   event = "VeryLazy",
   opts = {
     backend = "kitty", -- Supported natively by Ghostty / Kitty
@@ -7,35 +8,34 @@ return {
     integrations = {
       markdown = {
         enabled = true,
-        clear_in_insert_mode = true, -- Clear image while editing text on that line
+        clear_in_insert_mode = false,
         download_remote_images = true,
         only_render_image_at_cursor = false,
         filetypes = { "markdown", "vimwiki" },
+        resolve_image_path = function(document_path, image_path, fallback)
+          -- URL-decode paths (e.g. %20 -> space) so files pasted with %20 are found on disk
+          local decoded = image_path:gsub("%%(%x%x)", function(hex)
+            return string.char(tonumber(hex, 16))
+          end)
+          return fallback(document_path, decoded)
+        end,
       },
       neotree = {
-        enabled = true,
+        enabled = false,
       },
     },
-    max_width = 80,
-    max_height = 20,
-    max_width_window_percentage = 60,
-    max_height_window_percentage = 40,
+    max_width = nil,
+    max_height = nil,
+    max_width_window_percentage = 100,
+    max_height_window_percentage = 100,
     window_overlap_clear_enabled = true,
     window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
-    editor_only_render_when_focused = true,
+    editor_only_render_when_focused = false,
     tmux_show_only_in_active_window = true,
   },
   config = function(_, opts)
     local image = require("image")
     image.setup(opts)
-
-    -- Auto-clear graphics overlays when switching buffers or windows
-    vim.api.nvim_create_autocmd({ "BufLeave", "WinLeave", "BufHidden" }, {
-      group = vim.api.nvim_create_augroup("ImageNvimClearOnLeave", { clear = true }),
-      callback = function()
-        image.clear()
-      end,
-    })
 
     -- Add keymap <leader>ic to manually clear ghost image overlays
     vim.keymap.set("n", "<leader>ic", function()

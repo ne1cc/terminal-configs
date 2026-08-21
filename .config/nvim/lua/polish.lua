@@ -99,6 +99,36 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
+-- Open PDF under cursor or companion PDF in MuPDF
+local function open_in_mupdf()
+  -- 1. Check if the string under the cursor is a path/file
+  local cfile = vim.fn.expand("<cfile>")
+  local target = ""
 
+  if cfile ~= "" and vim.fn.filereadable(cfile) == 1 and cfile:match("%.pdf$") then
+    target = cfile
+  else
+    -- 2. Fallback: check if the current file itself is a PDF or has a corresponding .pdf
+    local current_file = vim.api.nvim_buf_get_name(0)
+    if current_file:match("%.pdf$") then
+      target = current_file
+    else
+      -- Check if companion file exists (e.g. paper.tex -> paper.pdf, document.typ -> document.pdf)
+      local companion_pdf = vim.fn.expand("%:p:r") .. ".pdf"
+      if vim.fn.filereadable(companion_pdf) == 1 then
+        target = companion_pdf
+      end
+    end
+  end
 
+  if target == "" or vim.fn.filereadable(target) == 0 then
+    vim.notify("No valid PDF found to open.", vim.log.levels.WARN)
+    return
+  end
 
+  -- Launch MuPDF asynchronously in the background
+  vim.fn.jobstart({ "mupdf", vim.fn.fnamemodify(target, ":p") }, { detach = true })
+  vim.notify("Opened in MuPDF: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>pdf", open_in_mupdf, { desc = "Open PDF under cursor/buffer in MuPDF", silent = true })

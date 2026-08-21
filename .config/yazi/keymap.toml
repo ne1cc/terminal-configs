@@ -84,6 +84,21 @@ on   = "o"
 run  = "open --interactive"
 desc = "Open selection with interactive menu"
 
+[[mgr.prepend_keymap]]
+on   = "P"
+run  = 'shell "qlmanage -p \"$@\" >/dev/null 2>&1 &" --confirm'
+desc = "Open with macOS Quick Look"
+
+[[mgr.prepend_keymap]]
+on   = "M"
+run  = "open --opener=mupdf"
+desc = "Open in MuPDF"
+
+[[mgr.prepend_keymap]]
+on   = "O"
+run  = 'open --interactive'
+desc = "Open selection with interactive menu"
+
 # Images always fill the preview pane, so there are no zoom keys to bind.
 
 # --- Fuzzy search integration (fzf.yazi) ---

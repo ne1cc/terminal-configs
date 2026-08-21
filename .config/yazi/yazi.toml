@@ -12,41 +12,25 @@ show_symlink   = true
 scrolloff      = 5
 
 [preview]
-tab_size = 2
-# SPEED DIAL. Your framebuffer is 6400x3600 (3200x1800 @2x) and these are a hard
-# ceiling on how many pixels a preview may use, so anything lower literally
-# shrinks the image on screen — display size is tied to pixel count.
-#
-# On Ghostty, Yazi uses the Kitty graphics protocol, which ships *uncompressed*
-# RGB. Measured throughput through tmux is ~27 MB/s, so cost is linear in pixels:
-#
-#   6400x3600 (fills pane) -> 65 MB -> ~2.4s
-#   3200x1800 (half size)  -> 16 MB -> ~0.6s
-#   2400x1350 (~40% size)  ->  9 MB -> ~0.35s
-#
-# Full size and instant are mutually exclusive on this protocol. Halve these if
-# you would rather have speed than a pane-filling image.
-max_width     = 6400
-max_height    = 3600
-image_delay   = 30
-# "triangle" (bilinear) is the cheapest filter that still looks smooth when
-# scaling up, which is the direction we now scale most often.
-image_filter  = "triangle"
-image_quality = 80
+tab_size       = 2
+# Optimized dimensions: Dramatically reduces Kitty/Ghostty RGB transfer sizes
+# from ~65 MB per frame down to ~5-8 MB, making previews render almost instantaneously.
+max_width      = 2048
+max_height     = 1536
+image_delay    = 0
+image_filter   = "triangle"
+image_quality  = 75
+sixel_fraction = 15
 
-# Yazi's built-in image previewer only downscales, so images smaller than the
-# pane render at native size. fill-preview scales them up to fill it instead.
-# Scoped to the formats Yazi decodes natively — avif/heic/jxl and svg keep their
-# own previewers, which the `image/*` catch-all below would otherwise shadow.
-[[plugin.prepend_previewers]]
-mime = "image/{jpeg,png,gif,webp,bmp,tiff}"
-run  = "fill-preview"
+[tasks]
+micro_workers    = 10
+macro_workers    = 25
+bizarre_retry    = 5
+image_alloc      = 536870912  # 512MB RAM allocation for image preview cache
+image_bound      = [ 0, 0 ]
+suppress_preload = false
 
-# The matching preloader is what makes it feel instant: the upscale runs ahead of
-# the cursor, so hovering a file is usually just a cache read.
-[[plugin.prepend_preloaders]]
-mime = "image/{jpeg,png,gif,webp,bmp,tiff}"
-run  = "fill-preview"
+
 
 [opener]
 edit = [
@@ -55,6 +39,13 @@ edit = [
 open = [
 	{ run = 'open %s', desc = "Open", for = "macos" },
 ]
+quicklook = [
+	{ run = 'qlmanage -p "$@"', orphan = true, desc = "Quick Look", for = "macos" },
+]
+mupdf = [
+	{ run = 'mupdf "$@"', orphan = true, desc = "MuPDF", for = "macos" },
+	{ run = 'mupdf "$@"', orphan = true, desc = "MuPDF", for = "unix" },
+]
 play-in-terminal = [
     { run = 'mpv --vo=t t %s', block = true, desc = "Play in terminal (CACA ASCII)" },
     { run = 'mpv --vo=kitty %s', block = true, desc = "Play in terminal (Kitty graphics)" }
@@ -62,7 +53,9 @@ play-in-terminal = [
 
 [open]
 rules = [
-    { mime = "video/*", use = [ "open", "play-in-terminal" ] }
+    { mime = "application/pdf", use = [ "mupdf", "open", "quicklook" ] },
+    { url = "*.pdf",            use = [ "mupdf", "open", "quicklook" ] },
+    { mime = "video/*",         use = [ "open", "play-in-terminal" ] }
 ]
 
 

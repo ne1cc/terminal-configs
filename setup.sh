@@ -102,7 +102,7 @@ if [[ -f "$REPO_DIR/.taskrc.template" ]]; then
   fi
 fi
 
-for dotfile in .zshrc .zprofile .p10k.zsh .tmux.conf .gitconfig .taskrc; do
+for dotfile in .zshrc .zprofile .p10k.zsh .tmux.conf .gitconfig .taskrc .inputrc; do
   [[ -f "$REPO_DIR/$dotfile" ]] && link_path "$REPO_DIR/$dotfile" "$HOME/$dotfile"
 done
 
@@ -118,6 +118,15 @@ for script in "$REPO_DIR"/bin/*; do
   [[ -f "$script" ]] || continue
   link_path "$script" "$HOME/bin/$(basename "$script")"
 done
+
+if [[ -d "$REPO_DIR/claude-code" ]]; then
+  run mkdir -p "$HOME/.claude/commands"
+  [[ -f "$REPO_DIR/claude-code/CLAUDE.md" ]] && link_path "$REPO_DIR/claude-code/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+  for cmd in "$REPO_DIR/claude-code/commands"/*.md; do
+    [[ -f "$cmd" && "$(basename "$cmd")" != "README.md" ]] || continue
+    link_path "$cmd" "$HOME/.claude/commands/$(basename "$cmd")"
+  done
+fi
 
 # Ghostty now uses ~/.config/ghostty/config on every supported platform. Remove
 # the obsolete macOS location only when it is our previously-managed symlink;
