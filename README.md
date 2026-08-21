@@ -121,7 +121,7 @@ A complete reference for every configured keyboard shortcut, alias, and shell fu
 | `Shift + Right Arrow` / `Ctrl + PageDown` / `Ctrl + Shift + l` | **(No Prefix)** | Switch to next window |
 | `Ctrl + Shift + Left Arrow` | **(No Prefix)** | Swap / move active window position left in tab bar |
 | `Ctrl + Shift + Right Arrow` | **(No Prefix)** | Swap / move active window position right in tab bar |
-| `Prefix + \`` | Prefix | Jump to last active window |
+| `Prefix + \`` / `Prefix + Tab` | Prefix | **Jump to last active window** |
 | `Prefix + >` | Prefix | Move active pane into the next window |
 | `Prefix + <` | Prefix | Move active pane into the previous window |
 
