@@ -432,6 +432,7 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | Script | Purpose |
 |---|---|
 | [`tmux-sessionizer`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
+| [`tmux-join-panes`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
 | [`tmux-save-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
 | [`tmux-restore-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |
 | [`macos-defaults.sh`](file:///Users/alex/Github/config/terminal-configs/bin/macos-defaults.sh) | Applies macOS performance defaults (fast key repeat, Finder tweaks, disable animations). |
