@@ -79,6 +79,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|---|
 | `Prefix + Shift + B` | Prefix | Break active pane out into a new foreground window |
 | `Prefix + Alt + Shift + B` | Prefix | Break active pane into a **background window** (`M-B`) |
+| `Prefix + Alt + p` | Prefix | **Break active pane out into a brand-new tmux session** (prompts for name, auto-switches) |
 | `Prefix + Alt + w` / `Prefix + Ctrl + w` | Prefix | **Break current window out into a brand-new tmux session** (prompts for name, auto-switches) |
 | `Prefix + Alt + b` | Prefix | Demote all other panes into background windows (`M-b`) |
 | `Prefix + Alt + a` | Prefix | Break active pane out into a new session in **Alacritty** (`M-a`) |
