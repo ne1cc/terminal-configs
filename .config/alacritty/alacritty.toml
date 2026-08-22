@@ -202,3 +202,14 @@ chars = "\u001B[27;5;9~"
 key = "Tab"
 mods = "Control|Shift"
 chars = "\u001B[27;6;9~"
+
+# Ctrl+Shift+H / Ctrl+Shift+L — explicit CSI sequences so tmux switches windows instead of panes
+[[keyboard.bindings]]
+key = "H"
+mods = "Control|Shift"
+chars = "\u001B[27;6;72~"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Control|Shift"
+chars = "\u001B[27;6;76~"

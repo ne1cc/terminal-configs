@@ -37,7 +37,7 @@ os:
 
 customCommands:
   # --- AI Commit Generator (Antigravity agy) ---
-  - key: '<alt-a>'
+  - key: '<c-a>'
     description: 'Generate conventional commit message with Antigravity (agy)'
     command: 'agy -p "Summarize these staged git changes and format as a concise conventional commit message title and short description"'
     context: 'files'
@@ -80,33 +80,27 @@ customCommands:
     output: terminal
 
   # --- Clipboard Tools ---
-  - key: '<ctrl-y>'
+  - key: '<c-y>'
     description: 'Copy full contents of selected file to clipboard'
-    command: 'cat {{.SelectedFile.Name}} | pbcopy'
+    command: 'cat {{.SelectedFile.Name}} | (xclip -selection clipboard 2>/dev/null || pbcopy 2>/dev/null || xsel -b 2>/dev/null)'
     context: 'files'
     loadingText: 'Copying file contents...'
 
-  - key: '<ctrl-y>'
+  - key: '<c-y>'
     description: 'Copy full contents of selected file to clipboard'
-    command: 'cat {{.SelectedCommitFile.Name}} | pbcopy'
+    command: 'cat {{.SelectedCommitFile.Name}} | (xclip -selection clipboard 2>/dev/null || pbcopy 2>/dev/null || xsel -b 2>/dev/null)'
     context: 'commitFiles'
     loadingText: 'Copying file contents...'
 
-  - key: '<alt-y>'
-    description: 'Copy unstaged diff patch of selected file'
-    command: 'git diff {{.SelectedFile.Name}} | pbcopy'
+  - key: 'Y'
+    description: 'Copy diff patch of selected file'
+    command: 'git diff {{.SelectedFile.Name}} | (xclip -selection clipboard 2>/dev/null || pbcopy 2>/dev/null || xsel -b 2>/dev/null)'
     context: 'files'
     loadingText: 'Copying file diff...'
 
-  - key: '<alt-y>'
-    description: 'Copy staged/commit diff patch of selected file'
-    command: 'git diff --staged {{.SelectedFile.Name}} | pbcopy'
-    context: 'files'
-    loadingText: 'Copying staged file diff...'
-
-  - key: '<alt-y>'
+  - key: 'Y'
     description: 'Copy patch of commit file'
-    command: 'git show {{.SelectedLocalCommit.Hash}} -- {{.SelectedCommitFile.Name}} | pbcopy'
+    command: 'git show {{.SelectedLocalCommit.Hash}} -- {{.SelectedCommitFile.Name}} | (xclip -selection clipboard 2>/dev/null || pbcopy 2>/dev/null || xsel -b 2>/dev/null)'
     context: 'commitFiles'
     loadingText: 'Copying commit file diff...'
 

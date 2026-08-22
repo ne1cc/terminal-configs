@@ -50,5 +50,26 @@ for cmd in "$DOTFILES/claude-code/commands"/*.md; do
     fi
 done
 
+# ==============================================================================
+# Setup ~/.config directories and helper binaries
+# ==============================================================================
+CONFIG_DIR="$HOME/.config"
+mkdir -p "$CONFIG_DIR" "$HOME/bin"
+
+echo "Linking ~/.config directories and tools..."
+for cfg in nvim ghostty alacritty lazygit yazi starship.toml; do
+    if [ -e "$DOTFILES/.config/$cfg" ]; then
+        ln -sfn "$DOTFILES/.config/$cfg" "$CONFIG_DIR/$cfg"
+        echo "  Symlinked $CONFIG_DIR/$cfg -> $DOTFILES/.config/$cfg"
+    fi
+done
+
+for script in "$DOTFILES"/bin/*; do
+    if [ -f "$script" ]; then
+        sname=$(basename "$script")
+        ln -sf "$script" "$HOME/bin/$sname"
+    fi
+done
+
 echo "Done. Restart your terminal or run: source ~/.zshrc"
 

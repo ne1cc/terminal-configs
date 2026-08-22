@@ -351,13 +351,15 @@ Available inside Lazygit (`lg` or `Prefix + Ctrl + g`):
 
 | Key | Context | Tool Executed | Description |
 |---|---|---|---|
-| **`<alt-a>`** | `files` | **Antigravity (`agy`)** | Analyzes staged changes and generates conventional commit title & description |
+| **`<c-a>`** (`Ctrl + A`) | `files` | **Antigravity (`agy`)** | Analyzes staged changes and generates conventional commit title & description |
 | **`C`** | `files` | **Claude CLI (`claude`)** | Reviews staged diff for bugs, edge cases, and performance regressions |
 | **`X`** | `localBranches` | **OpenAI Codex (`codex`)** | Analyzes branch changes to explain architectural impact |
 | **`Q`** | `files` | **Qoder (`qodercli`)** | Audits staged code changes for compliance and safety |
 | **`N`** | `global` | **GitHub CLI (`gh`)** | Creates GitHub Pull Request (`gh pr create --fill`) |
 | **`O`** | `localBranches` | **GitHub CLI (`gh`)** | Checks out GitHub Pull Request for selected branch |
-| **`<ctrl-y>`** | `files` / `commitFiles` | `pbcopy` | Copies full file contents to system clipboard |
+| **`<c-y>`** (`Ctrl + Y`) | `files` / `commitFiles` | Clipboard | Copies full file contents to system clipboard |
+| **`Y`** (`Shift + Y`) | `files` / `commitFiles` | Clipboard | Copies git diff / patch of selected file or commit to clipboard |
+| **`d`** | `commits` | Git Hard Reset | Drops selected local commit with confirmation (`git reset --hard HEAD~1`) |
 | **`<alt-y>`** | `files` / `commitFiles` | `pbcopy` | Copies unstaged or commit diff patch to system clipboard |
 | **`d`** | `commits` | `git reset --hard` | Permanently drop local commit with confirmation modal |
 | **`q`** | Global | Exit | Close Lazygit |

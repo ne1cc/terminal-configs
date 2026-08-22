@@ -4,6 +4,8 @@ command = /opt/homebrew/bin/tmux new-session -A -s main
 # Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
 keybind = ctrl+tab=text:\x1b[27;5;9~
 keybind = ctrl+shift+tab=text:\x1b[27;6;9~
+keybind = ctrl+shift+h=text:\x1b[27;6;72~
+keybind = ctrl+shift+l=text:\x1b[27;6;76~
 
 # Ghostty split shortcuts
 keybind = super+d=new_split:right
