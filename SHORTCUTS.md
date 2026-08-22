@@ -69,7 +69,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Prefix + Shift + G` | Prefix | **Kill all other panes** in the window except active pane |
 | `Prefix + m` | Prefix | Mark current pane |
 | `Prefix + Shift + M` | Prefix | Join marked pane into current window |
-| `Prefix + g` | Prefix | Interactive tree picker to join a pane into current window |
+| `Prefix + g` | Prefix | **Grab / Join Panes modal**: fuzzy search & multi-select panes with `Tab`, `Enter` to join all & auto-tile |
 | `Prefix + Shift + S` | Prefix | Prompt for source window number to join pane from |
 | `Prefix + Shift + R` | Prefix | Rename current pane title |
 | `Prefix + y` | Prefix | Toggle pane synchronization (broadcast keystrokes to all panes) |
