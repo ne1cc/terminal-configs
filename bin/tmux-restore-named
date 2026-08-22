@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
 
 mkdir -p ~/.tmux/resurrect
 

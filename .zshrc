@@ -11,6 +11,11 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     export IS_WSL=1
 fi
 
+# Locale sanitization (fixes macOS ICU format warnings in bash / tools)
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+
 # ==============================================================================
 # 2. OH MY ZSH INITIALIZATION & CONFIGURATION
 # ==============================================================================
