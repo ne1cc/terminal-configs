@@ -116,17 +116,24 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Prefix + Ctrl + a` | Prefix | Fuzzy-pick existing worktree and open Claude window |
 | `Prefix + Ctrl + x` | Prefix | Fuzzy-pick worktree to force-remove (directory + branch) |
 | `Prefix + a` | Prefix | Open/reattach persistent centered Claude popup session |
+| `Prefix + Alt + y` | Prefix | Open/reattach persistent centered Antigravity YOLO popup session (`agyy`) |
+| `Prefix + /` | Prefix | **Command Palette HUD**: Interactive fuzzy search to trigger ANY tmux / shell action |
+| `Prefix + Shift + O` | Prefix | **Screen File & Stacktrace Jumper**: Extract file paths from screen & jump in Neovim |
+| `Prefix + Alt + i` | Prefix | **Instant Scratchpad**: Centered floating note modal editing `~/notes/scratchpad.md` |
 | `Prefix + Ctrl + p` | Prefix | Open/reattach project-specific Claude popup session |
 | `Prefix + Shift + A` | Prefix | Open side-by-side Claude pane (35% width split) |
 | `Prefix + Ctrl + c` | Prefix | Spawn new full window running Claude in `$PWD` |
-| `Prefix + Ctrl + m` | Prefix | **Agent Matrix**: Interactive modal to tile 2, 3, or 4 parallel AI agents |
+| `Prefix + Ctrl + t` | Prefix | **Agent Matrix**: Interactive `fzf` modal to tile 2, 3, 4, or mixed parallel AI agents |
 | `Prefix + Shift + H` | Prefix | **Session Handoff**: Auto-generate markdown handoff note with git status & diff stats |
 | `Prefix + Shift + D` | Prefix | **Dev Workspace**: Instant 3-pane IDE layout (Editor 65% + server & shell 35%) |
 | `Prefix + Alt + Shift + D` | Prefix | **Triage Workspace**: Instant 4-pane 2x2 grid for debugging |
-| `Prefix + Shift + T` | Prefix | **Telemetry Dashboard**: Centered floating `btop` / `htop` hardware monitor |
-| `Prefix + Shift + K` | Prefix | **Interactive Process Killer**: Centered floating `fkill` process picker |
 | `Prefix + Ctrl + d` | Prefix | **Docker Exec Jumper**: Fuzzy select running container and drop into shell |
 | `Prefix + Ctrl + h` | Prefix | **SSH Host Jumper**: Fuzzy select SSH host from config and connect |
+| `Prefix + Alt + k` | Prefix | **Ports & Dev Servers**: Interactive port inspector & process killer |
+| `Prefix + Alt + c` | Prefix | **Cheat Sheet & Docs HUD**: Interactive documentation query (`cheat.sh`) |
+| `Prefix + Alt + e` | Prefix | **Dotfiles Config Switcher**: Fuzzy edit `.tmux.conf`, `.zshrc`, `nvim`, etc. |
+| `Prefix + Shift + Y` | Prefix | **Capture Full Visible Pane**: Copy visible screen text to system clipboard |
+| `Prefix + =` | Prefix | **Rebalance / Tile Panes**: Evenly tile all active panes |
 
 ### I. Copy-Mode & Clipboard
 | Keybinding | Scope | Description |
@@ -446,6 +453,12 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 
 | Script | Purpose |
 |---|---|
+| [`tmux-palette`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
+| [`tmux-open-path`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
+| [`tmux-scratchpad`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |
+| [`tmux-ports`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-ports) | Interactive listening ports inspector, process killer, and localhost opener. |
+| [`tmux-cheat`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-cheat) | Interactive developer cheatsheet and documentation HUD (`cheat.sh`). |
+| [`tmux-dotfiles`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-dotfiles) | Fuzzy dotfiles switcher and live config editor with auto-reload. |
 | [`tmux-sessionizer`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
 | [`tmux-agent-matrix`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
 | [`session-handoff`](file:///Users/alex/Github/config/terminal-configs/bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |

@@ -428,13 +428,34 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 # Quick access & Application Openers
 alias lg="lazygit"
 alias mu="mupdf"
-alias om='open -a "One Markdown"'
-alias omd='open -a "One Markdown"'
-alias onemarkdown='open -a "One Markdown"'
-alias prev='open -a Preview'
-alias preview='open -a Preview'
-alias finder='open'
-alias of='open -R'
+if [[ "$OSTYPE" == darwin* ]]; then
+    alias om='open -a "One Markdown"'
+    alias omd='open -a "One Markdown"'
+    alias onemarkdown='open -a "One Markdown"'
+    alias prev='open -a Preview'
+    alias preview='open -a Preview'
+    alias finder='open'
+    alias of='open -R'
+else
+    om() {
+        local target="${1:-}"
+        [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
+        if command -v glow >/dev/null; then
+            glow -p "$target"
+        elif command -v xdg-open >/dev/null; then
+            xdg-open "$target" &>/dev/null &
+        else
+            echo "No Markdown viewer found. Install glow or xdg-utils."
+            return 1
+        fi
+    }
+    alias omd='om'
+    alias onemarkdown='om'
+    alias prev='xdg-open'
+    alias preview='xdg-open'
+    alias finder='xdg-open'
+    alias of='xdg-open'
+fi
 
 # Yazi shell wrapper (changes terminal PWD on exit)
 function y() {
@@ -971,6 +992,8 @@ fssh() {
 handoff() {
   "$HOME/bin/session-handoff" "$@"
 }
+alias aghandoff='handoff'
+alias ag-handoff='handoff'
 
 matrix() {
   "$HOME/bin/tmux-agent-matrix" "${1:-2}" "${2:-claude}"

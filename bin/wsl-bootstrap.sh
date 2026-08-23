@@ -23,7 +23,7 @@ ok()     { echo -e "  ${GREEN}✓${NC} $*"; }
 info()   { echo -e "  ${CYAN}→${NC} $*"; }
 warn()   { echo -e "  ${YELLOW}!${NC} $*"; }
 
-DOTFILES="$HOME/Github/terminal-configs"
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ------------------------------------------------------------------------------
 # 1. Run the base Linux bootstrap

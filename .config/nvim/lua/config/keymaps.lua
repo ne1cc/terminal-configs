@@ -54,3 +54,56 @@ end, { desc = "Open selected file or URL silently" })
 
 -- Maximize / Zoom toggle for the current window split
 vim.keymap.set("n", "<leader>wm", "<cmd>WindowsMaximize<cr>", { desc = "Maximize / Zoom Window Split" })
+
+local function resolve_companion_file(extension)
+  local cfile = vim.fn.expand("<cfile>")
+  if cfile ~= "" and vim.fn.filereadable(cfile) == 1 and cfile:match("%." .. extension .. "$") then
+    return cfile
+  end
+
+  local current_file = vim.api.nvim_buf_get_name(0)
+  if current_file:match("%." .. extension .. "$") then
+    return current_file
+  end
+
+  local companion = vim.fn.expand("%:p:r") .. "." .. extension
+  if vim.fn.filereadable(companion) == 1 then
+    return companion
+  end
+
+  return nil
+end
+
+local function open_in_mupdf()
+  local target = resolve_companion_file("pdf")
+  if not target then
+    vim.notify("No valid PDF found to open.", vim.log.levels.WARN)
+    return
+  end
+
+  vim.fn.jobstart({ "mupdf", vim.fn.fnamemodify(target, ":p") }, { detach = true })
+  vim.notify("Opened in MuPDF: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+end
+
+local function open_in_omnireader()
+  local target = resolve_companion_file("epub")
+  if not target then
+    vim.notify("No valid EPUB found to open.", vim.log.levels.WARN)
+    return
+  end
+
+  local absolute_target = vim.fn.fnamemodify(target, ":p")
+  if vim.fn.has("mac") == 1 then
+    vim.fn.jobstart({ "open", "-a", "OmniReader", absolute_target }, { detach = true })
+  elseif vim.fn.executable("xdg-open") == 1 then
+    vim.fn.jobstart({ "xdg-open", absolute_target }, { detach = true })
+  else
+    vim.notify("No EPUB viewer found (OmniReader on macOS, xdg-open on Linux).", vim.log.levels.WARN)
+    return
+  end
+
+  vim.notify("Opened EPUB: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>op", open_in_mupdf, { desc = "Open PDF under cursor/buffer in MuPDF", silent = true })
+vim.keymap.set("n", "<leader>oe", open_in_omnireader, { desc = "Open EPUB under cursor/buffer in OmniReader", silent = true })

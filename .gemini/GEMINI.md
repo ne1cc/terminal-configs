@@ -36,3 +36,6 @@ When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or r
 ## 5. Inline Variables & Expressions
 - Wrap variable names, parameters, and short inline formulas in backtick code spans:
   - Examples: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
+
+## 6. Session Resumption & Handoffs
+- When asked to "resume", "continue", or "pick up where we left off", always check `.gemini/sessions/` or `~/.gemini/sessions/` for the latest dated session handoff document to instantly restore context, working branch, uncommitted diffs, and the open tasks roadmap.

@@ -81,8 +81,12 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Ctrl + x` | FZF-pick worktree in popup to force-remove (directory + branch) | Active Session |
 | `Prefix + Ctrl + g` | Centered floating **lazygit popup frame** (q to dismiss) | Active Pane |
 | `Prefix + a` | **Open/re-attach to persistent Claude popup session** | Active Session |
+| `Prefix + Alt + y` | **Open/re-attach to persistent Antigravity YOLO popup session (`agyy`)** | Active Session |
+| `Prefix + /` | **Interactive Command Palette HUD** (fuzzy search & trigger ANY workflow) | Active Window |
+| `Prefix + O` (`Shift + o`) | **Screen File & Stacktrace Jumper** (extract file paths on screen & jump in Neovim) | Active Window |
+| `Prefix + Alt + i` | **Instant Floating Scratchpad** (quick notes in `~/notes/scratchpad.md`) | Active Window |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
-| `Prefix + Ctrl + m` | **Agent Matrix Launcher** (interactive modal for 2-pane, 3-pane, or 4-pane parallel AI grid) | Active Session |
+| `Prefix + Ctrl + t` | **Agent Matrix Launcher** (interactive fzf modal for 2-pane, 3-pane, 4-pane, or mixed AI grid) | Active Session |
 | `Prefix + H` | **Session Handoff Snapshot** (dumps git status, diff stats, active tasks to markdown) | Active Session |
 | `Prefix + f` | **Fuzzy Project Switcher** (popup modal to search git repos & switch sessions) | Active Session |
 
@@ -96,6 +100,11 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + K` | **Interactive Process Killer Modal** (floating `fkill` process picker) | Active Window |
 | `Prefix + Ctrl + d` | **Interactive Docker Exec Modal** (fuzzy select container & drop into shell) | Active Window |
 | `Prefix + Ctrl + h` | **Interactive SSH Host Jumper Modal** (fuzzy select SSH host & connect) | Active Window |
+| `Prefix + Alt + k` | **Listening Ports & Dev Servers Inspector** (inspect ports, kill processes, open localhost) | Active Window |
+| `Prefix + Alt + c` | **Developer Cheatsheet & Docs HUD** (interactive query to `cheat.sh`) | Active Window |
+| `Prefix + Alt + e` | **Dotfiles Config Switcher & Editor** (fuzzy edit `.tmux.conf`, `.zshrc`, `nvim`, etc.) | Active Window |
+| `Prefix + Y` (`Shift + y`) | **Capture Full Visible Pane** to system clipboard with notification toast | Active Pane |
+| `Prefix + =` | **Rebalance / Tile Panes Evenly** in current window | Active Window |
 
 ### Advanced Logging & Archiving
 

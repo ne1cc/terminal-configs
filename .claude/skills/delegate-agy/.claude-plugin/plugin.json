@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "delegate-agy",
+  "version": "0.1.0",
+  "description": "Delegate tasks directly to Antigravity CLI (agy) from Claude Code prompts.",
+  "author": {
+    "name": "Alex Sun",
+    "email": "viciousshrapnel@gmail.com"
+  },
+  "skills": [
+    "./"
+  ]
+}

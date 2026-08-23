@@ -120,22 +120,19 @@ for script in "$REPO_DIR"/bin/*; do
 done
 
 if [[ -d "$REPO_DIR/claude-code" ]]; then
-  run mkdir -p "$HOME/.claude/commands"
-  [[ -f "$REPO_DIR/claude-code/CLAUDE.md" ]] && link_path "$REPO_DIR/claude-code/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-  for cmd in "$REPO_DIR/claude-code/commands"/*.md; do
-    [[ -f "$cmd" && "$(basename "$cmd")" != "README.md" ]] || continue
-    link_path "$cmd" "$HOME/.claude/commands/$(basename "$cmd")"
-  done
+  if "$DRY_RUN"; then
+    printf '[dry-run] %s/bin/link-claude-code.sh\n' "$REPO_DIR"
+  else
+    "$REPO_DIR/bin/link-claude-code.sh"
+  fi
 fi
 
-if [[ -d "$REPO_DIR/.gemini" ]]; then
-  run mkdir -p "$HOME/.gemini/config/skills"
-  [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]] && link_path "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
-  [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]] && link_path "$REPO_DIR/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md"
-  for skill_dir in "$REPO_DIR/.gemini/skills"/*; do
-    [[ -d "$skill_dir" ]] || continue
-    link_path "$skill_dir" "$HOME/.gemini/config/skills/$(basename "$skill_dir")"
-  done
+if [[ -x "$REPO_DIR/bin/link-agent-skills.sh" ]]; then
+  if "$DRY_RUN"; then
+    printf '[dry-run] %s/bin/link-agent-skills.sh\n' "$REPO_DIR"
+  else
+    "$REPO_DIR/bin/link-agent-skills.sh"
+  fi
 fi
 
 # Ghostty now uses ~/.config/ghostty/config on every supported platform. Remove

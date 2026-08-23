@@ -18,7 +18,7 @@ ok()     { echo -e "  ${GREEN}✓${NC} $*"; }
 info()   { echo -e "  ${CYAN}→${NC} $*"; }
 warn()   { echo -e "  ${YELLOW}!${NC} $*"; }
 
-DOTFILES="$HOME/Github/terminal-configs"
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ------------------------------------------------------------------------------
 # 1. Homebrew
@@ -86,65 +86,14 @@ cd "$DOTFILES"
 stow --target="$HOME" --restow .
 ok "All dotfiles linked."
 
-# ==============================================================================
-# Setup Claude Code global configurations (since ~/.claude is ignored by Stow)
-# ==============================================================================
-CLAUDE_DIR="$HOME/.claude"
-CLAUDE_CMD_DIR="$CLAUDE_DIR/commands"
+"$DOTFILES/bin/link-stow-extras.sh"
+ok "Stow-excluded paths linked (nvim, bin, taskrc)."
 
-info "Setting up global Claude Code configurations..."
-mkdir -p "$CLAUDE_CMD_DIR"
+"$DOTFILES/bin/link-claude-code.sh"
+ok "Claude Code global configuration linked."
 
-# Link global CLAUDE.md
-GLOBAL_CLAUDE_DEST="$CLAUDE_DIR/CLAUDE.md"
-if [ -f "$GLOBAL_CLAUDE_DEST" ] && [ ! -L "$GLOBAL_CLAUDE_DEST" ]; then
-    BACKUP="$GLOBAL_CLAUDE_DEST.backup_$(date +%Y%m%d_%H%M%S)"
-    warn "Backing up existing global CLAUDE.md to $BACKUP"
-    mv "$GLOBAL_CLAUDE_DEST" "$BACKUP"
-fi
-ln -sf "$DOTFILES/claude-code/CLAUDE.md" "$GLOBAL_CLAUDE_DEST"
-ok "Symlinked global CLAUDE.md"
-
-# Link slash commands
-for cmd in "$DOTFILES/claude-code/commands"/*.md; do
-    cmd_name=$(basename "$cmd")
-    if [ "$cmd_name" != "README.md" ]; then
-        dest="$CLAUDE_CMD_DIR/$cmd_name"
-        if [ -f "$dest" ] && [ ! -L "$dest" ]; then
-            BACKUP="$dest.backup_$(date +%Y%m%d_%H%M%S)"
-            warn "Backing up existing command $cmd_name to $BACKUP"
-            mv "$dest" "$BACKUP"
-        fi
-        ln -sf "$cmd" "$dest"
-        ok "Symlinked command: /$cmd_name"
-    fi
-done
-
-# ==============================================================================
-# Setup Antigravity / Gemini skills and global markdown rules
-# ==============================================================================
-GEMINI_DIR="$HOME/.gemini/config"
-GEMINI_SKILLS_DIR="$GEMINI_DIR/skills"
-
-info "Setting up global Antigravity / Gemini skills..."
-mkdir -p "$GEMINI_SKILLS_DIR"
-
-if [ -f "$DOTFILES/.gemini/GEMINI.md" ]; then
-    ln -sf "$DOTFILES/.gemini/GEMINI.md" "$HOME/GEMINI.md"
-    ln -sf "$DOTFILES/.gemini/GEMINI.md" "$GEMINI_DIR/GEMINI.md"
-    ok "Symlinked global GEMINI.md"
-fi
-
-if [ -d "$DOTFILES/.gemini/skills" ]; then
-    for skill in "$DOTFILES/.gemini/skills"/*; do
-        if [ -d "$skill" ]; then
-            skill_name=$(basename "$skill")
-            dest="$GEMINI_SKILLS_DIR/$skill_name"
-            ln -sfn "$skill" "$dest"
-        fi
-    done
-    ok "Symlinked $(ls -1 "$DOTFILES/.gemini/skills" | wc -l | tr -d ' ') skills to $GEMINI_SKILLS_DIR"
-fi
+"$DOTFILES/bin/link-agent-skills.sh"
+ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
 
 # ------------------------------------------------------------------------------
 # 7. fnm / Node

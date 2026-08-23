@@ -18,7 +18,7 @@ ok()     { echo -e "  ${GREEN}✓${NC} $*"; }
 info()   { echo -e "  ${CYAN}→${NC} $*"; }
 warn()   { echo -e "  ${YELLOW}!${NC} $*"; }
 
-DOTFILES="$HOME/Github/terminal-configs"
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ------------------------------------------------------------------------------
 # 1. System packages (apt)
@@ -168,14 +168,29 @@ fi
 ok "All dotfiles linked."
 
 # ------------------------------------------------------------------------------
-# 9. Git credential helper
+# 9. Stow-excluded paths, Claude Code, and agent skills
+# ------------------------------------------------------------------------------
+header "Stow-excluded paths"
+"$DOTFILES/bin/link-stow-extras.sh"
+ok "Linked nvim, bin scripts, and taskrc."
+
+header "Claude Code"
+"$DOTFILES/bin/link-claude-code.sh"
+ok "Claude Code global configuration linked."
+
+header "Agent skills"
+"$DOTFILES/bin/link-agent-skills.sh"
+ok "Agent skills linked."
+
+# ------------------------------------------------------------------------------
+# 10. Git credential helper
 # ------------------------------------------------------------------------------
 header "Git credential helper"
 git config --global credential.helper store
 ok "Git credential helper set to 'store'."
 
 # ------------------------------------------------------------------------------
-# 10. fnm / Node
+# 11. fnm / Node
 # ------------------------------------------------------------------------------
 header "Node.js (fnm)"
 if command -v fnm >/dev/null 2>&1; then
