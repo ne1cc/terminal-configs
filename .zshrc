@@ -429,15 +429,16 @@ alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nor
 alias lg="lazygit"
 alias mu="mupdf"
 if [[ "$OSTYPE" == darwin* ]]; then
-    alias om='open -a "One Markdown"'
-    alias omd='open -a "One Markdown"'
-    alias onemarkdown='open -a "One Markdown"'
+    om() {
+        local target="${1:-}"
+        [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
+        open -a "One Markdown" "$target"
+    }
     mt() {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
         open -na "Mark Text" --args "$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
     }
-    alias marktext='mt'
     alias prev='open -a Preview'
     alias preview='open -a Preview'
     alias finder='open'
@@ -455,8 +456,6 @@ else
             return 1
         fi
     }
-    alias omd='om'
-    alias onemarkdown='om'
     mt() {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
@@ -469,12 +468,14 @@ else
             return 1
         fi
     }
-    alias marktext='mt'
     alias prev='xdg-open'
     alias preview='xdg-open'
     alias finder='xdg-open'
     alias of='xdg-open'
 fi
+alias omd='om'
+alias onemarkdown='om'
+alias marktext='mt'
 
 # Yazi shell wrapper (changes terminal PWD on exit)
 function y() {
