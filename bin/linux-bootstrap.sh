@@ -163,7 +163,8 @@ if [[ ${#CONFLICTING[@]} -gt 0 ]]; then
     fi
 fi
 
-stow --target="$HOME" --restow .
+# install.sh restows via GNU Stow, then links Claude/config/bin and installs TPM.
+"$DOTFILES/install.sh"
 ok "All dotfiles linked."
 
 # ------------------------------------------------------------------------------

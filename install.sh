@@ -14,7 +14,11 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Symlinking dotfiles from $DOTFILES → $HOME"
 cd "$DOTFILES"
-stow --target="$HOME" --restow .
+# setup.sh creates absolute ln -s links; GNU Stow treats those as foreign
+# and aborts. Keep going — the explicit link loop below repairs them.
+if ! stow --target="$HOME" --restow .; then
+    echo "Stow reported conflicts (usually existing absolute symlinks). Continuing with explicit links."
+fi
 
 # ==============================================================================
 # Setup Claude Code global configurations (since ~/.claude is ignored by Stow)
@@ -57,10 +61,16 @@ CONFIG_DIR="$HOME/.config"
 mkdir -p "$CONFIG_DIR" "$HOME/bin"
 
 echo "Linking ~/.config directories and tools..."
-for cfg in nvim ghostty alacritty lazygit yazi starship.toml; do
+for cfg in nvim ghostty alacritty lazygit yazi starship.toml glow; do
     if [ -e "$DOTFILES/.config/$cfg" ]; then
-        ln -sfn "$DOTFILES/.config/$cfg" "$CONFIG_DIR/$cfg"
-        echo "  Symlinked $CONFIG_DIR/$cfg -> $DOTFILES/.config/$cfg"
+        dest="$CONFIG_DIR/$cfg"
+        # ln -sfn will not replace a real directory; it nests a symlink inside.
+        if [ -d "$dest" ] && [ ! -L "$dest" ]; then
+            echo "  Replacing directory $dest with symlink"
+            rm -rf "$dest"
+        fi
+        ln -sfn "$DOTFILES/.config/$cfg" "$dest"
+        echo "  Symlinked $dest -> $DOTFILES/.config/$cfg"
     fi
 done
 
@@ -70,6 +80,20 @@ for script in "$DOTFILES"/bin/*; do
         ln -sf "$script" "$HOME/bin/$sname"
     fi
 done
+
+# ------------------------------------------------------------------------------
+# Tmux plugin manager (TPM) + plugins
+# .tmux.conf ends with `run '~/.tmux/plugins/tpm/tpm'`, so TPM must be present.
+# It is NOT vendored here (it carries its own .git); clone at install time and
+# install resurrect / continuum / logging non-interactively.
+# ------------------------------------------------------------------------------
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$TPM_DIR" ]; then
+    echo "Installing TPM → $TPM_DIR"
+    git clone --depth=1 https://github.com/tmux-plugins/tpm "$TPM_DIR"
+fi
+echo "Installing tmux plugins via TPM"
+"$TPM_DIR/bin/install_plugins" || true
 
 echo "Done. Restart your terminal or run: source ~/.zshrc"
 

@@ -15,4 +15,5 @@
 ^\.tmux$
 nvim
 bin
+glow
 ^\.bashrc$
