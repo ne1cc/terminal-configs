@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — Neovim Neo-tree Configuration
+- Configured `hijack_netrw_behavior = "open_default"` so opening directories opens the left Neo-tree sidebar instead of netrw/full-window buffer.
+- Added `VimEnter` autocommand to automatically open the Neo-tree sidebar on startup when opening directory paths or starting with an empty buffer, preserving seamless preview capabilities (`P`).
+
 ### Added — Claude Code Configuration
 - Unified global [CLAUDE.md](file:///home/alexander/Github/terminal-configs/claude-code/CLAUDE.md) incorporating the MSTSPAT (Minimal, Self-documenting, Type-exact, Secure, Performant, Accessible, and Testable) code quality standard, mandatory `<thinking>` planning tags, Stack Preferences (TypeScript/Next.js/bun, Python/uv), and Pacific Time timezone settings.
 - Integrated custom Claude Code slash commands [plan.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/plan.md), [cook.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/cook.md), [continue.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/continue.md), and [release.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/release.md) under `claude-code/commands/`.
