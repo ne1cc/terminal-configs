@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Antigravity / Gemini Skills & Markdown Rules
+- Added all 100+ Antigravity skills (including newly created `markdown-architect` and full domain suites) to `.gemini/skills/`.
+- Tracked global formatting rules `GEMINI.md` in repository root under `.gemini/GEMINI.md`.
+- Updated [setup.sh](file:///Users/alex/Github/config/terminal-configs/setup.sh), [install.sh](file:///Users/alex/Github/config/terminal-configs/install.sh), and [bin/mac-bootstrap.sh](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
+
 ### Changed — Neovim Neo-tree Configuration
 - Configured `hijack_netrw_behavior = "open_default"` so opening directories opens the left Neo-tree sidebar instead of netrw/full-window buffer.
 - Added `VimEnter` autocommand to automatically open the Neo-tree sidebar on startup when opening directory paths or starting with an empty buffer, preserving seamless preview capabilities (`P`).

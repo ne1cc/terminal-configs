@@ -120,6 +120,31 @@ for cmd in "$DOTFILES/claude-code/commands"/*.md; do
     fi
 done
 
+# ==============================================================================
+# Setup Antigravity / Gemini skills and global markdown rules
+# ==============================================================================
+GEMINI_DIR="$HOME/.gemini/config"
+GEMINI_SKILLS_DIR="$GEMINI_DIR/skills"
+
+info "Setting up global Antigravity / Gemini skills..."
+mkdir -p "$GEMINI_SKILLS_DIR"
+
+if [ -f "$DOTFILES/.gemini/GEMINI.md" ]; then
+    ln -sf "$DOTFILES/.gemini/GEMINI.md" "$HOME/GEMINI.md"
+    ln -sf "$DOTFILES/.gemini/GEMINI.md" "$GEMINI_DIR/GEMINI.md"
+    ok "Symlinked global GEMINI.md"
+fi
+
+if [ -d "$DOTFILES/.gemini/skills" ]; then
+    for skill in "$DOTFILES/.gemini/skills"/*; do
+        if [ -d "$skill" ]; then
+            skill_name=$(basename "$skill")
+            dest="$GEMINI_SKILLS_DIR/$skill_name"
+            ln -sfn "$skill" "$dest"
+        fi
+    done
+    ok "Symlinked $(ls -1 "$DOTFILES/.gemini/skills" | wc -l | tr -d ' ') skills to $GEMINI_SKILLS_DIR"
+fi
 
 # ------------------------------------------------------------------------------
 # 7. fnm / Node

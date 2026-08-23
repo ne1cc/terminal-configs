@@ -12,6 +12,7 @@
 # Machine-local, hand-maintained — never stow these:
 ^\.gitconfig$
 ^\.claude$
+^\.gemini$
 ^\.tmux$
 nvim
 bin

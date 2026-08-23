@@ -119,6 +119,14 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Prefix + Ctrl + p` | Prefix | Open/reattach project-specific Claude popup session |
 | `Prefix + Shift + A` | Prefix | Open side-by-side Claude pane (35% width split) |
 | `Prefix + Ctrl + c` | Prefix | Spawn new full window running Claude in `$PWD` |
+| `Prefix + Ctrl + m` | Prefix | **Agent Matrix**: Interactive modal to tile 2, 3, or 4 parallel AI agents |
+| `Prefix + Shift + H` | Prefix | **Session Handoff**: Auto-generate markdown handoff note with git status & diff stats |
+| `Prefix + Shift + D` | Prefix | **Dev Workspace**: Instant 3-pane IDE layout (Editor 65% + server & shell 35%) |
+| `Prefix + Alt + Shift + D` | Prefix | **Triage Workspace**: Instant 4-pane 2x2 grid for debugging |
+| `Prefix + Shift + T` | Prefix | **Telemetry Dashboard**: Centered floating `btop` / `htop` hardware monitor |
+| `Prefix + Shift + K` | Prefix | **Interactive Process Killer**: Centered floating `fkill` process picker |
+| `Prefix + Ctrl + d` | Prefix | **Docker Exec Jumper**: Fuzzy select running container and drop into shell |
+| `Prefix + Ctrl + h` | Prefix | **SSH Host Jumper**: Fuzzy select SSH host from config and connect |
 
 ### I. Copy-Mode & Clipboard
 | Keybinding | Scope | Description |
@@ -228,6 +236,11 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|
 | `fo` | Fuzzy find a file with syntax-highlighted `bat` preview and open in `$EDITOR` |
 | `fkill` | Interactive fuzzy process killer with live arguments preview (supports multi-select with `Tab`) |
+| `fdocker` | Interactive fuzzy Docker container switcher & interactive shell attach |
+| `fssh` | Interactive fuzzy SSH host jumper parsed from `~/.ssh/config` |
+| `handoff [topic]` | Capture git diff stats, status, and active tasks into markdown session note |
+| `matrix [2|3|4]` | Spawn parallel AI agents across 2-pane, 3-pane, or 4-pane tiled tmux grid |
+| `gb-clean` | Safely delete local branches already merged into default remote branch |
 | `fenv` | Interactive fuzzy search across all environment variables |
 | `Ctrl + R` | Interactive fuzzy shell command history search |
 | `Ctrl + T` | Interactive fuzzy file picker |
@@ -434,6 +447,9 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | Script | Purpose |
 |---|---|
 | [`tmux-sessionizer`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
+| [`tmux-agent-matrix`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
+| [`session-handoff`](file:///Users/alex/Github/config/terminal-configs/bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |
+| [`tmux-workspace`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-workspace) | Instant declarative IDE-like workspace layouts (`dev`, `ai`, `triage`). |
 | [`tmux-join-panes`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
 | [`tmux-save-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
 | [`tmux-restore-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |

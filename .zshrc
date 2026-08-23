@@ -942,6 +942,50 @@ fenv() {
   env | sort | fzf --header='[Environment Variables]'
 }
 
+fdocker() {
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "Error: docker command not found" >&2
+    return 1
+  fi
+  local cid
+  cid=$(docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}" 2>/dev/null | \
+    fzf --header-lines=1 --reverse --header="[Select Docker Container to Exec]" | awk '{print $1}')
+  if [[ -n "$cid" ]]; then
+    echo "Attaching to container $cid..."
+    docker exec -it "$cid" /bin/sh -c "[ -e /bin/bash ] && exec /bin/bash || exec /bin/sh"
+  fi
+}
+
+fssh() {
+  local host
+  host=$(awk '/^Host / && !/\*/ {print $2}' ~/.ssh/config 2>/dev/null | fzf --reverse --header="[Select SSH Host]")
+  if [[ -n "$host" ]]; then
+    if [[ -n "$TMUX" ]]; then
+      tmux new-window -n "ssh:$host" "ssh $host"
+    else
+      ssh "$host"
+    fi
+  fi
+}
+
+handoff() {
+  "$HOME/bin/session-handoff" "$@"
+}
+
+matrix() {
+  "$HOME/bin/tmux-agent-matrix" "${1:-2}" "${2:-claude}"
+}
+
+gb-clean() {
+  local default_branch
+  default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+  default_branch="${default_branch:-main}"
+  echo "Pruning branches merged into $default_branch..."
+  git checkout "$default_branch" 2>/dev/null && git pull --ff-only 2>/dev/null
+  git branch --merged "$default_branch" | grep -v "^\*\|master\|main\|dev" | xargs -n 1 git branch -d 2>/dev/null || true
+  echo "✓ Local merged branches cleaned."
+}
+
 # --- Smart Shell Ergonomics ---
 mcd() {
   mkdir -p "$1" && cd "$1"

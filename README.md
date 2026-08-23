@@ -30,6 +30,9 @@ terminal-configs/
 ├── claude-code/
 │   ├── CLAUDE.md        # Unified global instructions (merged MSTSPAT standards)
 │   └── commands/        # Custom slash commands (/plan, /cook, /continue, /release)
+├── .gemini/
+│   ├── GEMINI.md        # Global Markdown and typography rules
+│   └── skills/          # Complete suite of Antigravity AI skills (100+ specialized agents)
 ├── docs/                # Specialized workflow and shortcut guides
 ├── .inputrc             # GNU Readline keybindings
 ├── .p10k.zsh            # Powerlevel10k prompt settings

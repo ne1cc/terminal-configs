@@ -128,6 +128,16 @@ if [[ -d "$REPO_DIR/claude-code" ]]; then
   done
 fi
 
+if [[ -d "$REPO_DIR/.gemini" ]]; then
+  run mkdir -p "$HOME/.gemini/config/skills"
+  [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]] && link_path "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
+  [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]] && link_path "$REPO_DIR/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md"
+  for skill_dir in "$REPO_DIR/.gemini/skills"/*; do
+    [[ -d "$skill_dir" ]] || continue
+    link_path "$skill_dir" "$HOME/.gemini/config/skills/$(basename "$skill_dir")"
+  done
+fi
+
 # Ghostty now uses ~/.config/ghostty/config on every supported platform. Remove
 # the obsolete macOS location only when it is our previously-managed symlink;
 # loading both files applies keybindings twice and produces duplicate errors.

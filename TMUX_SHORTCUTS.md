@@ -82,7 +82,20 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Ctrl + g` | Centered floating **lazygit popup frame** (q to dismiss) | Active Pane |
 | `Prefix + a` | **Open/re-attach to persistent Claude popup session** | Active Session |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
+| `Prefix + Ctrl + m` | **Agent Matrix Launcher** (interactive modal for 2-pane, 3-pane, or 4-pane parallel AI grid) | Active Session |
+| `Prefix + H` | **Session Handoff Snapshot** (dumps git status, diff stats, active tasks to markdown) | Active Session |
 | `Prefix + f` | **Fuzzy Project Switcher** (popup modal to search git repos & switch sessions) | Active Session |
+
+### Power-User Workspaces & Telemetry Modals
+
+| Keybinding | Action | Context / Scope |
+|---|---|---|
+| `Prefix + D` | **Instant Dev Workspace Layout** (65% Neovim / 35% server & shell stack) | Active Window |
+| `Prefix + Alt + D` | **Instant Triage Workspace Layout** (4-pane 2x2 grid for incident/bug analysis) | Active Window |
+| `Prefix + T` | **Hardware & Process Telemetry Modal** (floating `btop`/`htop` overlay) | Active Window |
+| `Prefix + K` | **Interactive Process Killer Modal** (floating `fkill` process picker) | Active Window |
+| `Prefix + Ctrl + d` | **Interactive Docker Exec Modal** (fuzzy select container & drop into shell) | Active Window |
+| `Prefix + Ctrl + h` | **Interactive SSH Host Jumper Modal** (fuzzy select SSH host & connect) | Active Window |
 
 ### Advanced Logging & Archiving
 

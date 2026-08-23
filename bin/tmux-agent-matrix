@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# tmux-agent-matrix — Orchestrate parallel AI agent workflows across tiled panes
+# ==============================================================================
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+LAYOUT="${1:-2}" # 2 (side-by-side), 3 (1-left 2-right), 4 (2x2 grid)
+AGENT_CMD="${2:-claude}" # 'claude' or 'agy'
+
+if [ -z "${TMUX:-}" ]; then
+    echo "Error: tmux-agent-matrix must be run from inside a tmux session."
+    exit 1
+fi
+
+CURRENT_DIR="$(pwd)"
+WINDOW_NAME="matrix-$(date +%H%M)"
+
+# Create a clean new window for the matrix
+tmux new-window -n "$WINDOW_NAME" -c "$CURRENT_DIR" "$AGENT_CMD"
+
+case "$LAYOUT" in
+    2)
+        # 2-pane side-by-side (50% split)
+        tmux split-window -h -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux select-layout even-horizontal
+        ;;
+    3)
+        # 3-pane: 1 main (50% left), 2 stacked (50% right)
+        tmux split-window -h -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux split-window -v -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux select-pane -L
+        ;;
+    4)
+        # 4-pane 2x2 grid
+        tmux split-window -h -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux split-window -v -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux select-pane -t :.1
+        tmux split-window -v -c "$CURRENT_DIR" "$AGENT_CMD"
+        tmux select-layout tiled
+        ;;
+    *)
+        echo "Usage: tmux-agent-matrix [2|3|4] [claude|agy]"
+        ;;
+esac
+
+tmux select-pane -t :.1
+tmux display-message "✓ Launched Agent Matrix ($LAYOUT panes: $AGENT_CMD)"
