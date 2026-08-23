@@ -40,9 +40,19 @@ return {
         hijack_netrw_behavior = "open_default",
         use_libuv_file_watcher = true,
       },
+      commands = {
+        open_mupdf = function(state)
+          local node = state.tree:get_node()
+          local filepath = node:get_id()
+          if filepath and node.type == "file" then
+            vim.fn.jobstart({ "mupdf", filepath }, { detach = true })
+          end
+        end,
+      },
       window = {
         mappings = {
           ["E"] = "expand_all",
+          ["M"] = "open_mupdf",
         },
       },
     },
