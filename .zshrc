@@ -432,6 +432,12 @@ if [[ "$OSTYPE" == darwin* ]]; then
     alias om='open -a "One Markdown"'
     alias omd='open -a "One Markdown"'
     alias onemarkdown='open -a "One Markdown"'
+    mt() {
+        local target="${1:-}"
+        [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
+        open -na "Mark Text" --args "$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
+    }
+    alias marktext='mt'
     alias prev='open -a Preview'
     alias preview='open -a Preview'
     alias finder='open'
@@ -451,6 +457,19 @@ else
     }
     alias omd='om'
     alias onemarkdown='om'
+    mt() {
+        local target="${1:-}"
+        [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
+        if command -v marktext >/dev/null; then
+            marktext "$target" &
+        elif command -v flatpak >/dev/null; then
+            flatpak run com.github.marktext.marktext "$target" &
+        else
+            echo "Mark Text not found. Install marktext or flatpak Mark Text."
+            return 1
+        fi
+    }
+    alias marktext='mt'
     alias prev='xdg-open'
     alias preview='xdg-open'
     alias finder='xdg-open'

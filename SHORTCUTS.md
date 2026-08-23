@@ -276,6 +276,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `lgd` | Launch Lazygit in dotfiles repository (`~/dotfiles`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
 | `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
+| `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |
 | `prev` / `preview` | Open file in Apple **Preview** |
 | `finder` | Open current directory in macOS Finder |
 | `of <file>` | Reveal file in macOS Finder (`open -R`) |
@@ -346,7 +347,10 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>p` / `<Leader>pi` | Normal | **Paste image from clipboard** directly into Markdown (`img-clip.nvim`) |
 | `<Leader>ic` | Normal | **Clear image overlays** (fixes terminal ghosting artifacts) |
 | `<Leader>~` / `<Leader>ms` | Normal / Visual | **Toggle strikethrough** (`~~text~~`) |
-| `<Leader>pdf` | Normal | Open PDF under cursor or companion `.pdf` file in **MuPDF** |
+| `<Leader>op` | Normal | Open PDF under cursor or companion `.pdf` file in **MuPDF** |
+| `<Leader>oe` | Normal | Open EPUB under cursor or companion `.epub` file in **OmniReader** |
+| `<Leader>om` | Normal | Open Markdown under cursor or buffer in **One Markdown** |
+| `<Leader>mt` | Normal | Open Markdown under cursor or buffer in **Mark Text** (new window) |
 | `j` / `]i` | Normal (Image buffer) | View next image in folder gallery |
 | `k` / `[i` | Normal (Image buffer) | View previous image in folder gallery |
 

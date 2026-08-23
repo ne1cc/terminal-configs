@@ -107,3 +107,87 @@ end
 
 vim.keymap.set("n", "<leader>op", open_in_mupdf, { desc = "Open PDF under cursor/buffer in MuPDF", silent = true })
 vim.keymap.set("n", "<leader>oe", open_in_omnireader, { desc = "Open EPUB under cursor/buffer in OmniReader", silent = true })
+
+local function is_markdown(path)
+  return path:match("%.md$") or path:match("%.markdown$")
+end
+
+local function resolve_markdown_file()
+  local cfile = vim.fn.expand("<cfile>")
+  if cfile ~= "" and vim.fn.filereadable(cfile) == 1 and is_markdown(cfile) then
+    return cfile
+  end
+
+  local current_file = vim.api.nvim_buf_get_name(0)
+  if current_file ~= "" and is_markdown(current_file) then
+    return current_file
+  end
+
+  for _, ext in ipairs({ "md", "markdown" }) do
+    local companion = vim.fn.expand("%:p:r") .. "." .. ext
+    if vim.fn.filereadable(companion) == 1 then
+      return companion
+    end
+  end
+
+  return nil
+end
+
+local function open_in_one_markdown()
+  local target = resolve_markdown_file()
+  if not target then
+    vim.notify("No valid Markdown file found to open.", vim.log.levels.WARN)
+    return
+  end
+
+  local absolute_target = vim.fn.fnamemodify(target, ":p")
+  if vim.fn.has("mac") == 1 then
+    vim.fn.jobstart({ "open", "-a", "One Markdown", absolute_target }, { detach = true })
+  elseif vim.fn.executable("glow") == 1 then
+    vim.fn.jobstart({ "glow", "-p", absolute_target }, { detach = true })
+  elseif vim.fn.executable("xdg-open") == 1 then
+    vim.fn.jobstart({ "xdg-open", absolute_target }, { detach = true })
+  else
+    vim.notify("No Markdown viewer found (One Markdown on macOS, glow/xdg-open on Linux).", vim.log.levels.WARN)
+    return
+  end
+
+  vim.notify("Opened in One Markdown: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+end
+
+local function open_in_marktext()
+  local target = resolve_markdown_file()
+  if not target then
+    vim.notify("No valid Markdown file found to open.", vim.log.levels.WARN)
+    return
+  end
+
+  local absolute_target = vim.fn.fnamemodify(target, ":p")
+  local launched = false
+
+  if vim.fn.has("mac") == 1 then
+    vim.fn.jobstart({ "open", "-na", "Mark Text", "--args", absolute_target }, { detach = true })
+    launched = true
+  elseif vim.fn.executable("marktext") == 1 then
+    vim.fn.jobstart({ "marktext", absolute_target }, { detach = true })
+    launched = true
+  elseif vim.fn.executable("flatpak") == 1 then
+    vim.fn.jobstart({
+      "flatpak",
+      "run",
+      "com.github.marktext.marktext",
+      absolute_target,
+    }, { detach = true })
+    launched = true
+  end
+
+  if not launched then
+    vim.notify("Mark Text not found (install Mark Text or marktext CLI).", vim.log.levels.WARN)
+    return
+  end
+
+  vim.notify("Opened in Mark Text (new window): " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>om", open_in_one_markdown, { desc = "Open Markdown under cursor/buffer in One Markdown", silent = true })
+vim.keymap.set("n", "<leader>mt", open_in_marktext, { desc = "Open Markdown under cursor/buffer in Mark Text (new window)", silent = true })
