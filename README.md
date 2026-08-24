@@ -11,6 +11,7 @@ A premium, curated repository for my complete terminal environment, shell config
 * ✍️ **[10X Neovim Session Guide](file:///Users/alex/Github/config/terminal-configs/docs/10X_NEOVIM_SESSION.md)** — Neovim workflows, buffer management, and image integration.
 * 🩺 **[LSP Shortcuts](file:///Users/alex/Github/config/terminal-configs/docs/LSP_SHORTCUTS.md)** — Code navigation, diagnostics, and formatting.
 * ✅ **[Taskwarrior Guide](file:///Users/alex/Github/config/terminal-configs/docs/TASKWARRIOR_GUIDE.md)** — Terminal task tracking workflows.
+* 🗂️ **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Per-platform bootstrap: macOS, Linux, WSL, and daily sync workflow.
 
 ---
 
@@ -64,7 +65,7 @@ brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
 ```
 The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; establishes symlinks from the repository folder to your home directory; and runs `setup-github-workspace` to create the identical `~/Github` layout on every machine.
 
-**Fresh machine bootstrap** (pick one):
+**Fresh machine bootstrap** — see **[docs/GITHUB_WORKSPACE_SETUP.md](docs/GITHUB_WORKSPACE_SETUP.md)** for full per-platform walkthrough. Quick start:
 
 ```bash
 # macOS (Apple Silicon or Intel)
