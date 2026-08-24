@@ -289,7 +289,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `sync-n1ecC` | Same as `ghsync` (also in `~/bin`) |
 | `gharchive` | Same as `ghar` (also in `~/bin`) |
 | `pin-portfolio` | Same as `ghpin` (also in `~/bin`) |
-| `setup-github-workspace` | Create `~/Github` layout (run by install/bootstrap) |
+| `setup-github-workspace` | Create full `~/Github` tree (macOS, Linux, WSL) — run by install/bootstrap |
 
 ### I. Application Launchers & File Handlers
 | Command / Alias | Action / Purpose |
@@ -498,7 +498,7 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | [`linux-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
 | [`wsl-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
 | [`setup.sh`](file:///Users/alex/Github/n1ecC/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
-| [`setup-github-workspace`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-workspace) | Creates `~/Github` folder layout and `_tools` symlinks. |
+| [`setup-github-workspace`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
 | [`sync-n1ecC`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/sync-n1ecC) | Clone/pull all github.com/n1ecC repos into `~/Github/n1ecC/`. |
 | [`gharchive`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
 | [`pin-portfolio`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |

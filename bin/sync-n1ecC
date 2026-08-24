@@ -15,7 +15,7 @@ mkdir -p "$N1ECC_DIR"
 
 is_excluded() {
   local name="$1"
-  [[ -f "$EXCLUDE_FILE" ]] && grep -qxF "$name" "$EXCLUDE_FILE"
+  [[ -f "$EXCLUDE_FILE" ]] && grep -vxE '^\s*(#|$)' "$EXCLUDE_FILE" | grep -qxF "$name"
 }
 
 list_repos() {

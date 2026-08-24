@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Create ~/Github folder layout, workspace gitignores, and _tools symlinks.
-# Called by install.sh, setup.sh, and mac-bootstrap.sh.
+# Create ~/Github folder layout on any machine (macOS, Linux, WSL).
+# Copies starter README/gitignores, links _tools scripts from terminal-configs.
+# Called by install.sh, setup.sh, and platform bootstrap scripts.
 
 set -euo pipefail
 
@@ -8,44 +9,68 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
 TEMPLATES="$DOTFILES/templates/github-workspace"
 
-echo "==> Github workspace -> ${GITHUB_ROOT}"
-
-mkdir -p \
-  "$GITHUB_ROOT/n1ecC" \
-  "$GITHUB_ROOT/config/local" \
-  "$GITHUB_ROOT/explore" \
-  "$GITHUB_ROOT/archive" \
-  "$GITHUB_ROOT/tracking" \
-  "$GITHUB_ROOT/_tools" \
-  "$GITHUB_ROOT/workspace/msba" \
-  "$GITHUB_ROOT/workspace/sandboxes" \
+# Top-level and nested directories — same tree on every platform.
+GITHUB_DIRS=(
+  "$GITHUB_ROOT/n1ecC"
+  "$GITHUB_ROOT/config/dotfiles"
+  "$GITHUB_ROOT/config/scripts"
+  "$GITHUB_ROOT/config/analytics"
+  "$GITHUB_ROOT/config/docs"
+  "$GITHUB_ROOT/config/external"
+  "$GITHUB_ROOT/config/local"
+  "$GITHUB_ROOT/explore"
+  "$GITHUB_ROOT/archive"
+  "$GITHUB_ROOT/tracking"
+  "$GITHUB_ROOT/_tools"
+  "$GITHUB_ROOT/workspace/msba"
+  "$GITHUB_ROOT/workspace/sandboxes"
   "$GITHUB_ROOT/workspace/datasets"
+)
 
-if [[ ! -f "$GITHUB_ROOT/README.md" && -f "$TEMPLATES/README.md" ]]; then
-  cp "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
-  echo "  created: $GITHUB_ROOT/README.md"
-fi
+GITHUB_SCRIPTS=(
+  sync-n1ecC
+  gharchive
+  pin-portfolio
+  setup-github-profile
+  setup-github-workspace
+)
 
-for template in workspace.gitignore datasets.gitignore datasets.README.md; do
-  src="$TEMPLATES/$template"
-  case "$template" in
-    workspace.gitignore) dest="$GITHUB_ROOT/workspace/.gitignore" ;;
-    datasets.gitignore) dest="$GITHUB_ROOT/workspace/datasets/.gitignore" ;;
-    datasets.README.md) dest="$GITHUB_ROOT/workspace/datasets/README.md" ;;
-  esac
+install_template() {
+  local src="$1"
+  local dest="$2"
   if [[ -f "$src" && ! -f "$dest" ]]; then
     cp "$src" "$dest"
     echo "  created: $dest"
   fi
+}
+
+echo "==> Github workspace -> ${GITHUB_ROOT}"
+
+for dir in "${GITHUB_DIRS[@]}"; do
+  mkdir -p "$dir"
 done
+echo "  directories: ${#GITHUB_DIRS[@]} paths ensured"
+
+install_template "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
+install_template "$TEMPLATES/config.README.md" "$GITHUB_ROOT/config/README.md"
+install_template "$TEMPLATES/archive.MANIFEST.md" "$GITHUB_ROOT/archive/MANIFEST.md"
+install_template "$TEMPLATES/archive-exclude.txt" "$GITHUB_ROOT/_tools/archive-exclude.txt"
+install_template "$TEMPLATES/workspace.gitignore" "$GITHUB_ROOT/workspace/.gitignore"
+install_template "$TEMPLATES/datasets.gitignore" "$GITHUB_ROOT/workspace/datasets/.gitignore"
+install_template "$TEMPLATES/datasets.README.md" "$GITHUB_ROOT/workspace/datasets/README.md"
 
 touch "$GITHUB_ROOT/_tools/archive-exclude.txt"
 
-for script in sync-n1ecC gharchive pin-portfolio setup-github-profile; do
+for script in "${GITHUB_SCRIPTS[@]}"; do
   if [[ -x "$DOTFILES/bin/$script" ]]; then
     ln -sf "$DOTFILES/bin/$script" "$GITHUB_ROOT/_tools/$script"
-    echo "  linked: _tools/$script -> terminal-configs/bin/$script"
+    echo "  linked: _tools/$script"
+    # Remove legacy duplicate scripts from before terminal-configs port.
+    [[ -f "$GITHUB_ROOT/_tools/${script}.sh" && ! -L "$GITHUB_ROOT/_tools/${script}.sh" ]] && {
+      rm -f "$GITHUB_ROOT/_tools/${script}.sh"
+      echo "  removed legacy: _tools/${script}.sh"
+    }
   fi
 done
 
-echo "Done. Use: ghn, ghsync, ghar (after source ~/.zshrc)"
+echo "Done. Run: source ~/.zshrc  then  ghsync-list"

@@ -62,7 +62,21 @@ brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
 ```bash
 ./setup.sh
 ```
-The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; establishes symlinks from the repository folder to your home directory; and runs `setup-github-workspace` to create the `~/Github` layout.
+The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; establishes symlinks from the repository folder to your home directory; and runs `setup-github-workspace` to create the identical `~/Github` layout on every machine.
+
+**Fresh machine bootstrap** (pick one):
+
+```bash
+# macOS (Apple Silicon or Intel)
+git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
+bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
+
+# Linux
+bash ~/Github/n1ecC/terminal-configs/bin/linux-bootstrap.sh
+
+# Windows (WSL2)
+bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
+```
 
 To restore packages automatically as part of setup:
 ```bash

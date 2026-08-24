@@ -4,8 +4,8 @@
 #
 # Usage (on a fresh machine):
 #   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/terminal-configs
-#   bash ~/Github/terminal-configs/bin/linux-bootstrap.sh
+#       ~/Github/n1ecC/terminal-configs
+#   bash ~/Github/n1ecC/terminal-configs/bin/linux-bootstrap.sh
 # ==============================================================================
 
 set -e
@@ -120,7 +120,7 @@ for d in "$HOME/.config" "$HOME/.config/ghostty" \
 done
 
 # ------------------------------------------------------------------------------
-# 8. Stow dotfiles
+# 8. Stow dotfiles (install.sh also runs setup-github-workspace)
 # ------------------------------------------------------------------------------
 header "Symlinking dotfiles via Stow"
 cd "$DOTFILES"
@@ -168,33 +168,14 @@ fi
 ok "All dotfiles linked."
 
 # ------------------------------------------------------------------------------
-# 9. Stow-excluded paths, Claude Code, and agent skills
-# ------------------------------------------------------------------------------
-header "Stow-excluded paths"
-"$DOTFILES/bin/link-stow-extras.sh"
-ok "Linked nvim, bin scripts, and taskrc."
-
-header "Claude Code"
-"$DOTFILES/bin/link-claude-code.sh"
-ok "Claude Code global configuration linked."
-
-header "Agent skills"
-"$DOTFILES/bin/link-agent-skills.sh"
-ok "Agent skills linked."
-
-header "Github workspace"
-"$DOTFILES/bin/setup-github-workspace"
-ok "Github workspace layout configured."
-
-# ------------------------------------------------------------------------------
-# 10. Git credential helper
+# 9. Git credential helper
 # ------------------------------------------------------------------------------
 header "Git credential helper"
 git config --global credential.helper store
 ok "Git credential helper set to 'store'."
 
 # ------------------------------------------------------------------------------
-# 11. fnm / Node
+# 10. fnm / Node
 # ------------------------------------------------------------------------------
 header "Node.js (fnm)"
 if command -v fnm >/dev/null 2>&1; then

@@ -2,7 +2,7 @@
 
 Canonical home for all Git work on this machine.
 
-**Path:** `/Users/alex/Github` (capital `G` — not `~/Documents/GitHub`)
+**Path:** `~/Github` (capital `G` — same on macOS, Linux, and WSL)
 
 ---
 
@@ -10,14 +10,25 @@ Canonical home for all Git work on this machine.
 
 ```
 ~/Github/
-??? n1ecC/          ? YOUR repos (github.com/n1ecC) — push from here
-??? config/         ? Dotfiles & machine config
-??? explore/        ? Third-party clones for learning / reference
-??? workspace/      ? Local-only work (not ready to push, school, sandboxes)
-??? archive/        ? Old experiments & superseded copies
-??? tracking/       ? Job search / application tracking
-??? _tools/         ? Sync scripts & utilities (symlinked from terminal-configs)
+??? n1ecC/          # YOUR repos (github.com/n1ecC) — push from here
+??? config/         # Dotfiles & machine config
+?   ??? dotfiles/
+?   ??? scripts/
+?   ??? analytics/
+?   ??? docs/
+?   ??? external/
+?   ??? local/      # machine-specific — never commit
+??? explore/        # Third-party clones for learning / reference
+??? workspace/      # Local-only work (school, sandboxes, datasets)
+?   ??? msba/
+?   ??? sandboxes/
+?   ??? datasets/   # large files (gitignored)
+??? archive/        # Cold storage + MANIFEST.md
+??? tracking/       # Job search / application tracking
+??? _tools/         # Symlinks to terminal-configs/bin scripts
 ```
+
+Created automatically by `setup-github-workspace` (runs on `install.sh`, `setup.sh`, and bootstrap).
 
 ---
 
@@ -55,3 +66,4 @@ git push origin main
 2. `explore/` is read-only — fork to `n1ecC/` if you keep changes
 3. `workspace/` stays local until promoted to `n1ecC/`
 4. Large datasets go in `workspace/datasets/` (gitignored)
+5. Run `ghsync-pull` before interviews so portfolio repos are current

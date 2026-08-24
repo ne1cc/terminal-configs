@@ -70,18 +70,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. Required directories
-# ------------------------------------------------------------------------------
-header "Directories"
-for d in "$HOME/.config" "$HOME/.config/ghostty" "$HOME/.config/karabiner" \
-         "$HOME/Pictures/Screenshots" "$HOME/bin" \
-         "$HOME/Github/n1ecC" "$HOME/Github/explore" "$HOME/Github/workspace" \
-         "$HOME/Github/archive" "$HOME/Github/_tools"; do
-    mkdir -p "$d" && ok "$d"
-done
-
-# ------------------------------------------------------------------------------
-# 6. Stow dotfiles
+# 5. Stow dotfiles + Github workspace (setup-github-workspace)
 # ------------------------------------------------------------------------------
 header "Symlinking dotfiles via Stow"
 cd "$DOTFILES"
@@ -101,7 +90,7 @@ ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
 ok "Github workspace layout and _tools symlinks configured."
 
 # ------------------------------------------------------------------------------
-# 7. fnm / Node
+# 6. fnm / Node
 # ------------------------------------------------------------------------------
 header "Node.js (fnm)"
 command -v fnm >/dev/null 2>&1 \

@@ -9,8 +9,8 @@
 #
 # Usage:
 #   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/terminal-configs
-#   bash ~/Github/terminal-configs/bin/wsl-bootstrap.sh
+#       ~/Github/n1ecC/terminal-configs
+#   bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
 # ==============================================================================
 
 set -e
