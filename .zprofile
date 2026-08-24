@@ -22,7 +22,7 @@ export GITHUB_ROOT="$HOME/Github"
 export N1ECC_DIR="$GITHUB_ROOT/n1ecC"
 
 # Custom scripts (bin/ in the dotfiles repo, stow'd to ~/bin)
-export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/Github/_tools:$HOME/bin:$HOME/.local/bin:$PATH"
 
 # OrbStack — macOS only
 [[ -f ~/.orbstack/shell/init.zsh ]] && source ~/.orbstack/shell/init.zsh
