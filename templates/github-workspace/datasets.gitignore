@@ -1,0 +1,5 @@
+# Local datasets — never commit raw data to git
+
+*
+!.gitignore
+!README.md

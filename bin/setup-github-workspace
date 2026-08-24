@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Create ~/Github folder layout, workspace gitignores, and _tools symlinks.
+# Called by install.sh, setup.sh, and mac-bootstrap.sh.
+
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
+TEMPLATES="$DOTFILES/templates/github-workspace"
+
+echo "==> Github workspace -> ${GITHUB_ROOT}"
+
+mkdir -p \
+  "$GITHUB_ROOT/n1ecC" \
+  "$GITHUB_ROOT/config/local" \
+  "$GITHUB_ROOT/explore" \
+  "$GITHUB_ROOT/archive" \
+  "$GITHUB_ROOT/tracking" \
+  "$GITHUB_ROOT/_tools" \
+  "$GITHUB_ROOT/workspace/msba" \
+  "$GITHUB_ROOT/workspace/sandboxes" \
+  "$GITHUB_ROOT/workspace/datasets"
+
+if [[ ! -f "$GITHUB_ROOT/README.md" && -f "$TEMPLATES/README.md" ]]; then
+  cp "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
+  echo "  created: $GITHUB_ROOT/README.md"
+fi
+
+for template in workspace.gitignore datasets.gitignore datasets.README.md; do
+  src="$TEMPLATES/$template"
+  case "$template" in
+    workspace.gitignore) dest="$GITHUB_ROOT/workspace/.gitignore" ;;
+    datasets.gitignore) dest="$GITHUB_ROOT/workspace/datasets/.gitignore" ;;
+    datasets.README.md) dest="$GITHUB_ROOT/workspace/datasets/README.md" ;;
+  esac
+  if [[ -f "$src" && ! -f "$dest" ]]; then
+    cp "$src" "$dest"
+    echo "  created: $dest"
+  fi
+done
+
+touch "$GITHUB_ROOT/_tools/archive-exclude.txt"
+
+for script in sync-n1ecC gharchive pin-portfolio setup-github-profile; do
+  if [[ -x "$DOTFILES/bin/$script" ]]; then
+    ln -sf "$DOTFILES/bin/$script" "$GITHUB_ROOT/_tools/$script"
+    echo "  linked: _tools/$script -> terminal-configs/bin/$script"
+  fi
+done
+
+echo "Done. Use: ghn, ghsync, ghar (after source ~/.zshrc)"

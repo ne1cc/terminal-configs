@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Update GitHub profile bio (requires gh auth with 'user' scope).
+# Run once: gh auth refresh -h github.com -s user
+
+set -euo pipefail
+
+BIO='Data Engineer | dbt · DuckDB · Dagster | olist-lakehouse · ab-testing-dagster | ticker-change.fly.dev'
+
+char_count=$(python3 -c "import sys; print(len(sys.argv[1]))" "$BIO")
+if ((char_count > 160)); then
+  echo "Bio is ${char_count} chars (max 160). Shorten BIO in this script." >&2
+  exit 1
+fi
+
+gh api user -X PATCH -f bio="$BIO" --jq '{login, name, bio}'
+echo "Profile bio updated (${char_count}/160 chars)."

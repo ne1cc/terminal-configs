@@ -135,6 +135,14 @@ if [[ -x "$REPO_DIR/bin/link-agent-skills.sh" ]]; then
   fi
 fi
 
+if [[ -x "$REPO_DIR/bin/setup-github-workspace" ]]; then
+  if "$DRY_RUN"; then
+    printf '[dry-run] %s/bin/setup-github-workspace\n' "$REPO_DIR"
+  else
+    "$REPO_DIR/bin/setup-github-workspace"
+  fi
+fi
+
 # Ghostty now uses ~/.config/ghostty/config on every supported platform. Remove
 # the obsolete macOS location only when it is our previously-managed symlink;
 # loading both files applies keybindings twice and produces duplicate errors.

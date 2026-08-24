@@ -269,11 +269,33 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `tui` | `taskwarrior-tui` | Interactive terminal UI for Taskwarrior |
 | `tdev` | `task` | Filter tasks for `project:dev` |
 
+### H. Github workspace (`~/Github`)
+| Command / Alias | Action / Purpose |
+|---|---|
+| `ghn` | `cd ~/Github/n1ecC` — your GitHub repos |
+| `ghr [repo]` | List or `cd` into a specific n1ecC repo |
+| `ghroot` | `cd ~/Github` |
+| `ghex` / `ghws` / `ghcfg` | `cd` explore / workspace / config |
+| `gho` | `cd ~/Github/n1ecC/olist-lakehouse` |
+| `ghab` | `cd ~/Github/n1ecC/ab-testing-dagster` |
+| `ghdhs` | `cd ~/Github/n1ecC/dhs-stunting-pipeline` |
+| `ghtk` | `cd ~/Github/n1ecC/ticker-change` |
+| `ghsync` | Clone missing + pull all n1ecC repos (`sync-n1ecC`) |
+| `ghsync-list` | Show local clone status and dirty repos |
+| `ghsync-pull` | Pull existing n1ecC repos only |
+| `ghar [name]` | Archive project to `~/Github/archive/` |
+| `ghar --from-n1ecc <repo>` | Archive local n1ecC clone (excludes from sync) |
+| `ghpin` | Open GitHub profile + portfolio pin instructions |
+| `sync-n1ecC` | Same as `ghsync` (also in `~/bin`) |
+| `gharchive` | Same as `ghar` (also in `~/bin`) |
+| `pin-portfolio` | Same as `ghpin` (also in `~/bin`) |
+| `setup-github-workspace` | Create `~/Github` layout (run by install/bootstrap) |
+
 ### I. Application Launchers & File Handlers
 | Command / Alias | Action / Purpose |
 |---|---|
 | `lg` | Launch Lazygit in current repository |
-| `lgd` | Launch Lazygit in dotfiles repository (`~/dotfiles`) |
+| `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
 | `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
 | `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |
@@ -475,5 +497,10 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | [`mac-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
 | [`linux-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
 | [`wsl-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
-| [`setup.sh`](file:///Users/alex/Github/config/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
+| [`setup.sh`](file:///Users/alex/Github/n1ecC/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
+| [`setup-github-workspace`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-workspace) | Creates `~/Github` folder layout and `_tools` symlinks. |
+| [`sync-n1ecC`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/sync-n1ecC) | Clone/pull all github.com/n1ecC repos into `~/Github/n1ecC/`. |
+| [`gharchive`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
+| [`pin-portfolio`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
+| [`setup-github-profile`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
 

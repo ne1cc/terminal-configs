@@ -27,6 +27,7 @@ fi
 "$DOTFILES/bin/link-stow-extras.sh"
 "$DOTFILES/bin/link-claude-code.sh"
 "$DOTFILES/bin/link-agent-skills.sh"
+"$DOTFILES/bin/setup-github-workspace"
 
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 if [[ ! -d "$TPM_DIR" ]]; then

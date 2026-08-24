@@ -3,9 +3,9 @@
 # mac-bootstrap.sh — zero-to-hero provisioning for a new Apple Silicon Mac
 #
 # Usage (on a fresh machine):
-#   git clone https://github.com/consciouspenguin/terminal-configs.git \
-#       ~/Github/terminal-configs
-#   bash ~/Github/terminal-configs/bin/mac-bootstrap.sh
+#   git clone https://github.com/n1ecC/terminal-configs.git \
+#       ~/Github/n1ecC/terminal-configs
+#   bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
 # ==============================================================================
 
 set -e
@@ -74,7 +74,9 @@ fi
 # ------------------------------------------------------------------------------
 header "Directories"
 for d in "$HOME/.config" "$HOME/.config/ghostty" "$HOME/.config/karabiner" \
-         "$HOME/Pictures/Screenshots" "$HOME/bin"; do
+         "$HOME/Pictures/Screenshots" "$HOME/bin" \
+         "$HOME/Github/n1ecC" "$HOME/Github/explore" "$HOME/Github/workspace" \
+         "$HOME/Github/archive" "$HOME/Github/_tools"; do
     mkdir -p "$d" && ok "$d"
 done
 
@@ -94,6 +96,9 @@ ok "Claude Code global configuration linked."
 
 "$DOTFILES/bin/link-agent-skills.sh"
 ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
+
+"$DOTFILES/bin/setup-github-workspace"
+ok "Github workspace layout and _tools symlinks configured."
 
 # ------------------------------------------------------------------------------
 # 7. fnm / Node

@@ -55,14 +55,14 @@ Follow these steps to fully restore your environment on a fresh machine.
 On macOS:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew bundle --file=~/Github/config/terminal-configs/Brewfile
+brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
 ```
 
 ### Step 2: Run the Portable Setup Script
 ```bash
 ./setup.sh
 ```
-The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; and establishes symlinks from the repository folder to your home directory.
+The script detects macOS, Linux, and WSL; moves existing conflicting files to `~/.terminal-configs-backups/<timestamp>`; establishes symlinks from the repository folder to your home directory; and runs `setup-github-workspace` to create the `~/Github` layout.
 
 To restore packages automatically as part of setup:
 ```bash
@@ -75,6 +75,7 @@ To restore packages automatically as part of setup:
 
 ### 🐚 Zsh (`.zshrc` & `.p10k.zsh`)
 * Integrates **Powerlevel10k** and **Oh My Zsh**.
+* **Github workspace aliases:** `ghn`, `ghr`, `ghsync`, `ghar`, `ghpin`, portfolio jumps (`gho`, `ghab`, `ghdhs`, `ghtk`). See [SHORTCUTS.md § H](SHORTCUTS.md).
 * Includes developer workflow utilities: `groot`, `gwip`, `copylast`, `port`, `killport`, `serve`, `fkill`, `fo`.
 * Antigravity AI audit ledger previewers (`glog`, `gdiff`, `agya`, `agyih`).
 
@@ -339,7 +340,7 @@ A complete reference for every configured keyboard shortcut, alias, and shell fu
 | Command / Alias | Action / Purpose |
 |---|---|
 | `lg` | Launch Lazygit in current repository |
-| `lgd` | Launch Lazygit in dotfiles repository (`~/dotfiles`) |
+| `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES` / `~/Github/n1ecC/terminal-configs`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
 | `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
 | `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |

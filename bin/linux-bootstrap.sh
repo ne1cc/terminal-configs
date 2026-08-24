@@ -182,6 +182,10 @@ header "Agent skills"
 "$DOTFILES/bin/link-agent-skills.sh"
 ok "Agent skills linked."
 
+header "Github workspace"
+"$DOTFILES/bin/setup-github-workspace"
+ok "Github workspace layout configured."
+
 # ------------------------------------------------------------------------------
 # 10. Git credential helper
 # ------------------------------------------------------------------------------
