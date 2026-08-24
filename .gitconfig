@@ -30,3 +30,7 @@
 	br = branch
 	st = status -sb
 	cm = commit -m
+[init]
+	defaultBranch = main
+[pull]
+	ff = only
