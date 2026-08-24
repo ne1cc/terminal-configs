@@ -14,6 +14,12 @@
 [core]
 	pager = delta
 
+[init]
+	defaultBranch = main
+
+[pull]
+	ff = only
+
 [interactive]
 	singleKey = true
 
@@ -30,7 +36,3 @@
 	br = branch
 	st = status -sb
 	cm = commit -m
-[init]
-	defaultBranch = main
-[pull]
-	ff = only
