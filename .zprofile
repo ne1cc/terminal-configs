@@ -15,7 +15,11 @@ elif [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
 fi
 
 # Dotfiles repo location — update this if you ever move the repo
-export DOTFILES="$HOME/Github/terminal-configs"
+export DOTFILES="$HOME/Github/n1ecC/terminal-configs"
+
+# Github workspace root (portfolio + explore + config)
+export GITHUB_ROOT="$HOME/Github"
+export N1ECC_DIR="$GITHUB_ROOT/n1ecC"
 
 # Custom scripts (bin/ in the dotfiles repo, stow'd to ~/bin)
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"

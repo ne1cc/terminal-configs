@@ -487,8 +487,8 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-# Open lazygit for a specific repo
-alias lgd="lazygit --path ~/dotfiles"
+# Open lazygit for terminal-configs dotfiles repo
+alias lgd="lazygit --path \"$DOTFILES\""
 
 # Yazi image preview protocol for Ghostty
 export YAZI_IMAGE_PROTOCOL="ghostty"
@@ -509,6 +509,35 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias mkdir='mkdir -p'
+
+# Github workspace (~/Github) — portfolio, explore, sync
+alias ghn='cd "$N1ECC_DIR"'
+alias ghex='cd "$GITHUB_ROOT/explore"'
+alias ghws='cd "$GITHUB_ROOT/workspace"'
+alias ghcfg='cd "$GITHUB_ROOT/config"'
+alias ghroot='cd "$GITHUB_ROOT"'
+alias ghsync='$GITHUB_ROOT/_tools/sync-n1ecC.sh'
+alias ghsync-list='$GITHUB_ROOT/_tools/sync-n1ecC.sh --list'
+alias ghsync-pull='$GITHUB_ROOT/_tools/sync-n1ecC.sh --pull'
+alias ghpin='$GITHUB_ROOT/_tools/pin-portfolio.sh'
+
+# Portfolio repo quick-jumps
+alias gho='cd "$N1ECC_DIR/olist-lakehouse"'
+alias ghab='cd "$N1ECC_DIR/ab-testing-dagster"'
+alias ghdhs='cd "$N1ECC_DIR/dhs-stunting-pipeline"'
+alias ghtk='cd "$N1ECC_DIR/ticker-change"'
+
+# cd into any n1ecC repo: ghr [repo-name]
+ghr() {
+  if [[ $# -eq 0 ]]; then
+    ls -1 "$N1ECC_DIR"
+    return 0
+  fi
+  cd "$N1ECC_DIR/$1" || {
+    echo "Unknown repo: $1 (try: ghr with no args to list)"
+    return 1
+  }
+}
 
 # Data Engineering & Quick Inspection
 alias headcsv='head -n 20'
