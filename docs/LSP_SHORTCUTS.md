@@ -1,5 +1,7 @@
 # LSP Shortcuts — Neovim (AstroNvim)
 
+**Neovim overview:** [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) · **Session walkthrough:** [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md)
+
 ## Navigation (jumping around code)
 
 | Key       | Action                | Description                                       |

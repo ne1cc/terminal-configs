@@ -1,5 +1,7 @@
 # 10x Neovim Session Walkthrough
 
+**Overview & integrations:** [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) · **LSP reference:** [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md)
+
 ## Phase 1: Launch & Get Oriented (5 seconds)
 
 ```bash

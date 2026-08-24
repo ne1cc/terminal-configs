@@ -3,6 +3,8 @@
 > **Configuration Status:** Custom bindings active with prefix `Ctrl+Space` (`C-Space`).
 > Default keys that don't conflict with custom overrides remain fully active.
 
+> **Workflow guide:** See **[docs/TMUX_WORKFLOW_GUIDE.md](docs/TMUX_WORKFLOW_GUIDE.md)** for layouts, command palette, AI integration, and daily patterns. This file is the full binding lookup table.
+
 ---
 
 ## 1. Custom Keybindings (from `.tmux.conf`)

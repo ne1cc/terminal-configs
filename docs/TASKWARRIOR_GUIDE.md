@@ -2,6 +2,8 @@
 
 This guide covers setting up Taskwarrior, `taskwarrior-tui`, minimal `.taskrc` production configuration, and automated Git hook integration on **macOS** and **Linux**.
 
+**See also:** [docs/README.md](README.md) · [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md)
+
 ---
 
 ## 1. Quick Installation

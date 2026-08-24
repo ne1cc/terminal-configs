@@ -2,6 +2,8 @@
 
 A complete, exhaustive, and structured reference for every shortcut, keybinding, alias, shell function, and utility across **tmux**, **Zsh**, **Neovim**, **Lazygit**, **Yazi**, **Ghostty**, **Alacritty**, and **Karabiner-Elements**.
 
+> **Getting started?** Use the workflow guides in **[docs/README.md](docs/README.md)** — this file is the exhaustive lookup table when you know *what* you need.
+
 ---
 
 ## 📑 Table of Contents

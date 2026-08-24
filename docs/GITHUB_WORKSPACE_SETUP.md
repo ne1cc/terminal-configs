@@ -291,6 +291,7 @@ ghar --from-n1ecc old-repo-name  # from n1ecC/ (excludes from future sync)
 
 ## Related docs
 
-- [SHORTCUTS.md § H](../SHORTCUTS.md) — Github workspace aliases
+- **[GITHUB_ALIASES_GUIDE.md](GITHUB_ALIASES_GUIDE.md)** — Getting started with `gh*` aliases, sync, archive, and daily workflow
+- [SHORTCUTS.md § H](../SHORTCUTS.md) — Github workspace aliases (quick reference table)
 - [README.md](../README.md) — Full terminal-configs overview
 - `~/Github/README.md` — Local workspace conventions (created by `setup-github-workspace`)

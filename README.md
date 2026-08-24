@@ -5,13 +5,33 @@ A premium, curated repository for my complete terminal environment, shell config
 ---
 
 ## 📖 Master Guides & Documentation
-* 🚀 **[Master Cheatsheet](file:///Users/alex/Github/config/terminal-configs/SHORTCUTS.md)** — Complete, exhaustive keybinding and alias reference.
-* 🗂️ **[tmux Shortcuts & Layouts](file:///Users/alex/Github/config/terminal-configs/TMUX_SHORTCUTS.md)** — Window stashing, pane joining, breakout sessions.
-* ⚡ **[Modern CLI Guide](file:///Users/alex/Github/config/terminal-configs/MODERN_CLI_GUIDE.md)** — Eza, Bat, Zoxide, FZF, Ripgrep, Duf, Dust.
-* ✍️ **[10X Neovim Session Guide](file:///Users/alex/Github/config/terminal-configs/docs/10X_NEOVIM_SESSION.md)** — Neovim workflows, buffer management, and image integration.
-* 🩺 **[LSP Shortcuts](file:///Users/alex/Github/config/terminal-configs/docs/LSP_SHORTCUTS.md)** — Code navigation, diagnostics, and formatting.
-* ✅ **[Taskwarrior Guide](file:///Users/alex/Github/config/terminal-configs/docs/TASKWARRIOR_GUIDE.md)** — Terminal task tracking workflows.
-* 🗂️ **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Per-platform bootstrap: macOS, Linux, WSL, and daily sync workflow.
+
+**Start here:** **[docs/README.md](docs/README.md)** — documentation hub with all workflow guides.
+
+### Setup & GitHub
+* 🗂️ **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Bootstrap macOS, Linux, WSL
+* 🔗 **[Github Aliases Guide](docs/GITHUB_ALIASES_GUIDE.md)** — `ghsync`, `ghn`, `ghr`, archive, pins
+
+### Terminal & shell
+* 🖥️ **[tmux Workflow Guide](docs/TMUX_WORKFLOW_GUIDE.md)** — Layouts, palette, AI panes, sessionizer
+* 🐚 **[Zsh & Git Workflow Guide](docs/ZSH_GIT_WORKFLOW_GUIDE.md)** — Git power moves, FZF, clipboard, worktrees
+* ⚡ **[Modern CLI Guide](docs/MODERN_CLI_GUIDE.md)** — Eza, Bat, Zoxide, Delta, Direnv
+* 🪟 **[Terminal Emulators Guide](docs/TERMINAL_EMULATORS_GUIDE.md)** — Ghostty, Alacritty, Karabiner
+
+### Editors & tools
+* ✍️ **[Neovim Guide](docs/NEOVIM_GUIDE.md)** — Overview + integrations
+* 📖 **[10X Neovim Session](docs/10X_NEOVIM_SESSION.md)** — Find code, trace bugs, edit fast
+* 🩺 **[LSP Shortcuts](docs/LSP_SHORTCUTS.md)** — Navigation, diagnostics, rename
+* 🐙 **[Lazygit Guide](docs/LAZYGIT_GUIDE.md)** — Git TUI + AI commit/review
+* 📁 **[Yazi Guide](docs/YAZI_GUIDE.md)** — Terminal file manager
+
+### AI & productivity
+* 🤖 **[AI Workflow Guide](docs/AI_WORKFLOW_GUIDE.md)** — Claude Code, Antigravity, handoffs, agent matrix
+* ✅ **[Taskwarrior Guide](docs/TASKWARRIOR_GUIDE.md)** — Task tracking + git hooks
+
+### Quick reference (cheatsheets)
+* 🚀 **[Master Cheatsheet](SHORTCUTS.md)** — Every keybinding and alias in one file
+* 🗂️ **[tmux Shortcuts](TMUX_SHORTCUTS.md)** — Full tmux binding tables
 
 ---
 
