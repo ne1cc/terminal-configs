@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# link-agent-skills.sh — symlink portable agent skills to all runtime directories.
+# link-agent-skills.sh ï¿½ symlink portable agent skills to all runtime directories.
 #
 # Shared skills (.gemini/skills) are linked into:
 #   ~/.gemini/config/skills   (Antigravity / Gemini CLI)
 #   ~/.claude/skills          (Claude Code)
 #   ~/.agents/skills          (cross-runtime alias: Codex, Copilot CLI, Gemini)
+#   ~/.qoder/skills           (Qoder CLI)
 #
 # Claude-only skills (.claude/skills) and Cursor skills (.cursor/skills-cursor)
 # are linked to their respective runtime directories only.
@@ -43,7 +44,7 @@ link_skill_tree() {
 
 printf '==> Linking agent skills from %s\n' "$REPO_DIR"
 
-mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor"
+mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor" "$HOME/.qoder/skills"
 
 if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
@@ -54,7 +55,8 @@ fi
 link_skill_tree "$REPO_DIR/.gemini/skills" \
   "$HOME/.gemini/config/skills" \
   "$HOME/.claude/skills" \
-  "$HOME/.agents/skills"
+  "$HOME/.agents/skills" \
+  "$HOME/.qoder/skills"
 
 link_skill_tree "$REPO_DIR/.claude/skills" "$HOME/.claude/skills"
 link_skill_tree "$REPO_DIR/.cursor/skills-cursor" "$HOME/.cursor/skills-cursor"
