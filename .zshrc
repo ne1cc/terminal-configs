@@ -83,6 +83,16 @@ rename-pane() {
     printf "\033]2;%s\033\\" "$1"
 }
 
+# Ghostty: propagate kitty-graphics capability into tmux panes so plugins like
+# mermaid.nvim detect it (tmux masks TERM_PROGRAM as "tmux" inside panes).
+# The export covers a server freshly started by the auto-attach below (the
+# server inherits this shell's env); set-environment covers attaching to an
+# already-running server.
+if [[ $TERM_PROGRAM == ghostty ]]; then
+    export KITTY_WINDOW_ID="${KITTY_WINDOW_ID:-1}"
+    tmux set-environment -g KITTY_WINDOW_ID 1 2>/dev/null
+fi
+
 # Auto-attach or create a persistent 'main' tmux session when launching
 # Alacritty directly (mirrors Ghostty's command = tmux new-session -A -s main).
 if [[ -z "$TMUX" ]] && command -v tmux >/dev/null; then
@@ -124,11 +134,13 @@ _copylast_preexec() {
     _copylast_is_self=0
     _copylast_cmd="$1"
     if [[ -n "$TMUX" ]]; then
-        local hist=$(tmux display-message -p "#{history_size}")
-        local cy=$(tmux display-message -p "#{cursor_y}")
-        _copylast_start_abs=$(( hist + cy ))
-        tmux set-option -p @copylast_start "$_copylast_start_abs" 2>/dev/null || true
-        tmux set-option -p @copylast_cmd "$1" 2>/dev/null || true
+        local _out
+        _out=$(tmux display-message -p "#{history_size} #{cursor_y}" 2>/dev/null) || true
+        if [[ -n "$_out" ]]; then
+            local hist="${_out%% *}"
+            local cy="${_out##* }"
+            _copylast_start_abs=$(( hist + cy ))
+        fi
     fi
 }
 
@@ -138,12 +150,18 @@ _copylast_precmd() {
         return
     fi
     if [[ -n "$TMUX" && -n "$_copylast_start_abs" ]]; then
-        local end_hist=$(tmux display-message -p "#{history_size}")
-        local end_cy=$(tmux display-message -p "#{cursor_y}")
-        _copylast_saved_start="$_copylast_start_abs"
-        _copylast_saved_end=$(( end_hist + end_cy - 1 ))
-        _copylast_saved_cmd="${_copylast_cmd:-$(tmux show-options -p -v @copylast_cmd 2>/dev/null)}"
-        tmux set-option -p @copylast_end "$_copylast_saved_end" 2>/dev/null || true
+        local _out
+        _out=$(tmux display-message -p "#{history_size} #{cursor_y}" 2>/dev/null) || true
+        if [[ -n "$_out" ]]; then
+            local end_hist="${_out%% *}"
+            local end_cy="${_out##* }"
+            _copylast_saved_start="$_copylast_start_abs"
+            _copylast_saved_end=$(( end_hist + end_cy - 1 ))
+            _copylast_saved_cmd="${_copylast_cmd}"
+            tmux set-option -p @copylast_start "$_copylast_saved_start" \; \
+                 set-option -p @copylast_end "$_copylast_saved_end" \; \
+                 set-option -p @copylast_cmd "$_copylast_saved_cmd" 2>/dev/null || true
+        fi
         unset _copylast_start_abs
     fi
 }
@@ -151,91 +169,16 @@ _copylast_precmd() {
 add-zsh-hook preexec _copylast_preexec
 add-zsh-hook precmd _copylast_precmd
 
-# Copy last command output (stdout + stderr) directly from terminal scrollback
+# Copy last command output (stdout + stderr) with zero latency via native binary
 copylast() {
-    local raw_mode=0
-    local mode=""
-    for arg in "$@"; do
-        case "$arg" in
-            -r|--raw) raw_mode=1 ;;
-            -a|--all) mode="-a" ;;
-            [0-9]*) mode="$arg" ;;
-            -h|--help)
-                echo "Usage: copylast [-r|--raw] [-a|--all] [N]"
-                echo "Copies output of previous terminal command to clipboard instantly."
-                return 0
-                ;;
-        esac
-    done
-
-    local output=""
-    local cmd="${_copylast_saved_cmd:-$(tmux show-options -p -v @copylast_cmd 2>/dev/null || true)}"
-
-    if [[ -n "$TMUX" ]]; then
-        if [[ "$mode" == "-a" ]]; then
-            output=$(tmux capture-pane -p -J -S -3000)
-        elif [[ "$mode" =~ ^[0-9]+$ ]]; then
-            output=$(tmux capture-pane -p -J -S "-$mode")
-        else
-            local start_abs="${_copylast_saved_start:-$(tmux show-options -p -v @copylast_start 2>/dev/null || true)}"
-            local end_abs="${_copylast_saved_end:-$(tmux show-options -p -v @copylast_end 2>/dev/null || true)}"
-            local curr_hist=$(tmux display-message -p "#{history_size}")
-
-            if [[ -n "$start_abs" && -n "$end_abs" ]]; then
-                local s=$(( start_abs - curr_hist ))
-                local e=$(( end_abs - curr_hist ))
-
-                if (( s <= e )); then
-                    local -a cap_args=(-p -J)
-                    (( raw_mode == 1 )) && cap_args+=(-e)
-                    output=$(tmux capture-pane "${cap_args[@]}" -S "$s" -E "$e")
-                    output="${output%"${output##*[![:space:]]}"}"
-                fi
-            fi
-        fi
-    fi
-
-    # Fallback when outside tmux or if hook captured nothing
-    if [[ -z "$output" ]]; then
-        local last_cmd
-        last_cmd=$(fc -ln -1 2>/dev/null)
-        if [[ -z "$last_cmd" ]]; then
-            last_cmd=$(history | tail -n 1 | sed 's/^[ ]*[0-9]*[ ]*//')
-        fi
-        if [[ -n "$last_cmd" ]]; then
-            cmd="$last_cmd"
-            output=$(eval "$last_cmd" 2>&1)
-        fi
-    fi
-
-    if [[ -z "$output" ]]; then
-        echo "copylast: No output captured from last command ('${cmd:-unknown}')." >&2
+    if [[ -x "$HOME/bin/copylast" ]]; then
+        "$HOME/bin/copylast" "$@"
+    elif (( $+commands[copylast] )); then
+        command copylast "$@"
+    else
+        echo "copylast: binary not found at $HOME/bin/copylast" >&2
         return 1
     fi
-
-    # Fast clipboard copy (priority: pbcopy / wl-copy / xclip / xsel / clip.exe)
-    if command -v pbcopy >/dev/null 2>&1; then
-        printf "%s" "$output" | pbcopy
-    elif [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-copy >/dev/null 2>&1; then
-        printf "%s" "$output" | wl-copy
-    elif command -v xclip >/dev/null 2>&1; then
-        printf "%s" "$output" | xclip -selection clipboard
-    elif command -v xsel >/dev/null 2>&1; then
-        printf "%s" "$output" | xsel --clipboard --input
-    elif [[ -n "${IS_WSL:-}" ]] && command -v clip.exe >/dev/null 2>&1; then
-        printf "%s" "$output" | clip.exe
-    fi
-
-    # Also emit OSC 52 sequence for remote/SSH/passthrough clipboard sync
-    if [[ -n "$TMUX" ]]; then
-        local b64
-        b64=$(printf "%s" "$output" | base64 | tr -d '\r\n')
-        printf "\033Ptmux;\033\033]52;c;%s\007\033\\" "$b64" 2>/dev/null || true
-    fi
-
-    local lines=$(printf "%s\n" "$output" | wc -l | tr -d ' ')
-    local bytes=$(printf "%s" "$output" | wc -c | tr -d ' ')
-    echo "✓ Copied output of '${cmd}' (${lines} lines, ${bytes} bytes) to clipboard"
 }
 
 
@@ -1115,3 +1058,8 @@ bindkey -M vicmd '^K' up-line-or-history
 export PATH="$(npm prefix -g)/bin:$PATH"
 export PATH="$HOME/.claude/bin:$PATH"
 export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
+
+# QODER_DISPATCHER_PATH v1
+path=("$HOME/.qoder/entry" ${path:#"$HOME/.qoder/entry"})
+export PATH
+# END QODER_DISPATCHER_PATH v1
