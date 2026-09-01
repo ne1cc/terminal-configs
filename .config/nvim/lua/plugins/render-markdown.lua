@@ -1,3 +1,16 @@
+-- Word-wrap prose files: soft wrap that breaks at word boundaries, with a
+-- hanging indent so wrapped lines align under the text rather than the gutter.
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("prose_wrap", { clear = true }),
+  pattern = { "markdown", "vimwiki" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
+    vim.opt_local.showbreak = "↪ "
+  end,
+})
+
 return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
@@ -82,6 +95,11 @@ return {
           web = { pattern = "^http", icon = "󰖟 " },
           file = { pattern = "^file:", icon = "󰈙 " },
         },
+      },
+
+      indent = {
+        enabled = true,
+        per_level = 2,
       },
 
       sign = {

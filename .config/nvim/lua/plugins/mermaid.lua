@@ -49,9 +49,10 @@ return {
   },
 
   -- 4. Terminal image rendering support via image.nvim and ImageMagick
+  --    Lazy-load on markdown filetypes: kitty-graphics rendering is only used there.
   {
     "3rd/image.nvim",
-    event = "VeryLazy",
+    ft = { "markdown", "vimwiki" },
     opts = {
       backend = "kitty",
       processor = "magick_cli",
@@ -71,6 +72,41 @@ return {
       window_overlap_clear_enabled = false,
       window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
     },
+  },
+
+  -- 5. mermaid.nvim: live browser preview (built-in server + SSE), mmdc lint
+  --    diagnostics, buffer formatting, and inline terminal render. Inline
+  --    rendering uses the kitty graphics protocol on Ghostty + nvim 0.12+
+  --    (tmux allow-passthrough on) and falls back to chafa on older nvim.
+  {
+    "kevalin/mermaid.nvim",
+    ft = { "mermaid", "mmd" },
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("mermaid").setup({
+        lint = { enabled = true, command = "mmdc" },
+        preview = { renderer = "mermaid.js", theme = "dark" },
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("mermaid_nvim_keys", { clear = true }),
+        pattern = { "mermaid", "mmd" },
+        callback = function(event)
+          local buf = event.buf
+          -- Buffer-local: shadows the global <leader>mp/<leader>mr markdown
+          -- bindings only inside mermaid buffers.
+          vim.keymap.set("n", "<leader>mp", "<cmd>MermaidPreview<CR>",
+            { buffer = buf, desc = "Mermaid Preview" })
+          vim.keymap.set("n", "<leader>mf", "<cmd>MermaidFormat<CR>",
+            { buffer = buf, desc = "Mermaid Format" })
+          vim.keymap.set("n", "<leader>mr", "<cmd>MermaidRender<CR>",
+            { buffer = buf, desc = "Mermaid Render (inline)" })
+          vim.keymap.set("n", "<leader>mc", "<cmd>MermaidCopyURL<CR>",
+            { buffer = buf, desc = "Mermaid Copy URL" })
+          vim.keymap.set("n", "<leader>mx", "<cmd>MermaidPreviewStop<CR>",
+            { buffer = buf, desc = "Mermaid Stop Preview" })
+        end,
+      })
+    end,
   },
 }
 
