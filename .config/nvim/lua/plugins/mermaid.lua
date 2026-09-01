@@ -1,3 +1,8 @@
+-- Prefer config-local shims: bin/mmdc wraps the brew binary with a puppeteer
+-- config that works around Ubuntu's AppArmor userns restriction breaking
+-- Chrome's sandbox inside mermaid-cli.
+vim.env.PATH = vim.fn.stdpath("config") .. "/bin:" .. vim.env.PATH
+
 return {
   -- 1. In-browser live preview with full Mermaid diagram rendering
   {
