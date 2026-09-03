@@ -3,7 +3,7 @@
 Shell aliases, git power moves, FZF tools, clipboard helpers, ports, worktrees, and project bootstrapping.
 
 **Source:** `.zshrc` (loaded via `source ~/.zshrc`)  
-**Cheatsheet:** [SHORTCUTS.md § 2](../SHORTCUTS.md)
+**Cheatsheet:** [SHORTCUTS.md Â§ 2](../SHORTCUTS.md)
 
 ---
 
@@ -64,15 +64,15 @@ gunwip              # removes WIP commit, keeps changes unstaged
 
 ## Interactive git (FZF)
 
-### Branch switcher — `gb`
+### Branch switcher â€” `gb`
 
 Opens fzf with all local branches. Preview pane shows commit graph for highlighted branch. `Enter` checks out.
 
-### Commit browser — `gshow`
+### Commit browser â€” `gshow`
 
 Fzf over all commits. Preview shows full diff. `Enter` opens in pager.
 
-### Clean merged branches — `gb-clean`
+### Clean merged branches â€” `gb-clean`
 
 Safely deletes local branches already merged into the default remote branch.
 
@@ -80,7 +80,7 @@ Safely deletes local branches already merged into the default remote branch.
 
 ## Git worktrees
 
-Parallel branches in separate directories — ideal for reviews, hotfixes, or AI sessions.
+Parallel branches in separate directories â€” ideal for reviews, hotfixes, or AI sessions.
 
 | Command | Action |
 |---------|--------|
@@ -88,7 +88,7 @@ Parallel branches in separate directories — ideal for reviews, hotfixes, or AI s
 | `wt-tmux-attach` | Fzf-pick worktree ? switch tmux window to it |
 | `wt-rm` | Fzf-pick worktree ? delete dir + branch |
 
-**tmux integration:** `Prefix + Ctrl + n/a/x` — see [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md).
+**tmux integration:** `Prefix + Ctrl + n/a/x` â€” see [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md).
 
 ```bash
 wt-new fix-ci-timeout
@@ -112,7 +112,7 @@ wt-rm    # pick and remove when done
 | `cpfile <file>` | Copy entire file contents |
 | `snap` | Screenshot ? clipboard + `~/Pictures/Screenshots` |
 
-`copylast` uses tmux pane capture when inside tmux — zero side effects on your shell history.
+`copylast` uses tmux pane capture when inside tmux â€” zero side effects on your shell history.
 
 ---
 
@@ -151,7 +151,7 @@ wt-rm    # pick and remove when done
 |---------|--------|
 | `z <partial>` | Zoxide smart jump (e.g. `z olist`) |
 | `zi` | Interactive zoxide picker |
-| `ghn` / `ghr` / `ghroot` | GitHub workspace jumps — see [GITHUB_ALIASES_GUIDE.md](GITHUB_ALIASES_GUIDE.md) |
+| `ghn` / `ghr` / `ghroot` | GitHub workspace jumps â€” see [GITHUB_ALIASES_GUIDE.md](GITHUB_ALIASES_GUIDE.md) |
 | `..` / `...` / `....` | Up 1/2/3 directory levels |
 | `mcd <dir>` | mkdir -p && cd |
 
@@ -181,7 +181,7 @@ wt-rm    # pick and remove when done
 | `dps` | Formatted container list |
 | `dlogs` | Follow logs (last 100 lines) |
 
-**tmux:** `Prefix + Ctrl + d` — fuzzy Docker exec jumper.
+**tmux:** `Prefix + Ctrl + d` â€” fuzzy Docker exec jumper.
 
 ---
 
@@ -270,7 +270,7 @@ cpath src/pipeline/main.py
 | `gb` / `fo` empty | Must be inside git repo / project dir |
 | `copylast` empty | Run a command first; must be in tmux for best results |
 | `killport` permission denied | Use `sudo killport` or kill PID manually |
-| `z` doesn't find dir | Visit the directory once — zoxide learns from `cd` |
+| `z` doesn't find dir | Visit the directory once â€” zoxide learns from `cd` |
 | FZF keys wrong | Check `$FZF_DEFAULT_OPTS` in `.zshrc` |
 
 ---

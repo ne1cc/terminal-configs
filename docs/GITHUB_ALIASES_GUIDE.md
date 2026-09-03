@@ -1,8 +1,8 @@
-# GitHub Workspace Aliases & Tools — Getting Started
+# GitHub Workspace Aliases & Tools â€” Getting Started
 
 A practical guide to the `gh*` shell aliases, sync scripts, and daily workflow for your `~/Github` workspace.
 
-**Documentation hub:** [README.md](README.md) · **Machine setup:** [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md)
+**Documentation hub:** [README.md](README.md) Â· **Machine setup:** [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md)
 
 **Account:** [github.com/n1ecC](https://github.com/n1ecC)  
 **Canonical repo:** `terminal-configs` (where these scripts and aliases live)
@@ -80,7 +80,7 @@ N1ECC_DIR=/tmp/test ghsync-list
 
 ```
 ~/Github/
-??? n1ecC/          # YOUR repos — single source of truth for pushing to GitHub
+??? n1ecC/          # YOUR repos â€” single source of truth for pushing to GitHub
 ??? config/         # Dotfiles, scripts, machine-specific overrides
 ??? explore/        # Third-party clones (read-only; fork to n1ecC/ if you keep changes)
 ??? workspace/      # Local-only work (sandboxes, coursework, datasets)
@@ -92,7 +92,7 @@ N1ECC_DIR=/tmp/test ghsync-list
 **Conventions:**
 
 1. Only **`n1ecC/`** gets pushed to your GitHub account.
-2. **`explore/`** is for learning — clone, read, delete; don't customize in place.
+2. **`explore/`** is for learning â€” clone, read, delete; don't customize in place.
 3. **`workspace/`** stays local until you promote a project to `n1ecC/`.
 4. Large datasets go in `workspace/datasets/` or repo-local `data/` (gitignored).
 
@@ -107,7 +107,7 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 | Alias | Action |
 |-------|--------|
 | `ghroot` | `cd ~/Github` |
-| `ghn` | `cd ~/Github/n1ecC` — all your GitHub repos |
+| `ghn` | `cd ~/Github/n1ecC` â€” all your GitHub repos |
 | `ghex` | `cd ~/Github/explore` |
 | `ghws` | `cd ~/Github/workspace` |
 | `ghcfg` | `cd ~/Github/config` |
@@ -165,7 +165,7 @@ The sync engine is **`sync-n1ecC`** (`~/Github/n1ecC/terminal-configs/bin/sync-n
 | Command | Mode | Use when |
 |---------|------|----------|
 | `ghsync` | `--sync` (default) | New machine, new repo on GitHub, or full refresh |
-| `ghsync-pull` | `--pull` | Start of session — update repos you already have |
+| `ghsync-pull` | `--pull` | Start of session â€” update repos you already have |
 | `ghsync-list` | `--list` | Inspect status without changing anything |
 
 ### Per-repo behavior
@@ -173,8 +173,8 @@ The sync engine is **`sync-n1ecC`** (`~/Github/n1ecC/terminal-configs/bin/sync-n
 **Already cloned:**
 
 1. Sets `origin` to `https://github.com/n1ecC/<repo>.git`
-2. `git fetch origin --prune` — download latest commits/branches, remove stale remote refs
-3. `git pull --ff-only origin <current-branch>` — fast-forward only (no merge commit)
+2. `git fetch origin --prune` â€” download latest commits/branches, remove stale remote refs
+3. `git pull --ff-only origin <current-branch>` â€” fast-forward only (no merge commit)
 
 **Not cloned yet:**
 
@@ -222,8 +222,8 @@ WARN: ticker-change pull failed (local changes or diverged branch?)
 
 Common causes:
 
-- **Dirty repo** — uncommitted changes block pull
-- **Diverged branch** — you have local commits that aren't on remote (or vice versa); `--ff-only` refuses to merge
+- **Dirty repo** â€” uncommitted changes block pull
+- **Diverged branch** â€” you have local commits that aren't on remote (or vice versa); `--ff-only` refuses to merge
 
 Fix dirty repos:
 
@@ -234,7 +234,7 @@ git stash          # or commit, or discard
 ghsync-pull
 ```
 
-Fix diverged branches manually inside the repo (`git pull --rebase`, merge, or reset — your choice).
+Fix diverged branches manually inside the repo (`git pull --rebase`, merge, or reset â€” your choice).
 
 ---
 
@@ -260,7 +260,7 @@ ghar --from-n1ecc old-repo-name  # archive from n1ecC/ (excludes from future syn
 
 ### Archiving from `n1ecC/`
 
-Repos in `n1ecC/` are protected by default — you must use `--from-n1ecc`:
+Repos in `n1ecC/` are protected by default â€” you must use `--from-n1ecc`:
 
 ```bash
 ghar --from-n1ecc wingstop-experiment
@@ -279,7 +279,7 @@ Opens your GitHub profile and prints the recommended pin order:
 3. `dhs-stunting-pipeline`
 4. `ticker-change`
 
-GitHub allows **6 pinned repos** — use the remaining slots for projects like `clinical-trial-intelligence` or `ticker-change-intelligence`.
+GitHub allows **6 pinned repos** â€” use the remaining slots for projects like `clinical-trial-intelligence` or `ticker-change-intelligence`.
 
 ---
 
@@ -302,8 +302,8 @@ Edit the `BIO` string inside the script to change the text (max 160 characters).
 ### Start of session
 
 ```bash
-ghsync-pull              # fast — pull existing clones only
-ghsync-list | rg '\*'    # optional — see what still has local edits
+ghsync-pull              # fast â€” pull existing clones only
+ghsync-list | rg '\*'    # optional â€” see what still has local edits
 ```
 
 ### New repo on GitHub
@@ -359,7 +359,7 @@ ghsync-list              # should show [--] not cloned
 | `ghsync` auth error | `gh auth login` then retry |
 | Pull fails on one repo | Check `git status` in that repo; commit, stash, or resolve divergence |
 | Repo keeps re-cloning after archive | Confirm it's in `_tools/archive-exclude.txt` |
-| Wrong workspace path | Check `echo $GITHUB_ROOT` — should be `~/Github` |
+| Wrong workspace path | Check `echo $GITHUB_ROOT` â€” should be `~/Github` |
 | Aliases point at old paths | `cd ~/Github/n1ecC/terminal-configs && ./install.sh` |
 | `ghar` can't find project | Use full path, or check explore/workspace/n1ecC spelling |
 | Bio update fails | `gh auth refresh -h github.com -s user` |
@@ -394,7 +394,7 @@ source ~/.zshrc
 | Doc | Contents |
 |-----|----------|
 | [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) | Fresh machine bootstrap (macOS, Linux, WSL) |
-| [SHORTCUTS.md § H](../SHORTCUTS.md) | Quick alias table (all terminal shortcuts) |
+| [SHORTCUTS.md Â§ H](../SHORTCUTS.md) | Quick alias table (all terminal shortcuts) |
 | `~/Github/README.md` | Local workspace conventions and portfolio list |
 
 ---

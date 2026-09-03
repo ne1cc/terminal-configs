@@ -550,7 +550,7 @@ alias tk='tmux kill-session -t'
 
 # Launch a brand new Ghostty window attached to a fresh tmux session
 ghostty-new() {
-    local sess="${1:-ghostty-$(date +%s)}"
+    local sess="${1:-$(date +%Y-%m-%d_%H-%M)}"
     local ghostty_bin="/Applications/Ghostty.app/Contents/MacOS/ghostty"
     if [[ ! -x "$ghostty_bin" ]]; then
         ghostty_bin=$(command -v ghostty 2>/dev/null || echo "ghostty")

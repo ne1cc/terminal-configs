@@ -31,15 +31,23 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Tab` / `Prefix + Shift + Tab` | Same as `` ` `` — jump to last active window | Active Session |
 | `Prefix + b` | Toggle tmux **status bar visibility** (fullscreen space) | Active Session |
 
-### Fuzzy Pickers (fzf popups)
+### Window & Session Pickers (choose-tree & fzf popups)
 
 | Keybinding | Action | Context / Scope |
 |---|---|---|
-| `Prefix + s` | Fuzzy **session** switcher | Tmux Server |
-| `Prefix + w` | Fuzzy **window** switcher (current session) | Active Session |
+| `Prefix + s` | Fuzzy **session** switcher (`fzf` popup) | Tmux Server |
+| `Prefix + w` | Interactive **tree/window picker** (`choose-tree -Zw`, collapsed panes) | Tmux Server |
 | `Prefix + e` | Fuzzy **pane** switcher with **live scrollback preview** | Tmux Server |
 | `Prefix + f` | Fuzzy **project/sessionizer** — search git repos & attach/switch | Tmux Server |
 | `Prefix + /` | **Command Palette HUD** — fuzzy search & trigger any workflow | Active Window |
+
+#### Tree Mode Navigation (inside `Prefix + w` / `choose-tree`)
+* `h` — Collapse current tree item
+* `l` — Expand current tree item
+* `H` — Collapse all tree items
+* `L` — Expand all tree items
+* `Enter` — Select and switch to highlighted window or session
+* `q` / `Esc` — Dismiss tree picker
 
 ### Pane Management & Reordering
 
@@ -169,7 +177,7 @@ These **default** keys are replaced by custom bindings above — do not expect s
 |---|---|---|
 | `Prefix + f` | Find window by search text | Fuzzy project sessionizer |
 | `Prefix + s` | Interactive session list | Fuzzy session switcher |
-| `Prefix + w` | Interactive window list | Fuzzy window switcher |
+| `Prefix + w` | Interactive window list | Interactive tree/window picker (`choose-tree -Zw`) with vim folding (`h`/`l`/`H`/`L`) |
 | `Prefix + e` | *(none by default)* | Fuzzy pane switcher with preview |
 | `Prefix + .` | Move window to index | Rename pane title |
 | `Prefix + =` | List paste buffers | Tile panes evenly |
@@ -180,10 +188,13 @@ These **default** keys are replaced by custom bindings above — do not expect s
 
 | Keybinding | Action |
 |---|---|
+| `Prefix + c` | Create a new window (inherits active directory) |
+| `Prefix + ,` | Rename current window |
 | `Prefix + n` | Move to next window |
 | `Prefix + p` | Move to previous window |
 | `Prefix + 1`–`9` | Select window by index number (1-based on your configuration) |
 | `Prefix + '` | Select window by prompting for index number |
+| `Prefix + .` (stock) / `:move-window -t <n>` | Move / renumber current window to index |
 | `Shift + Left` / `Shift + Right` | Previous / next window (no prefix) |
 | `Ctrl + Shift + h` / `Ctrl + Shift + l` | Previous / next window (no prefix) |
 | `Ctrl + PageUp` / `Ctrl + PageDown` | Previous / next window (no prefix) |
@@ -193,6 +204,12 @@ These **default** keys are replaced by custom bindings above — do not expect s
 
 | Keybinding | Action |
 |---|---|
+| `Prefix + !` | **Break active pane** out of current window into a new window |
+| `Prefix + Alt + Shift + B` | **Break active pane** into a **background window** (`break-pane -d`) |
+| `Prefix + Alt + b` | **Demote all other panes** into background windows |
+| `Prefix + Alt + p` | **Break active pane** into a **brand new session** (prompts for name) |
+| `Prefix + Alt + w` / `Prefix + Ctrl + w` | **Break active window** into a **brand new session** (prompts for name) |
+| `Prefix + <` / `Prefix + >` | Move active pane to previous / next window |
 | `Prefix + m` | **Mark active pane** (crucial for `Prefix + M` marked-join workflow) |
 | `Prefix + ;` | Switch focus back to the last active pane (great for fast toggling) |
 | `Prefix + o` | Cycle focus to the next pane (by pane index) |
@@ -202,15 +219,20 @@ These **default** keys are replaced by custom bindings above — do not expect s
 | `Prefix + }` | Swap the current pane with the next pane in index order |
 | `Prefix + Ctrl + o` | Rotate all panes in current window forward |
 | `Prefix + Alt + o` | Rotate all panes in current window backward |
-| `Prefix + !` | Break active pane out of current window into a new separate window |
 | `Prefix + Space` | Cycle layout through presets (even-horizontal, even-vertical, tiled, etc.) |
 
 ### Sessions & Client Management
 
 | Keybinding | Action |
 |---|---|
-| `Prefix + d` | Detach the current client (leaves session running in background) |
+| `Prefix + d` | **Detach** current client (leaves session running in background) |
+| `Prefix + D` | Choose a specific client to detach from interactive menu |
+| `Prefix + Alt + d` | **Detach all other clients** attached to the current session |
+| `Prefix + (` | Switch to the previous session |
+| `Prefix + )` | Switch to the next session |
 | `Prefix + L` | Switch to the last active session/client |
+| `Prefix + $` | Rename current session (prompt) |
+| `Prefix + N` | Create a new named session (prompt) |
 
 ### Paste Buffers
 
@@ -233,11 +255,11 @@ These **default** keys are replaced by custom bindings above — do not expect s
 ## 3. Quick Reference Card
 
 ```
-NAVIGATION          FUZZY PICKERS           RESURRECT
+NAVIGATION          PICKERS & TREES         RESURRECT
 C-Space h/j/k/l     C-Space s  sessions     C-Space S  save
-C-Tab / C-S-Tab     C-Space w  windows      C-Space R  restore
-C-Space z  zoom     C-Space e  panes+preview C-Space C-s  named save
-C-Space `  last win  C-Space f  projects     C-Space C-r  named restore
+C-Tab / C-S-Tab     C-Space w  tree/win     C-Space R  restore
+C-Space z  zoom     C-Space e  panes+prev   C-Space C-s  named save
+C-Space `  last win C-Space f  projects     C-Space C-r  named restore
 
 PANES               WORKSPACES              PALETTE
 C-Space | / -       C-Space D  dev layout   C-Space /  everything

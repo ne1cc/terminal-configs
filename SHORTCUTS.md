@@ -94,7 +94,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | Keybinding | Scope | Description |
 |---|---|---|
 | `Prefix + s` | Prefix | **Fuzzy Session Switcher** (fzf popup modal) |
-| `Prefix + w` | Prefix | **Fuzzy Window Switcher** (fzf popup modal) |
+| `Prefix + w` | Prefix | **Interactive Tree/Window Picker** (`choose-tree -Zw`, collapsed panes, `h`/`l`/`H`/`L` folding) |
 | `Prefix + e` | Prefix | **Fuzzy Pane Switcher** across all sessions (fzf popup modal) |
 | `Prefix + f` | Prefix | **Tmux Sessionizer**: fuzzy find git repositories and launch session |
 | `Prefix + Ctrl + g` | Prefix | **Floating Lazygit Popup** (centered 90% modal) |
@@ -448,7 +448,7 @@ Launched via `y` (shell wrapper that switches directory on exit) or `yazi`:
 ## 6. Terminal Emulators (Ghostty & Alacritty)
 
 ### A. Ghostty
-* **Multiplexer Integration**: Automatically attaches to or creates the `main` tmux session on start.
+* **Multiplexer Integration**: First surface creates or attaches to persistent `main` tmux session (`initial-command`). Subsequent surfaces and windows (`Cmd + N`) spawn an independent, uniquely timestamped tmux session via [`ghostty-new-session`](bin/ghostty-new-session).
 * **Extended Keys**: Passes explicit CSI sequences for `Ctrl + Tab` and `Ctrl + Shift + Tab` to tmux.
 
 | Keybinding | Action |
@@ -516,4 +516,6 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | [`gharchive`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
 | [`pin-portfolio`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
 | [`setup-github-profile`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
+| [`ghostty-new-session`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
+| [`clear-images`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
 

@@ -9,8 +9,8 @@ Modern replacements for classic Unix tools, plus navigation and environment auto
 ## Quick start
 
 ```bash
-ls          # actually eza — icons, git status, colors
-cat README  # actually bat — syntax highlighting
+ls          # actually eza â€” icons, git status, colors
+cat README  # actually bat â€” syntax highlighting
 z term      # zoxide jump to terminal-configs
 zi          # interactive directory picker
 cheat jq    # instant cheat sheet
@@ -20,7 +20,7 @@ cheat jq    # instant cheat sheet
 
 ## Directory navigation
 
-### Zoxide — smart `cd`
+### Zoxide â€” smart `cd`
 
 Zoxide learns from directories you visit. Jump with partial names:
 
@@ -42,7 +42,7 @@ zi                   # fzf picker over frequent directories
 
 ---
 
-## File listing — Eza (replaces `ls`)
+## File listing â€” Eza (replaces `ls`)
 
 | Alias | Command | Output |
 |-------|---------|--------|
@@ -56,7 +56,7 @@ Features: file icons, git change indicators, directory grouping.
 
 ---
 
-## File viewing — Bat (replaces `cat`)
+## File viewing â€” Bat (replaces `cat`)
 
 ```bash
 cat src/main.py      # syntax-highlighted with line numbers
@@ -78,7 +78,7 @@ Used by FZF preview in `fo` (fuzzy file open).
 
 ---
 
-## Git diffs — Delta
+## Git diffs â€” Delta
 
 Lazygit and shell git use **Delta** for syntax-highlighted diffs:
 
@@ -91,7 +91,7 @@ Side-by-side mode: `gdiff` on Antigravity audit ledger.
 
 ---
 
-## Environment automation — Direnv
+## Environment automation â€” Direnv
 
 Auto-load/unload environment variables per directory:
 
@@ -107,7 +107,7 @@ Direnv hooks are loaded in `.zshrc`.
 
 ---
 
-## Cheat sheets — cheat.sh
+## Cheat sheets â€” cheat.sh
 
 ```bash
 cheat tar            # tar examples
@@ -121,7 +121,7 @@ cheat docker/run
 
 ## Tmux sessionizer
 
-Fuzzy project switcher — scans `~/Github`:
+Fuzzy project switcher â€” scans `~/Github`:
 
 ```bash
 Prefix + f           # tmux binding
@@ -134,7 +134,7 @@ See [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md).
 
 ## Smart tmux splits
 
-`Prefix + v` — layout-aware split:
+`Prefix + v` â€” layout-aware split:
 
 - **Wide terminal** ? horizontal split (side by side)
 - **Tall terminal** ? vertical split (stacked)
@@ -149,7 +149,7 @@ Installed via `brew bundle` / bootstrap scripts:
 
 | Tool | Purpose |
 |------|---------|
-| `ripgrep` (`rg`) | Fast code search — Neovim, Yazi, fzf |
+| `ripgrep` (`rg`) | Fast code search â€” Neovim, Yazi, fzf |
 | `fd` | Fast file finder |
 | `fzf` | Fuzzy finder backbone |
 | `jq` / `yq` | JSON/YAML processing |
@@ -224,9 +224,9 @@ prettyjson <<< '{"a":1}'
 
 ## Related docs
 
-- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) — FZF, git, ports
-- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) — sessionizer, smart splits
-- [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) — bootstrap packages
+- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) â€” FZF, git, ports
+- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) â€” sessionizer, smart splits
+- [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) â€” bootstrap packages
 
 ---
 

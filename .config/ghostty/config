@@ -1,6 +1,8 @@
-# Auto-attach or create a persistent 'main' tmux session.
-# Use PATH tmux (linuxbrew / Homebrew / apt) instead of a macOS-only prefix.
-command = tmux new-session -A -s main
+# First terminal surface creates/attaches to the persistent 'main' session:
+initial-command = tmux new-session -A -s main
+
+# Subsequent surfaces (Cmd+N, new windows) launch a brand new tmux session:
+command = /Users/alex/bin/ghostty-new-session
 
 # Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
 keybind = ctrl+tab=text:\x1b[27;5;9~

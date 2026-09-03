@@ -2,7 +2,7 @@
 
 Git TUI with Tokyo Night theme, Delta diffs, AI-assisted commits, and GitHub CLI integration.
 
-**Launch:** `lg` (current repo) · `lgd` (dotfiles) · `Prefix + Ctrl + g` (tmux floating modal)
+**Launch:** `lg` (current repo) Â· `lgd` (dotfiles) Â· `Prefix + Ctrl + g` (tmux floating modal)
 
 **Config:** `.config/lazygit/config.yml`
 
@@ -37,9 +37,9 @@ Lazygit panels (typical layout):
 ??????????????????????????????????????????????
 ```
 
-- **Files panel** — stage/unstage, view diffs
-- **Branches panel** — checkout, merge, rebase
-- **Commits panel** — browse history, cherry-pick, reset
+- **Files panel** â€” stage/unstage, view diffs
+- **Branches panel** â€” checkout, merge, rebase
+- **Commits panel** â€” browse history, cherry-pick, reset
 
 Navigation uses Vim-style keys by default. Press `?` inside Lazygit for built-in help.
 
@@ -118,7 +118,7 @@ Uses `pbcopy` (macOS) or `xclip`/`xsel` (Linux).
 
 ## tmux integration
 
-`Prefix + Ctrl + g` opens Lazygit in a **centered 90% floating popup** — stays over your editor/shell layout.
+`Prefix + Ctrl + g` opens Lazygit in a **centered 90% floating popup** â€” stays over your editor/shell layout.
 
 From Neovim: `<Leader>gg` or `<Leader><Ctrl-g>` toggles Lazygit via `lazygit.nvim`.
 
@@ -177,16 +177,16 @@ lg
 | AI key does nothing | Ensure `agy`, `claude`, `codex`, `qodercli` on `$PATH` |
 | PR create fails | `gh auth login`; must be inside git repo with remote |
 | Delta not coloring | Install `git-delta`; check `git.pagers` in config |
-| Opens wrong editor | Config sets `nvim` — set `$EDITOR` if needed |
+| Opens wrong editor | Config sets `nvim` â€” set `$EDITOR` if needed |
 | Popup too small in tmux | Resize terminal; popup is 90% of current dimensions |
 
 ---
 
 ## Related docs
 
-- [AI_WORKFLOW_GUIDE.md](AI_WORKFLOW_GUIDE.md) — Claude, Antigravity, handoffs
-- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) — shell git aliases
-- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) — floating Lazygit binding
+- [AI_WORKFLOW_GUIDE.md](AI_WORKFLOW_GUIDE.md) â€” Claude, Antigravity, handoffs
+- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) â€” shell git aliases
+- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) â€” floating Lazygit binding
 
 ---
 

@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added / Changed — Tmux Session & Window Management, Ghostty Multi-Session
+- `.tmux.conf`: Re-enabled interactive zoomed tree picker on `Prefix + w` (`choose-tree -Zw`) with pane details collapsed for clean navigation.
+- `.tmux.conf`: Added vim-style fold navigation keys in `tree-mode` (`h` collapse item, `l` expand item, `H` collapse all, `L` expand all).
+- `bin/ghostty-new-session`: Added script to spawn fresh, uniquely-timestamped (`YYYY-MM-DD_HH-MM`) tmux sessions when launching new Ghostty windows (`Cmd+N`).
+- `.config/ghostty/config`: Configured `initial-command = tmux new-session -A -s main` and `command = /Users/alex/bin/ghostty-new-session` so the initial surface attaches to `main` while subsequent windows spawn isolated sessions.
+- `.zshrc`: Updated `ghostty-new()` timestamp naming format.
+- Documentation: Fully audited and updated `SHORTCUTS.md`, `TMUX_SHORTCUTS.md`, `docs/TMUX_WORKFLOW_GUIDE.md`, and `docs/TERMINAL_EMULATORS_GUIDE.md` covering all pane breaking, joining, session moving, and tree navigation shortcuts. Cleaned documentation to UTF-8 encoding.
+
 ### Added — Ghostty pane breakout (`tmux-breakout-ghostty`)
 - New script `bin/tmux-breakout-ghostty`: breaks the active pane into a fresh tmux session and opens it in a new Ghostty window.
 - macOS fix: Ghostty launched via `open` ignores `-e`; pass `--command=tmux attach-session -t …` to override the default `command = tmux new-session -A -s main` in ghostty config.

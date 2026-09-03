@@ -1,6 +1,6 @@
 # Terminal Emulators & Keyboard Guide
 
-Ghostty, Alacritty, and Karabiner-Elements — how they integrate with tmux and why certain keys work the way they do.
+Ghostty, Alacritty, and Karabiner-Elements â€” how they integrate with tmux and why certain keys work the way they do.
 
 **Configs:**
 - `.config/ghostty/config`
@@ -26,9 +26,10 @@ Use **Ghostty** as primary (GPU, native tabs). Use **Alacritty** for breakout se
 
 ### tmux integration
 
-- On start: attach to `main` or create it
-- Passes extended key sequences for `Ctrl + Tab` / `Ctrl + Shift + Tab` ? tmux pane cycling
-- Supports Kitty graphics protocol (Neovim images, Yazi previews)
+- **First surface (`initial-command`)**: Attach to persistent `main` tmux session (or create it if not running).
+- **Subsequent surfaces & windows (`Cmd + N`, `command`)**: Automatically launches `ghostty-new-session` to spawn a fresh, uniquely-named tmux session (`YYYY-MM-DD_HH-MM`), keeping independent project workspaces isolated.
+- Passes extended key sequences for `Ctrl + Tab` / `Ctrl + Shift + Tab` â†’ tmux pane cycling.
+- Supports Kitty graphics protocol (Neovim images, Yazi previews).
 
 ### Native window keys
 
@@ -41,7 +42,7 @@ Use **Ghostty** as primary (GPU, native tabs). Use **Alacritty** for breakout se
 | `Cmd + Shift + ]` | Next native tab |
 | `Cmd + Shift + [` | Previous native tab |
 
-Native Ghostty splits are separate from tmux splits — most workflow uses tmux inside one Ghostty window.
+Native Ghostty splits are separate from tmux splits â€” most workflow uses tmux inside one Ghostty window.
 
 ### Extended keys (tmux)
 
@@ -59,7 +60,7 @@ Without this, tmux couldn't distinguish Tab from modified Tab.
 ### tmux integration
 
 - **Dynamic attach:** re-attaches to `main` if idle; creates new session if `main` is already attached elsewhere
-- **Zero scrollback:** scrolling happens in tmux copy-mode — keeps pane state consistent
+- **Zero scrollback:** scrolling happens in tmux copy-mode â€” keeps pane state consistent
 
 ### Keys
 
@@ -67,12 +68,12 @@ Without this, tmux couldn't distinguish Tab from modified Tab.
 |-----|--------|
 | `Ctrl + Shift + U` | URL / regex hint selector |
 | `Shift + Return` | Raw escape return |
-| `Ctrl + Tab` | Extended sequence ? tmux |
-| `Ctrl + Shift + Tab` | Extended sequence ? tmux |
+| `Ctrl + Tab` | Extended sequence â†’ tmux |
+| `Ctrl + Shift + Tab` | Extended sequence â†’ tmux |
 
 ### When to use
 
-- `Prefix + Alt + a` — break pane into new Alacritty window
+- `Prefix + Alt + a` â€” break pane into new Alacritty window
 - Second monitor workflows
 - Lightweight fallback if Ghostty unavailable (Linux)
 
@@ -97,7 +98,7 @@ Useful when multiple Ghostty/tmux sessions are open.
 |-----|---------|
 | **Right Option** | **Left Control** |
 
-Makes tmux prefix (`Ctrl + Space`) and terminal chords easier — right hand on Space, left on modified keys.
+Makes tmux prefix (`Ctrl + Space`) and terminal chords easier â€” right hand on Space, left on modified keys.
 
 ---
 
@@ -111,7 +112,7 @@ Cross-shell prompt showing git branch, directory, language tool versions. Loaded
 
 ## Font
 
-**JetBrainsMono Nerd Font** — required for icons in eza, starship, Lazygit, Yazi.
+**JetBrainsMono Nerd Font** â€” required for icons in eza, starship, Lazygit, Yazi.
 
 Installed via Brewfile. WSL bootstrap copies to Windows fonts for cross-platform terminals.
 
@@ -143,26 +144,26 @@ Run manually after bootstrap if desired.
 
 ## Daily workflows
 
-### Normal day — one Ghostty window
+### Normal day â€” one Ghostty window
 
 ```
-Open Ghostty ? auto-attaches main tmux
-Prefix + f ? pick project
-Prefix + D ? dev layout
+Open Ghostty â†’ auto-attaches main tmux
+Prefix + f â†’ pick project
+Prefix + D â†’ dev layout
 ```
 
-### Second monitor — breakout
+### Second monitor â€” breakout
 
 ```
-Prefix + Alt + g    ? break pane to new Ghostty
-Prefix + @           ? break whole window to new Ghostty
+Prefix + Alt + g    â†’ break pane to new Ghostty
+Prefix + @           â†’ break whole window to new Ghostty
 ```
 
 ### Cycle between tmux sessions in same app
 
 ```
-Cmd + Option + l    ? next window (Karabiner)
-Prefix + s          ? fzf session picker (better)
+Cmd + Option + l    â†’ next window (Karabiner)
+Prefix + s          â†’ fzf session picker (better)
 ```
 
 ---
@@ -173,20 +174,20 @@ Prefix + s          ? fzf session picker (better)
 |---------|-----|
 | Ghostty doesn't attach tmux | Check config `command` setting; run `ta` manually |
 | Breakout opens `main` instead of breakout session | Fixed in `tmux-breakout-ghostty` via `--command=`; reload config (`Prefix + r`) |
-| `Prefix + Alt + g` returns exit 1 | Reload config — binding must pass `#{pane_id}` (`TMUX_PANE` is empty under `run-shell -b`) |
-| `Ctrl + Tab` doesn't work | Must use Ghostty/Alacritty — not all terminals send CSI |
+| `Prefix + Alt + g` returns exit 1 | Reload config â€” binding must pass `#{pane_id}` (`TMUX_PANE` is empty under `run-shell -b`) |
+| `Ctrl + Tab` doesn't work | Must use Ghostty/Alacritty â€” not all terminals send CSI |
 | Icons show boxes | Install Nerd Font; set terminal font to JetBrainsMono Nerd Font |
 | Right Option feels wrong | Disable Karabiner remap or adjust in karabiner.json |
-| Alacritty no scrollback | By design — use tmux copy-mode (`Prefix + Enter`) |
+| Alacritty no scrollback | By design â€” use tmux copy-mode (`Prefix + Enter`) |
 | WSL clipboard broken | Run `wsl --shutdown`; check `/etc/wsl.conf` interop |
 
 ---
 
 ## Related docs
 
-- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) — everything inside tmux
-- [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) — image protocol requirements
-- [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) — install Ghostty/fonts
+- [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md) â€” everything inside tmux
+- [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) â€” image protocol requirements
+- [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) â€” install Ghostty/fonts
 
 ---
 
@@ -195,6 +196,6 @@ Prefix + s          ? fzf session picker (better)
 ```
 Ghostty:     Cmd+d split  Cmd+h/j/k/l focus  Cmd+Shift+[/] tabs
 Alacritty:   Prefix+Alt+a breakout  Ctrl+Shift+U URLs
-Karabiner:   Cmd+Opt+h/l window cycle  Right Opt ? Ctrl
+Karabiner:   Cmd+Opt+h/l window cycle  Right Opt â†’ Ctrl
 tmux:        Ctrl+Tab pane cycle  ta attach main
 ```

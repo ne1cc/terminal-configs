@@ -1,4 +1,4 @@
-# Terminal Configs — Documentation Hub
+# Terminal Configs â€” Documentation Hub
 
 Getting-started guides and workflow references for everything in `terminal-configs`.
 
@@ -9,7 +9,7 @@ Getting-started guides and workflow references for everything in `terminal-confi
 
 ## Start here
 
-| If you want to… | Read this |
+| If you want toâ€¦ | Read this |
 |-----------------|-----------|
 | Set up a fresh Mac, Linux, or WSL machine | [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) |
 | Use `ghsync`, `ghn`, `ghr`, and GitHub aliases | [GITHUB_ALIASES_GUIDE.md](GITHUB_ALIASES_GUIDE.md) |
@@ -40,7 +40,7 @@ Getting-started guides and workflow references for everything in `terminal-confi
 
 | Guide | What it covers |
 |-------|----------------|
-| [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) | Neovim overview, leader keys, integrations — links to deep dives |
+| [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) | Neovim overview, leader keys, integrations â€” links to deep dives |
 | [TELESCOPE_GUIDE.md](TELESCOPE_GUIDE.md) | Snacks picker: find files, grep, git branches, buffers |
 | [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md) | Walkthrough: find code, trace bugs, edit fast |
 | [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md) | LSP navigation, diagnostics, rename, code actions |
@@ -65,7 +65,7 @@ Getting-started guides and workflow references for everything in `terminal-confi
 
 ## Quick reference (cheatsheets)
 
-These are exhaustive lookup tables — use when you know *what* you need, not *how* to use it:
+These are exhaustive lookup tables â€” use when you know *what* you need, not *how* to use it:
 
 | Cheatsheet | Scope |
 |------------|-------|
@@ -90,7 +90,7 @@ ghr olist-lakehouse
 # 4. Open editor layout
 # Prefix + D  (dev workspace: editor + server + shell)
 
-# 5. End of session — save handoff for AI resume
+# 5. End of session â€” save handoff for AI resume
 handoff "finished CI fixes"
 # or: Prefix + Shift + H
 ```

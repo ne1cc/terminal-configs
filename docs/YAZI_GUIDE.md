@@ -14,7 +14,7 @@ cd ~/Github/n1ecC
 y                     # browse files; exit returns to same directory
 ```
 
-The `y` wrapper runs Yazi and `cd`s to whatever directory you were in when you quit — your shell `$PWD` follows Yazi navigation.
+The `y` wrapper runs Yazi and `cd`s to whatever directory you were in when you quit â€” your shell `$PWD` follows Yazi navigation.
 
 ---
 
@@ -57,9 +57,9 @@ Preview pane gets most of the width for readable file previews.
 
 Preview limits are optimized for Ghostty/Kitty graphics:
 
-- `max_width: 2048`, `max_height: 1536` — reduces RGB transfer from ~65 MB to ~5–8 MB per frame
-- `image_alloc: 512MB` — image preview cache
-- `micro_workers: 10`, `macro_workers: 25` — parallel preview tasks
+- `max_width: 2048`, `max_height: 1536` â€” reduces RGB transfer from ~65 MB to ~5â€“8 MB per frame
+- `image_alloc: 512MB` â€” image preview cache
+- `micro_workers: 10`, `macro_workers: 25` â€” parallel preview tasks
 
 Result: near-instant previews on large images and PDFs.
 
@@ -159,7 +159,7 @@ y
 
 - Yazi complements Neo-tree (`<Leader>e` in Neovim) for terminal-only workflows
 - Use Yazi when you want full-screen file browsing with rich previews
-- Use Neo-tree when editing — sidebar stays visible
+- Use Neo-tree when editing â€” sidebar stays visible
 
 ---
 
@@ -167,7 +167,7 @@ y
 
 | Problem | Fix |
 |---------|-----|
-| Preview slow/laggy | Already tuned — reduce terminal size or disable image preview |
+| Preview slow/laggy | Already tuned â€” reduce terminal size or disable image preview |
 | `y` doesn't cd on exit | Use `y` wrapper, not raw `yazi` |
 | MuPDF not opening | Install `mupdf` (`brew install mupdf`) |
 | Quick Look fails | macOS only; use `o` ? Open on Linux |
@@ -177,9 +177,9 @@ y
 
 ## Related docs
 
-- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) — `y` launcher
-- [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) — Neo-tree alternative
-- [SHORTCUTS.md § 5](../SHORTCUTS.md) — full keybinding table
+- [ZSH_GIT_WORKFLOW_GUIDE.md](ZSH_GIT_WORKFLOW_GUIDE.md) â€” `y` launcher
+- [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) â€” Neo-tree alternative
+- [SHORTCUTS.md Â§ 5](../SHORTCUTS.md) â€” full keybinding table
 
 ---
 

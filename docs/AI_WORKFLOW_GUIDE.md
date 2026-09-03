@@ -7,7 +7,7 @@ Claude Code, Antigravity (Gemini CLI), Lazygit AI integrations, agent matrix, an
 ## Quick start
 
 ```bash
-# Claude Code — interactive
+# Claude Code â€” interactive
 claude
 
 # Shell shortcuts
@@ -110,13 +110,13 @@ Full details: [claude-code/commands/README.md](../claude-code/commands/README.md
 
 ### MSTSPAT standard (enforced in CLAUDE.md)
 
-- **M**inimal — only necessary code
-- **S**elf-documenting — precise naming
-- **T**ype-exact — no `any`, full validation
-- **S**ecure — input validation, env vars for secrets
-- **P**erformant — framework best practices
-- **A**ccessible — when UI applies
-- **T**estable — meaningful coverage
+- **M**inimal â€” only necessary code
+- **S**elf-documenting â€” precise naming
+- **T**ype-exact â€” no `any`, full validation
+- **S**ecure â€” input validation, env vars for secrets
+- **P**erformant â€” framework best practices
+- **A**ccessible â€” when UI applies
+- **T**estable â€” meaningful coverage
 
 ---
 
@@ -142,7 +142,7 @@ Antigravity writes session history to `~/.gemini_history.md`.
 
 ### Skills
 
-100+ specialized skills live in `.gemini/skills/` — data engineering, document processing, code review, etc. Skills activate contextually when using Antigravity.
+100+ specialized skills live in `.gemini/skills/` â€” data engineering, document processing, code review, etc. Skills activate contextually when using Antigravity.
 
 Global rules: `.gemini/GEMINI.md`
 
@@ -247,13 +247,13 @@ Remove when done: `Prefix + Ctrl + x` or `wt-rm`
 
 Cursor agent skills symlinked via `link-agent-skills.sh`:
 
-- `review-bugbot`, `review-security` — code review
-- `babysit` — PR merge-ready loop
-- `loop` — recurring prompts
-- `sdk` — Cursor SDK automation
-- `share`, `new-repo`, `origin` — repo management
+- `review-bugbot`, `review-security` â€” code review
+- `babysit` â€” PR merge-ready loop
+- `loop` â€” recurring prompts
+- `sdk` â€” Cursor SDK automation
+- `share`, `new-repo`, `origin` â€” repo management
 
-Claude Code skill: `delegate-agy` — delegate to Antigravity CLI
+Claude Code skill: `delegate-agy` â€” delegate to Antigravity CLI
 
 ---
 
@@ -288,7 +288,7 @@ agya                             # export audit report
 glog                             # preview ledger
 ```
 
-### End session — hand off to tomorrow
+### End session â€” hand off to tomorrow
 
 ```bash
 handoff "olist promote_run fix"
