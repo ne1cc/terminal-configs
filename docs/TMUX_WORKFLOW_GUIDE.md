@@ -240,7 +240,7 @@ Pop a pane or window into its own session or terminal emulator:
 |------|--------|
 | `Prefix + Alt + p` | Break pane ? new tmux session |
 | `Prefix + Alt + w` | Break window ? new tmux session |
-| `Prefix + Alt + g` | Break pane ? new Ghostty window |
+| `Prefix + Alt + g` | Break pane ? new tmux session ? new Ghostty window (`bin/tmux-breakout-ghostty`) |
 | `Prefix + Alt + a` | Break pane ? new Alacritty window |
 | `Prefix + @` | Break window ? new Ghostty process |
 

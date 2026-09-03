@@ -31,6 +31,7 @@ K             hover docs
 
 | Guide | Best for |
 |-------|----------|
+| [TELESCOPE_GUIDE.md](TELESCOPE_GUIDE.md) | Find files, grep, git branches, buffers (Snacks picker) |
 | [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md) | Walkthrough: orient, find code, trace bugs, edit |
 | [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md) | LSP navigation, diagnostics, rename, code actions |
 
@@ -40,7 +41,7 @@ This guide covers integrations and daily patterns; those two docs go deeper on s
 
 ## Navigation model
 
-Neovim shares tmux pane navigation — same keys everywhere:
+Neovim shares tmux pane navigation â€” same keys everywhere:
 
 | Key | Action |
 |-----|--------|
@@ -49,7 +50,7 @@ Neovim shares tmux pane navigation — same keys everywhere:
 | `Space + z` | Maximize current window |
 | `]b` / `[b` | Next / previous buffer |
 
-**Jump pattern:** `gd` ? inspect ? `Ctrl + o` back — the most-used read workflow.
+**Jump pattern:** `gd` ? inspect ? `Ctrl + o` back â€” the most-used read workflow.
 
 ---
 
@@ -123,11 +124,20 @@ Full table: [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md)
 | `Space + ~` | Toggle strikethrough |
 | `Space + op` | Open PDF (MuPDF) |
 | `Space + oe` | Open EPUB (OmniReader) |
+| `Space + mr` | Toggle Markdown Raw (As-Is: nowrap, conceal 0) / Rendered |
+| `Space + mw` | Toggle soft wrap (Prose wrap vs Table nowrap view) |
+| `Space + mz` | Fit viewport to full screen (closes sidebar, zooms tmux, nowrap) |
+| `Space + mm` | Cycle Markdown display modes (Rendered wrap â†’ Table nowrap â†’ Raw as-is) |
+| `Space + mp` | Markdown live browser preview (`markdown-preview.nvim`) |
+| `Space + md` | Show diagram preview hover (clean floating window at cursor) |
+| `Space + mb` | Toggle diagram in-buffer rendering (opaque background) |
+| `Space + mx` | Toggle Markdown checklist item (`[ ]` â†’ `[x]` â†’ `[-]`) |
+| `Space + mi` | Insert continuation list/numbered item |
 | `Space + om` | Open Markdown (One Markdown) |
 | `Space + mt` | Open Markdown (Mark Text) |
 | `j` / `k` | Next/prev image in gallery buffer |
 
-Inline image rendering via `3rd/image.nvim` + `img-clip.nvim` — optimized for Kitty/Ghostty graphics protocol.
+Inline image rendering via `3rd/image.nvim` + `img-clip.nvim` â€” optimized for Kitty/Ghostty graphics protocol.
 
 ---
 
@@ -147,7 +157,7 @@ Matches shell `Alt + K` ergonomics.
 | tmux | Neovim |
 |------|--------|
 | `Prefix + Shift + O` | Jump to file:line from error on screen |
-| `Prefix + D` | Dev layout — Neovim in 65% pane |
+| `Prefix + D` | Dev layout â€” Neovim in 65% pane |
 | `Ctrl + h/j/k/l` | Seamless pane navigation |
 
 `tmux-open-path` extracts stack traces and compiler paths from terminal output ? opens in Neovim at the correct line.
@@ -158,7 +168,7 @@ Matches shell `Alt + K` ergonomics.
 
 ### Open project and find code
 
-See [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md) Phase 1–3.
+See [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md) Phase 1ï¿½3.
 
 ```bash
 nvim .
@@ -211,7 +221,7 @@ P               push
 
 | Problem | Fix |
 |---------|-----|
-| LSP not attaching | `:LspInfo` or `Space + li` — install language server |
+| LSP not attaching | `:LspInfo` or `Space + li` â€” install language server |
 | Images garbled | `Space + ic` to clear overlays; use Ghostty/Kitty |
 | Fzf empty | Must be inside project root with files |
 | Lazygit won't open | Install `lazygit`; check `$PATH` |
@@ -225,7 +235,7 @@ P               push
 - [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md)
 - [LAZYGIT_GUIDE.md](LAZYGIT_GUIDE.md)
 - [TMUX_WORKFLOW_GUIDE.md](TMUX_WORKFLOW_GUIDE.md)
-- [SHORTCUTS.md § 3](../SHORTCUTS.md)
+- [SHORTCUTS.md ï¿½ 3](../SHORTCUTS.md)
 
 ---
 

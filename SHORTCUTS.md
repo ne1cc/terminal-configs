@@ -85,7 +85,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Prefix + Alt + w` / `Prefix + Ctrl + w` | Prefix | **Break current window out into a brand-new tmux session** (prompts for name, auto-switches) |
 | `Prefix + Alt + b` | Prefix | Demote all other panes into background windows (`M-b`) |
 | `Prefix + Alt + a` | Prefix | Break active pane out into a new session in **Alacritty** (`M-a`) |
-| `Prefix + Alt + g` | Prefix | Break active pane out into a new session in **Ghostty** (`M-g`) |
+| `Prefix + Alt + g` | Prefix | Break active pane → new tmux session → new **Ghostty** window (`tmux-breakout-ghostty`) |
 | `Prefix + @` | Prefix | **Break current window out into a new Ghostty process & session** |
 | `Prefix + Alt + j` | Prefix | Pull all panes from a chosen window into current window (`M-j`) |
 | `Prefix + Alt + m` | Prefix | Push all panes from current window to another window (`M-m`) |
@@ -104,6 +104,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Prefix + $` | Prefix | Rename current session |
 | `Prefix + Shift + D` | Prefix | Detach all other attached clients |
 | `Prefix + r` | Prefix | Reload `~/.tmux.conf` configuration |
+| `Prefix + Ctrl + l` | Prefix | **Purge ghost terminal image/diagram overlays** & refresh screen |
 
 ### G. Window Stashing (Background Scratchpads)
 | Keybinding | Scope | Description |
@@ -373,6 +374,15 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>~` / `<Leader>ms` | Normal / Visual | **Toggle strikethrough** (`~~text~~`) |
 | `<Leader>op` | Normal | Open PDF under cursor or companion `.pdf` file in **MuPDF** |
 | `<Leader>oe` | Normal | Open EPUB under cursor or companion `.epub` file in **OmniReader** |
+| `<Leader>mr` | Normal | **Toggle Raw (As-Is) / Rendered** mode (nowrap, conceal 0 in Raw) |
+| `<Leader>mw` | Normal | **Toggle soft wrap** (Prose wrap vs Table nowrap view) |
+| `<Leader>mz` | Normal | **Fit viewport to full screen** (closes sidebar, zooms tmux, nowrap) |
+| `<Leader>mm` | Normal | **Cycle display modes** (Rendered wrap → Table nowrap → Raw as-is) |
+| `<Leader>mp` | Normal | Open **live browser preview** (`markdown-preview.nvim`) |
+| `<Leader>md` | Normal | **Show diagram preview hover** (clean floating window at cursor) |
+| `<Leader>mb` | Normal | **Toggle diagram in-buffer rendering** (opaque background) |
+| `<Leader>mx` | Normal | **Toggle checklist item** (`[ ]` → `[x]` → `[-]`) |
+| `<Leader>mi` | Normal | **Insert list/bullet continuation** |
 | `<Leader>om` | Normal | Open Markdown under cursor or buffer in **One Markdown** |
 | `<Leader>mt` | Normal | Open Markdown under cursor or buffer in **Mark Text** (new window) |
 | `j` / `]i` | Normal (Image buffer) | View next image in folder gallery |
@@ -481,6 +491,7 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 
 | Script | Purpose |
 |---|---|
+| [`fleet`](file:///Users/alex/Github/config/terminal-configs/bin/fleet) | Production Multi-Agent Git Worktree & Tmux Swarm Orchestrator (`claude`, `agy`, `qoder`). |
 | [`tmux-palette`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
 | [`tmux-open-path`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
 | [`tmux-scratchpad`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |

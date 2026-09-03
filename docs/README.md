@@ -41,6 +41,7 @@ Getting-started guides and workflow references for everything in `terminal-confi
 | Guide | What it covers |
 |-------|----------------|
 | [NEOVIM_GUIDE.md](NEOVIM_GUIDE.md) | Neovim overview, leader keys, integrations — links to deep dives |
+| [TELESCOPE_GUIDE.md](TELESCOPE_GUIDE.md) | Snacks picker: find files, grep, git branches, buffers |
 | [10X_NEOVIM_SESSION.md](10X_NEOVIM_SESSION.md) | Walkthrough: find code, trace bugs, edit fast |
 | [LSP_SHORTCUTS.md](LSP_SHORTCUTS.md) | LSP navigation, diagnostics, rename, code actions |
 | [LAZYGIT_GUIDE.md](LAZYGIT_GUIDE.md) | Lazygit TUI + AI custom commands (Claude, Antigravity, Codex) |

@@ -27,6 +27,9 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Disable auto-setting terminal title (tmux owns this)
 DISABLE_AUTO_TITLE="true"
 
+# Fleet Multi-Agent Orchestrator Completions
+fpath=("${XDG_CONFIG_HOME:-$HOME/.config}/fleet/completions" $fpath)
+
 plugins=(git)
 
 [[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
@@ -368,16 +371,31 @@ alias yolo='agy --dangerously-skip-permissions'
 alias glog='glow -p ~/.gemini_history.md'
 alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nord"'
 
+# Fleet Multi-Agent Worktree Orchestrator
+alias fsp='fleet spawn'
+alias fbc='fleet broadcast'
+alias fkp='fleet keep'
+alias fdf='fleet diff'
+alias fkl='fleet kill'
+alias fls='fleet ls'
+alias fdoc='fleet doctor'
+alias fat='fleet attach'
+alias flog='fleet logs'
+[[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/fleet/fleet.zsh" ]] && source "${XDG_CONFIG_HOME:-$HOME/.config}/fleet/fleet.zsh"
+
+
 # Quick access & Application Openers
 alias lg="lazygit"
 alias mu="mupdf"
+unalias om 2>/dev/null
+unalias mt 2>/dev/null
 if [[ "$OSTYPE" == darwin* ]]; then
-    om() {
+    function om {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
         open -a "One Markdown" "$target"
     }
-    mt() {
+    function mt {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
         open -na "Mark Text" --args "$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
@@ -387,7 +405,7 @@ if [[ "$OSTYPE" == darwin* ]]; then
     alias finder='open'
     alias of='open -R'
 else
-    om() {
+    function om {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
         if command -v glow >/dev/null; then
@@ -399,7 +417,7 @@ else
             return 1
         fi
     }
-    mt() {
+    function mt {
         local target="${1:-}"
         [[ -n "$target" ]] || { echo "Usage: mt <file.md>"; return 1; }
         if command -v marktext >/dev/null; then
@@ -453,7 +471,16 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias mkdir='mkdir -p'
 
+# iCloud Drive & Markdown notes (synced via iCloud)
+: "${ICLOUD_DRIVE:=$HOME/Library/Mobile Documents/com~apple~CloudDocs}"
+: "${ICLOUD_MD:=$ICLOUD_DRIVE/Markdown}"
+alias icloud='cd "$ICLOUD_DRIVE"'
+alias mdf='cd "$ICLOUD_MD"'
+
 # Github workspace (~/Github) — portfolio, explore, sync
+: "${DOTFILES:=$HOME/Github/n1ecC/terminal-configs}"
+: "${GITHUB_ROOT:=$HOME/Github}"
+: "${N1ECC_DIR:=$GITHUB_ROOT/n1ecC}"
 alias ghn='cd "$N1ECC_DIR"'
 alias ghex='cd "$GITHUB_ROOT/explore"'
 alias ghws='cd "$GITHUB_ROOT/workspace"'
@@ -483,6 +510,27 @@ ghr() {
   }
 }
 
+# CareerOps Recruiting Workbench quick-jump
+rc() {
+  cd "/Users/alex/Documents/Recruiting" || return 1
+  case "$1" in
+    agyy|agy-yolo|yolo)
+      shift
+      agy --dangerously-skip-permissions "$@"
+      ;;
+    agy)
+      shift
+      agy "$@"
+      ;;
+    "")
+      ;;
+    *)
+      "$@"
+      ;;
+  esac
+}
+alias rcyy='rc agyy'
+
 # Data Engineering & Quick Inspection
 alias headcsv='head -n 20'
 alias tailcsv='tail -n 20'
@@ -499,6 +547,16 @@ alias dlogs='docker logs -f --tail=100'
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+
+# Launch a brand new Ghostty window attached to a fresh tmux session
+ghostty-new() {
+    local sess="${1:-ghostty-$(date +%s)}"
+    local ghostty_bin="/Applications/Ghostty.app/Contents/MacOS/ghostty"
+    if [[ ! -x "$ghostty_bin" ]]; then
+        ghostty_bin=$(command -v ghostty 2>/dev/null || echo "ghostty")
+    fi
+    "$ghostty_bin" -e tmux new-session -s "$sess" >/dev/null 2>&1 &
+}
 
 # Developer & Data Project Scaffolding Utilities
 mkpy() {

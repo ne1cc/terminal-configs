@@ -26,3 +26,8 @@ export PATH="$HOME/Github/_tools:$HOME/bin:$HOME/.local/bin:$PATH"
 
 # OrbStack — macOS only
 [[ -f ~/.orbstack/shell/init.zsh ]] && source ~/.orbstack/shell/init.zsh
+
+# QODER_DISPATCHER_PATH v1
+path=("$HOME/.qoder/entry" ${path:#"$HOME/.qoder/entry"})
+export PATH
+# END QODER_DISPATCHER_PATH v1

@@ -7,14 +7,14 @@ return {
         function()
           require("maximize").toggle()
         end,
-        desc = "Maximize / Restore current split window",
+        desc = "Maximize / restore window",
       },
       {
         "<leader>z",
         function()
           require("maximize").toggle()
         end,
-        desc = "Maximize / Restore current split window (Zoom)",
+        desc = "Maximize / zoom window",
       },
     },
     opts = {},

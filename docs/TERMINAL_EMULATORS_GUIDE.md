@@ -172,6 +172,8 @@ Prefix + s          ? fzf session picker (better)
 | Problem | Fix |
 |---------|-----|
 | Ghostty doesn't attach tmux | Check config `command` setting; run `ta` manually |
+| Breakout opens `main` instead of breakout session | Fixed in `tmux-breakout-ghostty` via `--command=`; reload config (`Prefix + r`) |
+| `Prefix + Alt + g` returns exit 1 | Reload config — binding must pass `#{pane_id}` (`TMUX_PANE` is empty under `run-shell -b`) |
 | `Ctrl + Tab` doesn't work | Must use Ghostty/Alacritty — not all terminals send CSI |
 | Icons show boxes | Install Nerd Font; set terminal font to JetBrainsMono Nerd Font |
 | Right Option feels wrong | Disable Karabiner remap or adjust in karabiner.json |

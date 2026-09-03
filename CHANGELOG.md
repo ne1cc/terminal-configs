@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Ghostty pane breakout (`tmux-breakout-ghostty`)
+- New script `bin/tmux-breakout-ghostty`: breaks the active pane into a fresh tmux session and opens it in a new Ghostty window.
+- macOS fix: Ghostty launched via `open` ignores `-e`; pass `--command=tmux attach-session -t …` to override the default `command = tmux new-session -A -s main` in ghostty config.
+- `Prefix + Alt + g` binding passes `#{pane_id}` explicitly (required because `run-shell -b` clears `TMUX_PANE`).
+- Command palette entry: **Break Pane → Ghostty**.
+- `Prefix + @` (break whole window → Ghostty) updated to use the same `--command=` launch pattern.
+
 ### Added — Antigravity / Gemini Skills & Markdown Rules
 - Added all 100+ Antigravity skills (including newly created `markdown-architect` and full domain suites) to `.gemini/skills/`.
 - Tracked global formatting rules `GEMINI.md` in repository root under `.gemini/GEMINI.md`.

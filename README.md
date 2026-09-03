@@ -205,7 +205,7 @@ A complete reference for every configured keyboard shortcut, alias, and shell fu
 | `Prefix + Alt + w` / `Prefix + Ctrl + w` | Prefix | **Break current window out into a brand-new tmux session** (prompts for name, auto-switches) |
 | `Prefix + Alt + b` | Prefix | Demote all other panes into background windows (`M-b`) |
 | `Prefix + Alt + a` | Prefix | Break active pane out into a new session in **Alacritty** (`M-a`) |
-| `Prefix + Alt + g` | Prefix | Break active pane out into a new session in **Ghostty** (`M-g`) |
+| `Prefix + Alt + g` | Prefix | Break active pane → new tmux session → new **Ghostty** window (`tmux-breakout-ghostty`) |
 | `Prefix + @` | Prefix | **Break current window out into a new Ghostty process & session** |
 | `Prefix + Alt + j` | Prefix | Pull all panes from a chosen window into current window (`M-j`) |
 | `Prefix + Alt + m` | Prefix | Push all panes from current window to another window (`M-m`) |
