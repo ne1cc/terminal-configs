@@ -711,10 +711,30 @@ alias wma='workmux add'
 alias wmls='workmux list'
 alias wmrm='workmux remove'
 alias wmo='workmux open'
-alias wmc='workmux close'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
 alias wmm='workmux merge'
+
+# wmc <branch> [prompt...] — One-shot Claude Worktree Dispatcher
+# Example: wmc feat/auth "Implement JWT auth middleware with tests"
+wmc() {
+  local branch="${1:-}"
+  shift || true
+  local prompt="$*"
+
+  if [[ -z "$branch" ]]; then
+    echo "Usage: wmc <branch-name> [prompt...]"
+    return 1
+  fi
+
+  if [[ -n "$prompt" ]]; then
+    echo "==> Creating worktree '$branch' and dispatching Claude prompt..."
+    workmux add "$branch" -A "$prompt"
+  else
+    echo "==> Creating worktree '$branch' with Neovim + Claude..."
+    workmux add "$branch"
+  fi
+}
 
 
 # ==============================================================================
