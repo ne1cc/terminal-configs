@@ -2,7 +2,9 @@
 # sesh-picker — interactive fuzzy session picker using sesh and fzf
 set -euo pipefail
 
-session=$(sesh list -t -c -z | fzf-tmux -p 75%,60% \
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+session=$(sesh list -t -c -z | fzf \
   --no-sort --border-label ' sesh sessions ' --prompt '⚡  ' \
   --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
   --bind 'tab:down,btab:up' \
