@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# gh-mirror-check — namespace mirror drift check for ~/Github/<owner>
+#
+# Only checks "synced" owners (full mirrors of your accounts/orgs), never
+# third-party reference namespaces like ~/Github/facebook/.
+#
+# Owners come from (first match wins):
+#   1) repeated --owner flags
+#   2) ~/Github/.mirror-owners  (one owner per line)
+#   3) default: n1ecC
+#
+# Usage:
+#   gh-mirror-check
+#   gh-mirror-check --quiet
+#   gh-mirror-check --if-stale 7
+#   gh-mirror-check --owner n1ecC --owner my-org
+# ==============================================================================
+set -euo pipefail
+
+QUIET=false
+STALE_DAYS=""
+OWNERS=()
+GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
+OWNERS_FILE="${GITHUB_ROOT}/.mirror-owners"
+
+usage() { sed -n '2,22p' "$0" | sed 's/^# \?//'; }
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -q|--quiet) QUIET=true; shift ;;
+    --if-stale)
+      STALE_DAYS="${2:-}"
+      [[ -n "$STALE_DAYS" && "$STALE_DAYS" =~ ^[0-9]+$ ]] || {
+        echo "error: --if-stale requires an integer day count" >&2; exit 2; }
+      shift 2 ;;
+    --owner)
+      [[ -n "${2:-}" ]] || { echo "error: --owner requires a value" >&2; exit 2; }
+      OWNERS+=("$2"); shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+if [[ ${#OWNERS[@]} -eq 0 ]]; then
+  if [[ -f "$OWNERS_FILE" ]]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      line="${line%%#*}"
+      line="$(printf '%s' "$line" | tr -d '[:space:]')"
+      [[ -z "$line" ]] && continue
+      OWNERS+=("$line")
+    done < "$OWNERS_FILE"
+  fi
+fi
+if [[ ${#OWNERS[@]} -eq 0 ]]; then
+  OWNERS=(n1ecC)
+fi
+
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+STAMP_FILE="$CACHE_DIR/gh-mirror-check.stamp"
+
+if [[ -n "$STALE_DAYS" ]]; then
+  mkdir -p "$CACHE_DIR"
+  if [[ -f "$STAMP_FILE" ]]; then
+    now=$(date +%s)
+    mtime=$(stat -f %m "$STAMP_FILE" 2>/dev/null || stat -c %Y "$STAMP_FILE" 2>/dev/null || echo 0)
+    age_days=$(( (now - mtime) / 86400 ))
+    if (( age_days < STALE_DAYS )); then
+      exit 0
+    fi
+  fi
+fi
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "error: gh CLI not found" >&2
+  exit 127
+fi
+
+total_problems=0
+total_remotes=0
+
+check_owner() {
+  local owner="$1"
+  local mirror_root="$GITHUB_ROOT/$owner"
+  local remotes_file missing_file orphan_file
+  local remote_count=0 missing_count=0 orphan_count=0 problems=0
+  local name dir
+
+  mkdir -p "$mirror_root"
+  remotes_file=$(mktemp)
+  missing_file=$(mktemp)
+  orphan_file=$(mktemp)
+
+  if ! gh repo list "$owner" --limit 500 --json name --jq '.[].name' 2>/dev/null \
+      | LC_ALL=C sort -u > "$remotes_file"; then
+    echo "error: failed to list repos for '$owner'" >&2
+    rm -f "$remotes_file" "$missing_file" "$orphan_file"
+    return 1
+  fi
+
+  if [[ ! -s "$remotes_file" ]]; then
+    echo "error: no repos returned for owner '$owner' (auth / network?)" >&2
+    rm -f "$remotes_file" "$missing_file" "$orphan_file"
+    return 1
+  fi
+
+  remote_count=$(wc -l < "$remotes_file" | tr -d ' ')
+  total_remotes=$(( total_remotes + remote_count ))
+
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    if [[ ! -d "$mirror_root/$name/.git" ]]; then
+      printf '%s\n' "$name" >> "$missing_file"
+    fi
+  done < "$remotes_file"
+
+  shopt -s nullglob
+  for dir in "$mirror_root"/*/; do
+    name=$(basename "$dir")
+    case "$name" in _*|.*) continue ;; esac
+    if ! grep -Fxq "$name" "$remotes_file"; then
+      printf '%s\n' "$name" >> "$orphan_file"
+    fi
+  done
+  shopt -u nullglob
+
+  [[ -s "$missing_file" ]] && missing_count=$(wc -l < "$missing_file" | tr -d ' ')
+  [[ -s "$orphan_file" ]] && orphan_count=$(wc -l < "$orphan_file" | tr -d ' ')
+  problems=$(( missing_count + orphan_count ))
+  total_problems=$(( total_problems + problems ))
+
+  if "$QUIET"; then
+    if (( problems > 0 )); then
+      printf '[%s]\n' "$owner"
+      if (( missing_count > 0 )); then
+        printf 'MISSING (%d)\n' "$missing_count"
+        sed 's/^/  /' "$missing_file"
+      fi
+      if (( orphan_count > 0 )); then
+        printf 'ORPHAN (%d)\n' "$orphan_count"
+        sed 's/^/  /' "$orphan_file"
+      fi
+    fi
+  else
+    printf 'GitHub mirror check  %s  ↔  %s\n' "$owner" "$mirror_root"
+    printf 'Remotes on GitHub: %d\n' "$remote_count"
+    if (( problems == 0 )); then
+      printf 'OK — every remote is cloned; no orphan directories.\n'
+    else
+      if (( missing_count > 0 )); then
+        printf 'MISSING (%d)\n' "$missing_count"
+        sed 's/^/  /' "$missing_file"
+      fi
+      if (( orphan_count > 0 )); then
+        printf 'ORPHAN (%d)\n' "$orphan_count"
+        sed 's/^/  /' "$orphan_file"
+      fi
+    fi
+    printf '\n'
+  fi
+
+  rm -f "$remotes_file" "$missing_file" "$orphan_file"
+  return 0
+}
+
+for owner in "${OWNERS[@]}"; do
+  check_owner "$owner" || true
+done
+
+mkdir -p "$CACHE_DIR"
+touch "$STAMP_FILE"
+
+if (( total_problems > 0 )); then
+  exit 1
+fi
+
+if ! "$QUIET"; then
+  if (( ${#OWNERS[@]} > 1 )); then
+    printf 'All namespaces OK (%d owner(s), %d remote(s)).\n' "${#OWNERS[@]}" "$total_remotes"
+  fi
+fi
+exit 0

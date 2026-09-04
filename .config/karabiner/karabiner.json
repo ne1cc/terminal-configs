@@ -64,7 +64,11 @@
             ],
             "name": "Default profile",
             "selected": true,
-            "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
+            "virtual_hid_keyboard": {
+                "keyboard_type_v2": "ansi",
+                "delay_milliseconds": 120,
+                "interval_milliseconds": 10
+            }
         }
     ]
 }

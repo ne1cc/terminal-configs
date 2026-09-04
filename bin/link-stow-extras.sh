@@ -26,14 +26,28 @@ link_path() {
 
 printf '==> Linking Stow-excluded paths from %s\n' "$REPO_DIR"
 
-mkdir -p "$CONFIG_DIR" "$HOME/bin"
+mkdir -p "$CONFIG_DIR"
 
 link_path "$REPO_DIR/.config/nvim" "$CONFIG_DIR/nvim"
 
-for script in "$REPO_DIR"/bin/*; do
-  [[ -f "$script" ]] || continue
-  link_path "$script" "$HOME/bin/$(basename "$script")"
-done
+# ~/bin may already be a directory symlink to $REPO_DIR/bin (common on this host).
+# Linking files into that path would replace the real scripts with self-symlinks.
+repo_bin="$(cd "$REPO_DIR/bin" && pwd -P)"
+if [[ -L "$HOME/bin" || -d "$HOME/bin" ]]; then
+  home_bin="$(cd "$HOME/bin" && pwd -P)"
+else
+  home_bin=""
+fi
+
+if [[ -n "$home_bin" && "$home_bin" == "$repo_bin" ]]; then
+  printf '  unchanged: %s (already points at repo bin)\n' "$HOME/bin"
+else
+  mkdir -p "$HOME/bin"
+  for script in "$REPO_DIR"/bin/*; do
+    [[ -f "$script" ]] || continue
+    link_path "$script" "$HOME/bin/$(basename "$script")"
+  done
+fi
 
 if [[ -f "$REPO_DIR/.taskrc.template" ]]; then
   theme_path=""

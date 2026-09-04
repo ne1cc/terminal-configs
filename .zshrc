@@ -464,6 +464,19 @@ alias gco='git checkout'
 alias gcb='git checkout -b'
 alias gl='git log --oneline --graph --decorate -n 20'
 alias gaa='git add -A'
+alias gmc='gh-mirror-check'
+alias gh-mirror='gh-mirror-check'
+alias gnc='gh-ns-clone'
+alias gnf='gh-ns-fork'
+alias gnn='gh-ns-new'
+alias gnp='gh-ns-promote'
+alias gns='gh-ns-status'
+
+# Weekly GitHub mirror drift check (n1ecC ↔ ~/Github/n1ecC). Quiet; only prints problems.
+# Runs at most once per 7 days in interactive shells; skip with: export GH_MIRROR_CHECK=0
+if [[ -o interactive && "${GH_MIRROR_CHECK:-1}" != 0 ]] && command -v gh-mirror-check >/dev/null 2>&1; then
+  (gh-mirror-check --quiet --if-stale 7 || true) &!
+fi
 
 # Directory Navigation & Quick Jumps
 alias ..='cd ..'

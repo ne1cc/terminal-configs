@@ -43,3 +43,46 @@ Never self-report a task as done. Always:
 ## Claude Code Configuration
 - **Security**: Deny access to `.env*`, `secrets/**`, and dangerous bash commands. Confirm `git push*` and `package.json` changes.
 - **MCP Integration**: Configure external tools (database, GitHub, etc.) via JSON config.
+
+## GitHub Namespace Layout & Shortcuts (mandatory)
+
+Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
+
+```text
+~/Github/
+  n1ecC/                 # ONLY repos that exist on github.com/n1ecC/*
+  _local/projects/       # local WIP with no remote yet
+  _local/archive/        # old / non-synced trees
+  _local/worktrees/      # linked git worktrees
+  <other-owner>/         # reference clones (do not add to .mirror-owners)
+  .mirror-owners         # synced owners list (currently: n1ecC)
+```
+
+### Shell aliases (prefer these over raw git/gh for repo placement)
+
+| Alias | Command | Use when |
+|-------|---------|----------|
+| `gnn <name>` | `gh-ns-new` | Start a **local-only** project in `~/Github/_local/projects/<name>` (`--python` / `--node` optional) |
+| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `n1ecC/<name>` on GitHub, push, **move** into `~/Github/n1ecC/<name>` (`--public`, `--name`, `--owner`) |
+| `gns` | `gh-ns-status` | Show local WIP + mirror drift |
+| `gmc` | `gh-mirror-check` | Compare `n1ecC` remotes vs `~/Github/n1ecC` (`MISSING` / `ORPHAN`) |
+| `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
+| `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
+
+### Happy path
+```bash
+gnn invoice-etl --python
+cd ~/Github/_local/projects/invoice-etl
+# commit work…
+gnp
+cd ~/Github/n1ecC/invoice-etl
+gmc
+```
+
+### Rules agents must follow
+1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/n1ecC/<repo>`.
+2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
+3. After `gnp`, the canonical path is `~/Github/n1ecC/<repo>`; do not leave promoted repos under `_local`.
+4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
+5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
+6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
