@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# link-stow-extras.sh — link paths GNU Stow skips (.stow-local-ignore).
+# link-stow-extras.sh â€” link paths GNU Stow skips (.stow-local-ignore).
 
 set -euo pipefail
 

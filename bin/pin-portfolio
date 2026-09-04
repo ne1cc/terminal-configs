@@ -17,7 +17,7 @@ for i in "${!REPOS[@]}"; do
   echo "     https://github.com/n1ecC/${REPOS[$i]}"
 done
 echo ""
-echo "Opening your GitHub profile — click 'Customize your pins' and select the repos above."
+echo "Opening your GitHub profile â€” click 'Customize your pins' and select the repos above."
 echo ""
 
 if command -v open >/dev/null; then

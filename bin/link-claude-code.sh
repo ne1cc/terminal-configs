@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# link-claude-code.sh — symlink global Claude Code config and slash commands.
+# link-claude-code.sh â€” symlink global Claude Code config and slash commands.
 
 set -euo pipefail
 
