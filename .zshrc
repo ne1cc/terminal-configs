@@ -1170,3 +1170,14 @@ export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
 path=("$HOME/.qoder/entry" ${path:#"$HOME/.qoder/entry"})
 export PATH
 # END QODER_DISPATCHER_PATH v1
+alias wml="workmux list"
+unalias wmo 2>/dev/null || true
+wmo() {
+  if [ -n "$1" ]; then
+    workmux open "$1"
+  else
+    local b
+    b=$(workmux list 2>/dev/null | tail -n +2 | grep -v '(here)' | awk '{print $1}' | fzf --prompt='Select worktree: ' --reverse)
+    [ -n "$b" ] && workmux open "$b"
+  fi
+}

@@ -1,28 +1,24 @@
-# .workmux.yaml
-main_branch: auto             # Resolves dynamically to origin/HEAD, main, or master
-base_branch: auto             # Always branch off your trunk, not stale feature branches
-worktree_dir: "../__worktrees" # Keeps worktrees isolated outside your repository root
-window_prefix: "wm-"
-
-# 1. File Synchronization
+worktree_dir: .worktrees
+window_prefix: wm-
 files:
   copy:
-    - .env
-    - .env.local
+  - .env
+  - .env.local
   symlink:
-    # Symlink lockfiles and content-addressable package caches to prevent disk bloat
-    - node_modules            # Node (pnpm or bun)
-    - .venv                   # Python (uv / virtualenv)
-    - target                  # Rust (shared build cache)
-
-# 2. Fast Environment Validation (Runs synchronously before opening tmux)
+  - node_modules
+  - .venv
+  - target
 post_create:
-  - git status --short
-
-# 3. Tmux Pane Topology
-# Splits window: Neovim on top, clean shell on bottom
+- git status --short
 panes:
-  - command: "nvim"
-    focus: false
-  - split: horizontal
-    focus: true
+- command: nvim .
+  focus: true
+- split: horizontal
+  command: agyy
+  focus: false
+- split: vertical
+  command: claude
+  focus: false
+- split: vertical
+  focus: false
+nerdfont: true
