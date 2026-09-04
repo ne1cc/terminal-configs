@@ -1,0 +1,7 @@
+# sesh configuration (~/.config/sesh/sesh.toml)
+
+default_session = "main"
+
+[[session]]
+name = "terminal-configs"
+path = "~/Github/n1ecC/terminal-configs"

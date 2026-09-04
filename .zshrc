@@ -682,6 +682,42 @@ wt-rm() {
 }
 
 # ==============================================================================
+# WORKMUX & SESH WORKFLOW INTEGRATIONS
+# ==============================================================================
+
+# SESH Smart Session Manager helpers
+sesh-sessions() {
+  sesh connect "$(sesh list -t -c -z | fzf-tmux -p 75%,60% \
+    --no-sort --border-label ' sesh sessions ' --prompt '⚡  ' \
+    --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
+    --bind 'tab:down,btab:up' \
+    --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list)' \
+    --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t)' \
+    --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c)' \
+    --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z)' \
+    --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d -E .Trash . ~/Github)' \
+    --bind 'ctrl-d:execute(tmux kill-session -t {})+change-prompt(⚡  )+reload(sesh list)' \
+    --preview-window 'right:55%' \
+    --preview 'sesh preview {}')"
+}
+zle -N sesh-sessions
+bindkey -M emacs '\es' sesh-sessions
+bindkey -M viins '\es' sesh-sessions
+bindkey -M vicmd '\es' sesh-sessions
+
+# Workmux: Zero-friction git worktrees + tmux windows
+alias wm='workmux'
+alias wma='workmux add'
+alias wmls='workmux list'
+alias wmrm='workmux remove'
+alias wmo='workmux open'
+alias wmc='workmux close'
+alias wmd='workmux dashboard'
+alias wms='workmux sidebar'
+alias wmm='workmux merge'
+
+
+# ==============================================================================
 # CLAUDE CODE 10X DEVELOPER EXTENSIONS
 # ==============================================================================
 

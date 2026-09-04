@@ -2,8 +2,56 @@ return {
   -- 1. DIFFVIEW: Side-by-side git diffs for reviewing agent overhauls
   {
     "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
-    config = true,
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewFileHistory" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Review Agent Diff" },
+      { "<leader>gq", "<cmd>DiffviewClose<cr>", desc = "Close Diffview" },
+      { "<leader>gf", "<cmd>DiffviewToggleFiles<cr>", desc = "Toggle File Tree" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "Diffview Current File History" },
+      { "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "Diffview Branch History" },
+    },
+    opts = {
+      enhanced_diff_hl = true,
+      use_icons = true,
+      view = {
+        default = {
+          layout = "diff2_horizontal", -- Side-by-side split review
+        },
+      },
+      keymaps = {
+        view = {
+          -- Quick keyboard review motions
+          ["]q"] = "<cmd>DiffviewNextClose<cr>",
+          ["[q"] = "<cmd>DiffviewPrevClose<cr>",
+        },
+        file_panel = {
+          ["s"] = false, -- Disable default stage
+          ["<space>"] = "toggle_stage_entry", -- Space to stage/unstage files
+          ["c"] = "<cmd>Neogit commit<cr>",
+        },
+      },
+    },
+  },
+
+  -- NEOGIT: Magit clone for Neovim with direct Diffview integration
+  {
+    "NeogitOrg/neogit",
+    cmd = { "Neogit" },
+    keys = {
+      { "<leader>gn", "<cmd>Neogit<cr>", desc = "Neogit Status" },
+      { "<leader>gc", "<cmd>Neogit commit<cr>", desc = "Neogit Commit" },
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "sindrets/diffview.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    opts = {
+      integrations = {
+        diffview = true,
+        telescope = true,
+      },
+    },
   },
 
   -- 2. TELESCOPE: Advanced file browsing and live-grep with built-in previews

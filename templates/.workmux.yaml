@@ -1,0 +1,32 @@
+# .workmux.yaml
+main_branch: auto             # Resolves dynamically to origin/HEAD, main, or master
+base_branch: auto             # Always branch off your trunk, not stale feature branches
+worktree_dir: "../__worktrees" # Keeps worktrees isolated outside your repository root
+agent: claude                 # Headless agent to run (claude, codex, opencode)
+window_prefix: "wm-"
+
+# 1. File Synchronization
+files:
+  copy:
+    - .env
+    - .env.local
+  symlink:
+    # Symlink lockfiles and content-addressable package caches to prevent disk bloat
+    - node_modules            # Node (pnpm or bun)
+    - .venv                   # Python (uv / virtualenv)
+    - target                  # Rust (shared build cache)
+
+# 2. Fast Environment Validation (Runs synchronously before opening tmux)
+post_create:
+  - git status --short
+
+# 3. Tmux Pane Topology
+# Splits window vertically: Neovim on top (65%), Agent runner on bottom (35%)
+panes:
+  - split: vertical
+    focus: false
+    command: "nvim"
+  - split: horizontal
+    size: "35%"
+    focus: true
+    command: "{{ agent }}"

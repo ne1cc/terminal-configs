@@ -3,6 +3,7 @@ tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
 tap "jesseduffield/lazydocker"
 tap "macos-fuse-t/cask", trusted: { casks: ["fuse-t"] }
 tap "nikitabobko/tap"
+tap "raine/workmux"
 tap "steipete/tap"
 tap "yakitrak/yakitrak"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -71,6 +72,8 @@ brew "pre-commit"
 brew "ripgrep"
 # Wrapper around ripgrep that adds multiple rich file types
 brew "ripgrep-all"
+# Smart terminal session manager
+brew "sesh"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
@@ -83,6 +86,8 @@ brew "taskwarrior-tui"
 brew "tmux"
 # Command-line unarchiving tools supporting multiple formats
 brew "unar"
+# Git worktrees + tmux windows for parallel dev
+brew "workmux"
 # Terminal spreadsheet multitool for discovering and arranging data
 brew "visidata"
 # Generate your Xcode project from a spec file and your folder structure
