@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tmux-workmux-new — interactive modal launcher for workmux + Claude
+# tmux-workmux-new — interactive modal launcher for workmux worktrees
 set -euo pipefail
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
@@ -23,7 +23,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 🚀 LAUNCH CLAUDE WORKTREE (workmux)"
+echo " 🚀 LAUNCH NEW WORKTREE (workmux)"
 echo " Repo: $(basename "$REPO_ROOT")"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -39,14 +39,5 @@ fi
 branch="${branch// /-}"
 
 echo ""
-printf "Prompt for Claude (optional, leave empty for interactive):\n> "
-read -r prompt
-
-echo ""
-if [[ -n "${prompt:-}" ]]; then
-  echo "==> Creating worktree '$branch' and dispatching Claude prompt..."
-  workmux add "$branch" -A "$prompt"
-else
-  echo "==> Creating worktree '$branch' with Neovim + Claude..."
-  workmux add "$branch"
-fi
+echo "==> Creating worktree '$branch' with Neovim + clean terminal..."
+workmux add "$branch"

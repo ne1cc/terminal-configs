@@ -13,7 +13,7 @@ fi
 
 MENU=$(cat << 'ACTIONS'
 🚀 Fleet Agent Swarm    | Parallel worktree swarm (claude/agy/qoder)            | zsh -ic 'fleet ls; echo ""; read -k 1 "?Press any key to close..."'
-🤖 Launch Claude Worktree| Fast modal to create worktree with Neovim + Claude    | $HOME/bin/tmux-workmux-new
+🌳 Launch Worktree       | Fast modal to create worktree with Neovim + Shell     | $HOME/bin/tmux-workmux-new
 ⚡ Sesh Smart Picker     | Interactive fuzzy session switcher with preview (sesh)| $HOME/bin/sesh-picker
 🌳 Workmux Dashboard     | TUI dashboard of worktree agents and windows (workmux)| workmux dashboard
 🤖 Agent Matrix          | Launch 2/3/4 parallel AI agent swarm (claude/agyy)    | $HOME/bin/tmux-agent-matrix

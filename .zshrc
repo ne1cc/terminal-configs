@@ -716,27 +716,6 @@ alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
 alias wmm='workmux merge'
 
-# wmclaude <branch> [prompt...] — One-shot Claude Worktree Dispatcher
-# Example: wmclaude feat/auth "Implement JWT auth middleware with tests"
-wmclaude() {
-  local branch="${1:-}"
-  shift || true
-  local prompt="$*"
-
-  if [[ -z "$branch" ]]; then
-    echo "Usage: wmc <branch-name> [prompt...]"
-    return 1
-  fi
-
-  if [[ -n "$prompt" ]]; then
-    echo "==> Creating worktree '$branch' and dispatching Claude prompt..."
-    workmux add "$branch" -A "$prompt"
-  else
-    echo "==> Creating worktree '$branch' with Neovim + Claude..."
-    workmux add "$branch"
-  fi
-}
-
 
 # ==============================================================================
 # CLAUDE CODE 10X DEVELOPER EXTENSIONS
