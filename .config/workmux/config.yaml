@@ -11,14 +11,7 @@ files:
 post_create:
 - git status --short
 panes:
-- command: nvim .
-  focus: true
+- focus: true
 - split: horizontal
-  command: agyy
-  focus: false
-- split: vertical
-  command: claude
-  focus: false
-- split: vertical
   focus: false
 nerdfont: true
