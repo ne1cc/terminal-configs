@@ -20,11 +20,9 @@ post_create:
   - git status --short
 
 # 3. Tmux Pane Topology
-# Splits window vertically: Neovim on top (65%), empty shell on bottom (35%)
+# Splits window: Neovim on top, clean shell on bottom
 panes:
-  - split: vertical
+  - command: "nvim"
     focus: false
-    command: "nvim"
   - split: horizontal
-    size: "35%"
     focus: true

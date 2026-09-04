@@ -40,4 +40,9 @@ branch="${branch// /-}"
 
 echo ""
 echo "==> Creating worktree '$branch' with Neovim + clean terminal..."
-workmux add "$branch"
+if ! workmux add "$branch"; then
+  echo ""
+  echo "Failed to create worktree. Press any key to close..."
+  read -n 1 -s -r
+  exit 1
+fi
