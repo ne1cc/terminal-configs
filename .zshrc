@@ -711,13 +711,14 @@ alias wma='workmux add'
 alias wmls='workmux list'
 alias wmrm='workmux remove'
 alias wmo='workmux open'
+alias wmc='workmux close'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
 alias wmm='workmux merge'
 
-# wmc <branch> [prompt...] — One-shot Claude Worktree Dispatcher
-# Example: wmc feat/auth "Implement JWT auth middleware with tests"
-wmc() {
+# wmclaude <branch> [prompt...] — One-shot Claude Worktree Dispatcher
+# Example: wmclaude feat/auth "Implement JWT auth middleware with tests"
+wmclaude() {
   local branch="${1:-}"
   shift || true
   local prompt="$*"
