@@ -13,7 +13,7 @@ post_create:
 panes:
 - command: 'nvim .'
   focus: true
-- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; agy -i "$WT"'
+- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; agyy -i "$WT"'
   split: horizontal
   focus: false
 - command: 'command -v lg >/dev/null 2>&1 && lg -p . || lazygit -p .'
