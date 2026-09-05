@@ -40,7 +40,16 @@ When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or r
 ## 6. Session Resumption & Handoffs
 - When asked to "resume", "continue", or "pick up where we left off", always check `.gemini/sessions/` or `~/.gemini/sessions/` for the latest dated session handoff document to instantly restore context, working branch, uncommitted diffs, and the open tasks roadmap.
 
-## GitHub Namespace Layout & Shortcuts (mandatory)
+## 7. Fast File & Code Search (Use `rg` Instead of `find`)
+- NEVER use traditional UNIX `find` or slow shell directory recursion when searching for files, archives, or code.
+- ALWAYS use `rg` (Ripgrep) or `fd` for all file and directory discovery:
+  - Finding files by pattern/name: `rg --files -g "*pattern*"` (or `fd "pattern"`)
+  - Finding all files including hidden/ignored: `rg --files --hidden --no-ignore -g "*pattern*"` (or `fd -H -I "pattern"`)
+  - Searching file contents: `rg "query"` or `rg -i "query"`
+  - Listing matching file paths only: `rg -l "query"`
+- Ripgrep respects `.gitignore` by default and uses multi-threaded traversal, preventing background command hangs and slow searches.
+
+## 8. GitHub Namespace Layout & Shortcuts (mandatory)
 
 Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
 
@@ -82,3 +91,11 @@ gmc
 4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
 6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
+
+## 9. Worktree & PR Lifecycle (mandatory)
+
+All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development, before the user removes the worktree (`wmr`) and prunes:
+1. Commit all work on the worktree's branch (Conventional Commits).
+2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
+3. Report the PR URL. Done = PR URL reported. The user merges the PR, then runs `wmr` and `git worktree prune` themselves.
+

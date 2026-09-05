@@ -33,6 +33,7 @@ Never self-report a task as done. Always:
   - `wt-new <branch>` (create worktree, open tmux window, launch claude)
   - `wt-tmux-attach` (attach to existing worktree)
   - `wt-rm [branch]` (cleanup worktree + branch)
+- **Worktree & PR Lifecycle (mandatory)**: Sessions run in workmux-managed worktrees (`.worktrees/`, one branch and one tmux window per worktree; `wmux` manages them). At the end of development, before the user removes the worktree (`wmr`) and prunes: commit all work on the worktree's branch, push with `git push -u origin <branch>`, then open a PR (`gh pr create` — title under 70 chars, summary body, test plan) and report the PR URL. Done = PR URL reported. The user merges, then runs `wmr` and `git worktree prune` themselves.
 - **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`).
 - **Proactive Remote Sync**: For any branch except `main`, proactively push after completing meaningful work (`git push` automatically) so PRs can be created at any time.
 
