@@ -48,8 +48,9 @@ mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$
 
 if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
+  ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/.gemini/GEMINI.md"
   ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md"
-  printf '  linked GEMINI.md\n'
+  printf '  linked GEMINI.md (Home, ~/.gemini, and ~/.gemini/config)\n'
 fi
 
 link_skill_tree "$REPO_DIR/.gemini/skills" \
@@ -60,5 +61,20 @@ link_skill_tree "$REPO_DIR/.gemini/skills" \
 
 link_skill_tree "$REPO_DIR/.claude/skills" "$HOME/.claude/skills"
 link_skill_tree "$REPO_DIR/.cursor/skills-cursor" "$HOME/.cursor/skills-cursor"
+
+if [[ -f "$REPO_DIR/.gemini/hooks.json" ]]; then
+  ln -sfn "$REPO_DIR/.gemini/hooks.json" "$HOME/.gemini/config/hooks.json"
+  printf '  linked hooks.json (~/.gemini/config/hooks.json)\n'
+fi
+
+# Ensure workmux does not prompt to install broken Antigravity lifecycle hooks
+mkdir -p "$HOME/.local/state/workmux"
+if [[ -f "$HOME/.local/state/workmux/setup.json" ]]; then
+  if ! grep -q '"agy"' "$HOME/.local/state/workmux/setup.json" 2>/dev/null; then
+    printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
+  fi
+else
+  printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
+fi
 
 printf 'Done linking agent skills.\n'
