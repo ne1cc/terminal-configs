@@ -91,7 +91,16 @@ check_owner() {
   missing_file=$(mktemp)
   orphan_file=$(mktemp)
 
-  if ! gh repo list "$owner" --limit 500 --json name --jq '.[].name' 2>/dev/null \
+  local gh_owner="$owner"
+  if ! gh repo list "$gh_owner" --limit 1 2>/dev/null >/dev/null; then
+    local auth_user
+    auth_user=$(gh api user -q .login 2>/dev/null || true)
+    if [[ -n "$auth_user" ]] && gh repo list "$auth_user" --limit 1 2>/dev/null >/dev/null; then
+      gh_owner="$auth_user"
+    fi
+  fi
+
+  if ! gh repo list "$gh_owner" --limit 500 --json name --jq '.[].name' 2>/dev/null \
       | LC_ALL=C sort -u > "$remotes_file"; then
     echo "error: failed to list repos for '$owner'" >&2
     rm -f "$remotes_file" "$missing_file" "$orphan_file"
