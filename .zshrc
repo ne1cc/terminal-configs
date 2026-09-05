@@ -792,6 +792,20 @@ alias wmc='workmux close'
 alias wmm='workmux merge'
 alias wmr='workmux remove'
 alias wmrm='workmux remove'
+alias wmrg='workmux remove --gone'
+
+# wmp — prune dead tmux windows whose worktree directories no longer exist
+wmp() {
+  local target dir
+  tmux list-windows -a -F '#{session_name}:#{window_id} #{pane_current_path}' 2>/dev/null | while read -r target dir; do
+    if [[ -n "$dir" && ! -d "$dir" ]]; then
+      echo "🧹 Pruning orphaned window $target (directory gone: $dir)"
+      tmux kill-window -t "$target" 2>/dev/null || true
+    fi
+  done
+  return 0
+}
+alias wm-prune='wmp'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
 
