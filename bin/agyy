@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# agyy: Antigravity YOLO mode (auto-skip permissions)
+exec agy --dangerously-skip-permissions "$@"
