@@ -37,6 +37,35 @@ Never self-report a task as done. Always:
 - **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`).
 - **Proactive Remote Sync**: For any branch except `main`, proactively push after completing meaningful work (`git push` automatically) so PRs can be created at any time.
 
+## Worktree Rebase & Drift Protocol
+
+**Every session starts synced.** The `SessionStart` hook automatically fetches and rebases `origin/main`. If the hook reports a conflict, stop and resolve it before writing any code.
+
+### Detecting drift mid-session
+When a PR merges to `main` while you are working, check for drift before any multi-file refactor or commit:
+```bash
+git fetch origin main && git log HEAD..origin/main --oneline
+```
+If new commits appear, rebase immediately:
+```bash
+git rebase origin/main
+```
+
+### Resolving rebase conflicts
+1. Inspect both sides: `git diff` and `git diff --staged`.
+2. **Never overwrite upstream changes blindly.** Preserve both features if logic allows.
+3. After editing each conflicted file: `git add <file>` then `git rebase --continue`.
+4. `rerere` is enabled globally — previously resolved conflict patterns are replayed automatically.
+5. Run the project test/typecheck suite after rebasing to confirm integration.
+
+### Push safety rules
+- **Never** `git push --force` to a shared branch.
+- Use `git push --force-with-lease` only on your own feature branch after a rebase.
+- Run `git log --oneline origin/main..HEAD` before pushing to confirm your commits are the only delta.
+
+### Broadcast rebase across all sibling worktrees
+To sync every open worktree after a PR merges to main, run `wt-rebase-all` from any directory in the repo.
+
 ## Project Planning & TODO.md Management
 - Create/maintain a structured `TODO.md` file in the project root with hierarchical checkboxes.
 - **Incremental Task Updates**: Mark `[x]` immediately when each task is completed. Note blockers `[?]` or decisions in-line. Keep TODO.md as the true source of progress.
