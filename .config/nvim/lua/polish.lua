@@ -276,3 +276,71 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     end
   end,
 })
+
+local function cycle_sibling_file(step)
+  -- 1. Get the full canonical path of the active buffer
+  local current_path = vim.api.nvim_buf_get_name(0)
+  if current_path == "" or vim.bo.buftype ~= "" then
+    vim.notify("Buffer is not a normal file on disk", vim.log.levels.WARN)
+    return
+  end
+
+  -- Resolve symlinks to ensure exact path matching
+  local uv = vim.uv or vim.loop
+  current_path = vim.fs.normalize(uv.fs_realpath(current_path) or current_path)
+  local current_dir = vim.fs.dirname(current_path)
+
+  -- 2. Collect all regular files in the directory
+  local files = {}
+  for name, type in vim.fs.dir(current_dir) do
+    if type == "file" then
+      local full_path = vim.fs.normalize(current_dir .. "/" .. name)
+      table.insert(files, full_path)
+    end
+  end
+
+  if #files == 0 then
+    return
+  end
+
+  -- 3. Sort alphabetically (matches Neo-tree alphanumeric ordering)
+  table.sort(files)
+
+  -- 4. Locate current file index and calculate destination
+  for idx, file_path in ipairs(files) do
+    if file_path == current_path then
+      local target_idx = idx + step
+
+      -- Bounds check: prevent out-of-index errors at top/bottom of folder
+      if target_idx < 1 then
+        vim.notify("Already at first file in directory", vim.log.levels.INFO)
+        return
+      elseif target_idx > #files then
+        vim.notify("Already at last file in directory", vim.log.levels.INFO)
+        return
+      end
+
+      -- 5. Open target file in current window
+      vim.cmd("edit " .. vim.fn.fnameescape(files[target_idx]))
+      return
+    end
+  end
+
+  vim.notify("Current file not found in directory listing", vim.log.levels.ERROR)
+end
+
+-- Cycle through sibling files in current directory alphabetically
+vim.keymap.set("n", "]f", function()
+  cycle_sibling_file(1)
+end, {
+  desc = "Next sibling file in directory",
+  silent = true,
+})
+
+vim.keymap.set("n", "[f", function()
+  cycle_sibling_file(-1)
+end, {
+  desc = "Previous sibling file in directory",
+  silent = true,
+})
+
