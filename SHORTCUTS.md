@@ -115,6 +115,9 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### H. Git Worktrees & AI Assistant Integration
 | Keybinding | Scope | Description |
 |---|---|---|
+| `Prefix + Alt + n` | Prefix | **Workmux Launch Modal**: Fast interactive popup to create worktree branch |
+| `Prefix + w` | Prefix | **Workmux Dashboard**: Centered 85% TUI popup monitoring all active worktrees & agents |
+| `Prefix + Alt + Shift + W` (`M-W`) | Prefix | **Workmux Live Sidebar**: Toggle real-time agent status sidebar in tmux |
 | `Prefix + Ctrl + n` | Prefix | Prompt branch name, create git worktree & open Claude window |
 | `Prefix + Ctrl + a` | Prefix | Fuzzy-pick existing worktree and open Claude window |
 | `Prefix + Ctrl + x` | Prefix | Fuzzy-pick worktree to force-remove (directory + branch) |
@@ -201,12 +204,21 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `gaa` | Stage all changes (`git add -A`) |
 | `gis` | Check if inside a valid git repository |
 
-### C. Git Worktree Workflows
+### C. Git Worktree & Workmux Workflows
 | Command / Alias | Action / Purpose |
 |---|---|
-| `wt-new <branch>` | Create new git worktree with dedicated branch in `.worktrees/<branch>` |
-| `wt-tmux-attach` | Fuzzy-pick existing worktree and switch tmux window directly to it |
-| `wt-rm` | Fuzzy-pick worktree to cleanly delete worktree and associated branch |
+| `wm` / `wmux` | Base command for `workmux` (or `wmux <branch>` to create worktree directly) |
+| `wma <branch>` | **Workmux Add**: Create worktree branch, tmux window, and copy/symlink configs |
+| `wmo [branch]` | **Workmux Open**: Open/switch to worktree window (fuzzy-picks via `fzf` if branch omitted!) |
+| `wml` / `wmls` | **Workmux List**: List all active worktrees with agent status and branch diffs |
+| `wmm` | **Workmux Merge**: Merge current worktree branch into main and clean up window/directory |
+| `wmr` / `wmrm` | **Workmux Remove**: Clean up worktree directory, tmux window, and branch without merging |
+| `wmc` | **Workmux Close**: Close the tmux window for a worktree while keeping the branch/directory intact |
+| `wmd` | **Workmux Dashboard**: Open the interactive TUI dashboard |
+| `wms` | **Workmux Sidebar**: Toggle the persistent live agent status sidebar in tmux |
+| `wt-new <branch>` | Legacy helper: Create new git worktree with dedicated branch in `.worktrees/<branch>` |
+| `wt-tmux-attach` | Legacy helper: Fuzzy-pick existing worktree and switch tmux window directly to it |
+| `wt-rm` | Legacy helper: Fuzzy-pick worktree to cleanly delete worktree and associated branch |
 
 ### D. Claude Code Automation Workflows
 | Command / Alias | Action / Purpose |
@@ -341,6 +353,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `Ctrl + \` | Normal | Navigate to previous split / tmux pane |
 | `<Leader>z` / `<C-w>z` / `<C-w>m` | Normal | **Toggle Maximize Window** |
 | `]b` / `[b` | Normal | Next / Previous buffer tab |
+| `]f` / `[f` | Normal | Next / Previous sibling file in directory (alphabetical) |
 | `<Leader>bd` | Normal | Close buffer from tabline picker |
 | `<Leader>um` | Normal | Toggle buffer modifiable state / Toggle Markdown render |
 

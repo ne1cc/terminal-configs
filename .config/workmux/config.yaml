@@ -11,7 +11,9 @@ files:
 post_create:
 - git status --short
 panes:
-- focus: true
-- split: horizontal
+- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; agy -i "$WT"'
+  focus: true
+- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; command -v qodercli >/dev/null 2>&1 && qodercli -i "$WT" || qoder -i "$WT"'
+  split: horizontal
   focus: false
 nerdfont: true

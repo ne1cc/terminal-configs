@@ -708,13 +708,26 @@ bindkey -M vicmd '\es' sesh-sessions
 # Workmux: Zero-friction git worktrees + tmux windows
 alias wm='workmux'
 alias wma='workmux add'
+alias wml='workmux list'
 alias wmls='workmux list'
-alias wmrm='workmux remove'
 alias wmo='workmux open'
 alias wmc='workmux close'
+alias wmm='workmux merge'
+alias wmr='workmux remove'
+alias wmrm='workmux remove'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
-alias wmm='workmux merge'
+
+# wmux: Smart wrapper that forwards subcommands or creates worktrees directly
+wmux() {
+  if [ $# -eq 0 ]; then
+    workmux
+  elif [[ "$1" =~ ^(add|open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
+    workmux "$@"
+  else
+    workmux add "$@"
+  fi
+}
 
 
 # ==============================================================================
