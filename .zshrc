@@ -780,7 +780,11 @@ bindkey -M vicmd '\es' sesh-sessions
 
 # Workmux: Zero-friction git worktrees + tmux windows
 alias wm='workmux'
-alias wma='workmux add'
+wma() {
+  workmux add "$@"
+  tmux select-layout tiled 2>/dev/null || true
+  tmux select-pane -t 1 2>/dev/null || true
+}
 alias wml='workmux list'
 alias wmls='workmux list'
 alias wmo='workmux open'
@@ -795,10 +799,16 @@ alias wms='workmux sidebar'
 wmux() {
   if [ $# -eq 0 ]; then
     workmux
-  elif [[ "$1" =~ ^(add|open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
+  elif [[ "$1" == "add" ]]; then
+    workmux "$@"
+    tmux select-layout tiled 2>/dev/null || true
+    tmux select-pane -t 1 2>/dev/null || true
+  elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
     workmux "$@"
   else
     workmux add "$@"
+    tmux select-layout tiled 2>/dev/null || true
+    tmux select-pane -t 1 2>/dev/null || true
   fi
 }
 
