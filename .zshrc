@@ -560,6 +560,18 @@ alias dlogs='docker logs -f --tail=100'
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+alias tp='$HOME/bin/tmux-popup-term'
+
+# Quickly jump to the caller pane's directory inside the tmux popup terminal
+cdhere() {
+    local target_dir
+    target_dir="$(cat "${TMPDIR:-/tmp}/tmux-${UID:-$(id -u)}/last_dir" 2>/dev/null || true)"
+    if [[ -n "$target_dir" && -d "$target_dir" ]]; then
+        cd "$target_dir" && echo "📂 Jumped to: $target_dir"
+    else
+        echo "No caller directory recorded."
+    fi
+}
 
 # Launch a brand new Ghostty window attached to a fresh tmux session
 ghostty-new() {
