@@ -5,7 +5,8 @@
 All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development, before the user removes the worktree (`wmr`) and prunes:
 1. Commit all work on the worktree's branch (Conventional Commits).
 2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
-3. Report the PR URL. Done = PR URL reported. The user merges the PR, then runs `wmr` and `git worktree prune` themselves.
+3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL. Skip for one-commit chore/fix PRs where the PR body already tells the whole story.
+4. Report the PR URL (and retrospective comment URL). Done = PR URL reported. The user merges the PR, then runs `wmr` and `git worktree prune` themselves.
 
 ## Worktree Git Sync & Rebase Protocol
 
