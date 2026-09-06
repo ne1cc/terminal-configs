@@ -117,7 +117,11 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|---|
 | `Prefix + Alt + n` | Prefix | **Workmux Launch Modal**: Fast interactive popup to create worktree branch |
 | `Prefix + w` | Prefix | **Workmux Dashboard**: Centered 85% TUI popup monitoring all active worktrees & agents |
-| `Prefix + Alt + Shift + W` (`M-W`) | Prefix | **Workmux Live Sidebar**: Toggle real-time agent status sidebar in tmux |
+| `Prefix + Alt + Shift + W` (`M-W`) | Prefix | **Workmux Live Sidebar**: Toggle real-time agent status sidebar in tmux (global) |
+| `Prefix + Alt + Shift + S` (`M-S`) | Prefix | **Workmux Live Sidebar (Session)**: Toggle sidebar for current session only |
+| `Alt + ]` / `Prefix + Alt + ]` | Global / Prefix | **Workmux Agent Next**: Instantly jump to the next active agent |
+| `Alt + [` / `Prefix + Alt + [` | Global / Prefix | **Workmux Agent Prev**: Instantly jump to the previous active agent |
+| `Prefix + Alt + f` | Prefix | **Workmux Sidebar Filter**: Toggle session-only vs global agent list |
 | `Prefix + Ctrl + n` | Prefix | Prompt branch name, create git worktree & open Claude window |
 | `Prefix + Ctrl + a` | Prefix | Fuzzy-pick existing worktree and open Claude window |
 | `Prefix + Ctrl + x` | Prefix | Fuzzy-pick worktree to force-remove (directory + branch) |
@@ -209,13 +213,21 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|
 | `wm` / `wmux` | Base command for `workmux` (or `wmux <branch>` to create worktree directly) |
 | `wma <branch>` | **Workmux Add**: Create worktree branch, tmux window, and copy/symlink configs |
+| `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and immediately inject prompt into agent |
+| `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM and launch agent |
 | `wmo [branch]` | **Workmux Open**: Open/switch to worktree window (fuzzy-picks via `fzf` if branch omitted!) |
 | `wml` / `wmls` | **Workmux List**: List all active worktrees with agent status and branch diffs |
 | `wmm` | **Workmux Merge**: Merge current worktree branch into main and clean up window/directory |
 | `wmr` / `wmrm` | **Workmux Remove**: Clean up worktree directory, tmux window, and branch without merging |
+| `wmrg` | **Workmux Remove Gone**: Auto-remove all worktrees whose upstream branches were merged and deleted on GitHub (`workmux remove --gone`) |
 | `wmc` | **Workmux Close**: Close the tmux window for a worktree while keeping the branch/directory intact |
 | `wmd` | **Workmux Dashboard**: Open the interactive TUI dashboard |
-| `wms` | **Workmux Sidebar**: Toggle the persistent live agent status sidebar in tmux |
+| `wms` | **Workmux Sidebar**: Toggle the persistent live agent status sidebar in tmux (global) |
+| `wmss` | **Workmux Sidebar (Session)**: Toggle sidebar for current session only |
+| `wmsn` / `wmsp` | **Workmux Next/Prev**: Jump to next / previous running agent |
+| `wmsf` | **Workmux Filter**: Toggle sidebar session filter |
+| `wmst` / `wmsl` | **Workmux Position**: Switch sidebar between top horizontal bar and left column |
+| `wmsr` | **Workmux Reap**: Clean up tracked agents older than 12 hours |
 | `wt-new <branch>` | Legacy helper: Create new git worktree with dedicated branch in `.worktrees/<branch>` |
 | `wt-tmux-attach` | Legacy helper: Fuzzy-pick existing worktree and switch tmux window directly to it |
 | `wt-rm` | Legacy helper: Fuzzy-pick worktree to cleanly delete worktree and associated branch |
@@ -287,8 +299,11 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### H. Github workspace (`~/Github`)
 | Command / Alias | Action / Purpose |
 |---|---|
-| `ghn` | `cd ~/Github/n1ecC` — your GitHub repos |
-| `ghr [repo]` | List or `cd` into a specific n1ecC repo |
+| `ghn` | Interactive `fzf` repo selector with git status preview (`cd ~/Github/n1ecC/<repo>`) |
+| `ghn <repo>` | Jump directly to repository under `~/Github/n1ecC/` |
+| `ghn -s [repo]` | Open or attach dedicated tmux session for repository via `tmux-sessionizer` |
+| `ghn --root` | `cd ~/Github/n1ecC` (namespace root) |
+| `ghr [repo]` | Alias for `ghn` |
 | `ghroot` | `cd ~/Github` |
 | `ghex` / `ghws` / `ghcfg` | `cd` explore / workspace / config |
 | `gho` | `cd ~/Github/n1ecC/olist-lakehouse` |

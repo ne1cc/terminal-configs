@@ -11,15 +11,24 @@ files:
 post_create:
 - git status --short
 panes:
-- command: 'nvim .'
-  focus: true
 - command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; agyy -i "$WT"'
+  focus: true
+- command: 'command -v lg >/dev/null 2>&1 && lg -p . || lazygit -p .'
   split: horizontal
   focus: false
-- command: 'command -v lg >/dev/null 2>&1 && lg -p . || lazygit -p .'
-  split: vertical
-  focus: false
-- command: '(sleep 0.1 && tmux select-layout tiled 2>/dev/null &); WT="${WM_HANDLE:-$(basename "$PWD")}"; command -v qodercli >/dev/null 2>&1 && qodercli -i "$WT" || qoder -i "$WT"'
+- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; command -v qodercli >/dev/null 2>&1 && qodercli -i "$WT" || qoder -i "$WT"'
   split: vertical
   focus: false
 nerdfont: true
+
+sidebar:
+  position: left
+  width: 50
+  layout: tiles
+  dim_stale: true
+
+dashboard:
+  sort_mode: priority
+  preview_size: 50
+  agent_columns: [number, project, worktree, git, pr, status, time, title]
+  close_on_jump: true

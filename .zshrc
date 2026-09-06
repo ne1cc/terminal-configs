@@ -491,10 +491,79 @@ alias icloud='cd "$ICLOUD_DRIVE"'
 alias mdf='cd "$ICLOUD_MD"'
 
 # Github workspace (~/Github) — portfolio, explore, sync
-: "${DOTFILES:=$HOME/Github/n1ecC/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
-: "${N1ECC_DIR:=$GITHUB_ROOT/n1ecC}"
-alias ghn='cd "$N1ECC_DIR"'
+if [[ -d "$GITHUB_ROOT/ne1cc" ]]; then
+  export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
+  export N1ECC_DIR="$GITHUB_ROOT/ne1cc"
+else
+  export NE1CC_DIR="$GITHUB_ROOT/n1ecC"
+  export N1ECC_DIR="$GITHUB_ROOT/n1ecC"
+fi
+: "${DOTFILES:=$NE1CC_DIR/terminal-configs}"
+
+# Smart jump into ne1cc repos:
+#   ghn                 -> interactive fzf picker with git preview, cds directly into selected repo
+#   ghn <repo-name>     -> cds directly to ~/Github/ne1cc/<repo-name> (or closest match)
+#   ghn -s [repo-name]  -> opens/attaches dedicated tmux session via tmux-sessionizer
+#   ghn --root          -> cd ~/Github/ne1cc
+ghn() {
+  local target_dir
+  local repo_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}"
+  [[ ! -d "$repo_dir" && -d "$HOME/Github/n1ecC" ]] && repo_dir="$HOME/Github/n1ecC"
+
+  if [[ "$1" == "--root" || "$1" == "-r" ]]; then
+    cd "$repo_dir"
+    return 0
+  fi
+
+  if [[ "$1" == "-s" ]]; then
+    shift
+    if [[ $# -eq 0 ]]; then
+      tmux-sessionizer
+    else
+      local match
+      match=$(fd --min-depth 1 --max-depth 1 -t d "$1" "$repo_dir" 2>/dev/null | head -n 1)
+      if [[ -n "$match" ]]; then
+        tmux-sessionizer "$match"
+      else
+        tmux-sessionizer "$repo_dir/$1"
+      fi
+    fi
+    return 0
+  fi
+
+  if [[ $# -eq 0 ]]; then
+    if [[ -t 0 && -t 1 ]] && command -v fzf >/dev/null 2>&1; then
+      target_dir=$(
+        fd -L --min-depth 1 --max-depth 1 -t d . "$repo_dir" 2>/dev/null |
+          sed 's|/*$||; s|.*/||' |
+          fzf --prompt="ne1cc repo > " \
+              --preview="git -C '$repo_dir/{}' status -sb 2>/dev/null || ls -la '$repo_dir/{}'" \
+              --preview-window="right:50%:wrap"
+      )
+      [[ -z "$target_dir" ]] && return 0
+      cd "$repo_dir/$target_dir"
+      return 0
+    else
+      cd "$repo_dir"
+      return 0
+    fi
+  fi
+
+  if [[ -d "$repo_dir/$1" ]]; then
+    cd "$repo_dir/$1"
+  else
+    local fuzzy_match
+    fuzzy_match=$(fd --min-depth 1 --max-depth 1 -t d "$1" "$repo_dir" 2>/dev/null | head -n 1)
+    if [[ -n "$fuzzy_match" && -d "$fuzzy_match" ]]; then
+      cd "$fuzzy_match"
+    else
+      echo "No matching repository for '$1' under $repo_dir" >&2
+      return 1
+    fi
+  fi
+}
+alias ghr=ghn
 alias ghex='cd "$GITHUB_ROOT/explore"'
 alias ghws='cd "$GITHUB_ROOT/workspace"'
 alias ghcfg='cd "$GITHUB_ROOT/config"'
@@ -510,18 +579,6 @@ alias gho='cd "$N1ECC_DIR/olist-lakehouse"'
 alias ghab='cd "$N1ECC_DIR/ab-testing-dagster"'
 alias ghdhs='cd "$N1ECC_DIR/dhs-stunting-pipeline"'
 alias ghtk='cd "$N1ECC_DIR/ticker-change"'
-
-# cd into any n1ecC repo: ghr [repo-name]
-ghr() {
-  if [[ $# -eq 0 ]]; then
-    ls -1 "$N1ECC_DIR"
-    return 0
-  fi
-  cd "$N1ECC_DIR/$1" || {
-    echo "Unknown repo: $1 (try: ghr with no args to list)"
-    return 1
-  }
-}
 
 # CareerOps Recruiting Workbench quick-jump
 rc() {
@@ -560,6 +617,7 @@ alias dlogs='docker logs -f --tail=100'
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+alias unsync='unsync'
 
 # Launch a brand new Ghostty window attached to a fresh tmux session
 ghostty-new() {
@@ -808,6 +866,13 @@ wmp() {
 alias wm-prune='wmp'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
+alias wmss='workmux sidebar --session'
+alias wmsn='workmux sidebar next'
+alias wmsp='workmux sidebar prev'
+alias wmsf='workmux sidebar filter'
+alias wmst='workmux sidebar on --position top'
+alias wmsl='workmux sidebar on --position left'
+alias wmsr='workmux reap-agents --hours 12'
 
 # wmux: Smart wrapper that forwards subcommands or creates worktrees directly
 wmux() {
