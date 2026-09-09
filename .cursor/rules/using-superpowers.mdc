@@ -1,0 +1,17 @@
+---
+description: Invoke the using-superpowers skill at the start of every conversation to establish skill discovery and usage before any action.
+globs:
+alwaysApply: true
+---
+
+## Superpowers (Mandatory — Start of Every Session)
+
+At the start of every conversation, read and follow the `using-superpowers` skill:
+
+```
+~/.cursor/skills-cursor/using-superpowers/SKILL.md
+```
+
+This skill establishes how to discover and invoke all relevant skills **before** any response, action, or clarifying question. Brainstorm or debug? There is a skill for that. New feature? There is a skill for that. Code review? There is a skill for that.
+
+**This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.

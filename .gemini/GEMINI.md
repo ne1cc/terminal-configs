@@ -1,3 +1,11 @@
+## Superpowers (Mandatory — Start of Every Session)
+
+At the start of every conversation, read and follow the `using-superpowers` skill (`~/.gemini/config/skills/using-superpowers/SKILL.md`). This skill establishes how to discover and invoke all other skills before any action or clarifying question.
+
+**This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.
+
+---
+
 # Markdown & Equation Formatting Rules for Antigravity
 
 When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
