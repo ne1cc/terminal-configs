@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-# link-agent-skills.sh � symlink portable agent skills to all runtime directories.
+# link-agent-skills.sh — symlink portable agent skills to all agent runtime directories
+#                        and bootstrap global agent instruction files.
 #
 # Shared skills (.gemini/skills) are linked into:
 #   ~/.gemini/config/skills   (Antigravity / Gemini CLI)
 #   ~/.claude/skills          (Claude Code)
-#   ~/.agents/skills          (cross-runtime alias: Codex, Copilot CLI, Gemini)
+#   ~/.agents/skills          (cross-runtime alias: Copilot CLI, Gemini)
 #   ~/.qoder/skills           (Qoder CLI)
+#   ~/.codex/skills           (Codex / ChatGPT)
 #
-# Claude-only skills (.claude/skills) and Cursor skills (.cursor/skills-cursor)
-# are linked to their respective runtime directories only.
+# Cursor-only skills (.cursor/skills-cursor) → ~/.cursor/skills-cursor/
+# Cursor rules (.cursor/rules/*.mdc)         → ~/.cursor/rules/
+#
+# Global instruction files bootstrapped (if absent):
+#   ~/.codex/AGENTS.md        (instructs Codex to invoke using-superpowers at session start)
+#   ~/.qoder/QODER.md         (instructs Qoder to invoke using-superpowers at session start)
 
 set -euo pipefail
 
@@ -90,6 +96,95 @@ if [[ -f "$HOME/.local/state/workmux/setup.json" ]]; then
   fi
 else
   printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
+fi
+
+# ── Codex: bootstrap global AGENTS.md if absent ──────────────────────────────
+CODEX_AGENTS="$HOME/.codex/AGENTS.md"
+if [[ ! -f "$CODEX_AGENTS" ]]; then
+  mkdir -p "$HOME/.codex"
+  cat > "$CODEX_AGENTS" <<'AGENTS_EOF'
+# AGENTS.md — Global Agent Instructions
+
+## Superpowers (Mandatory — Start of Every Session)
+
+At the start of every conversation, read and follow the `using-superpowers` skill:
+
+```
+~/.codex/skills/using-superpowers/SKILL.md
+```
+
+This skill establishes how to discover and invoke all relevant skills **before** any
+response, action, or clarifying question. New feature? Use brainstorming.
+Bug? Use systematic-debugging. Code review? There's a skill for that.
+
+**This is non-negotiable.** Do not skip it. Do not assume you remember it.
+Read it fresh every session.
+
+## Platform: Codex
+
+Read `~/.codex/skills/using-superpowers/references/codex-tools.md` for
+Codex-specific tool mappings.
+AGENTS_EOF
+  printf '  bootstrapped: %s\n' "$CODEX_AGENTS"
+else
+  printf '  unchanged: %s\n' "$CODEX_AGENTS"
+fi
+
+# ── Qoder: bootstrap global QODER.md if absent ───────────────────────────────
+QODER_MD="$HOME/.qoder/QODER.md"
+if [[ ! -f "$QODER_MD" ]]; then
+  mkdir -p "$HOME/.qoder"
+  cat > "$QODER_MD" <<'QODER_EOF'
+# QODER.md — Global Qoder Agent Instructions
+
+## Superpowers (Mandatory — Start of Every Session)
+
+At the start of every conversation, read and follow the `using-superpowers` skill:
+
+```
+~/.qoder/skills/using-superpowers/SKILL.md
+```
+
+This skill establishes how to discover and invoke all relevant skills **before** any
+response, action, or clarifying question. New feature? Use brainstorming.
+Bug? Use systematic-debugging. Code review? There's a skill for that.
+
+**This is non-negotiable.** Do not skip it. Do not assume you remember it.
+Read it fresh every session.
+
+## Platform: Qoder
+
+Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for
+Qoder-specific tool mappings, if that file exists.
+QODER_EOF
+  printf '  bootstrapped: %s\n' "$QODER_MD"
+else
+  printf '  unchanged: %s\n' "$QODER_MD"
+fi
+
+# ── Claude Code: seed ~/.claude/settings.json with required permissions ───────
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+if command -v python3 >/dev/null 2>&1 && [[ -f "$CLAUDE_SETTINGS" ]]; then
+  python3 - "$CLAUDE_SETTINGS" <<'PY_EOF'
+import json, sys
+path = sys.argv[1]
+with open(path) as f:
+    data = json.load(f)
+perms = data.setdefault("permissions", {})
+allow = perms.setdefault("allow", [])
+added = []
+for entry in ["Bash(gh pr merge:*)"]:
+    if entry not in allow:
+        allow.append(entry)
+        added.append(entry)
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+if added:
+    print(f"  seeded ~/.claude/settings.json permissions: {added}")
+else:
+    print("  unchanged: ~/.claude/settings.json permissions already set")
+PY_EOF
 fi
 
 printf 'Done linking agent skills.\n'
