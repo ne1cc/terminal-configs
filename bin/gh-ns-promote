@@ -94,17 +94,24 @@ if [[ -n "$existing_url" ]]; then
       ;;
   esac
 else
+  # Resolve GitHub owner (handles case or alias differences like n1ecC vs ne1cc)
+  gh_owner="$OWNER"
+  auth_user=$(gh api user -q .login 2>/dev/null || true)
+  if ! gh user view "$gh_owner" >/dev/null 2>&1 && [[ -n "$auth_user" ]]; then
+    gh_owner="$auth_user"
+  fi
+
   # Create on GitHub from local source
-  if gh repo view "$OWNER/$NAME" >/dev/null 2>&1; then
-    echo "→ remote $OWNER/$NAME exists; adding origin + push"
-    git -C "$SRC" remote add origin "https://github.com/$OWNER/$NAME.git"
+  if gh repo view "$gh_owner/$NAME" >/dev/null 2>&1; then
+    echo "→ remote $gh_owner/$NAME exists; adding origin + push"
+    git -C "$SRC" remote add origin "https://github.com/$gh_owner/$NAME.git"
     git -C "$SRC" push -u origin HEAD
   else
-    echo "→ creating github.com/$OWNER/$NAME ($VISIBILITY) and pushing"
+    echo "→ creating github.com/$gh_owner/$NAME ($VISIBILITY) and pushing"
     # --source must be used from inside or with path; run in SRC
     (
       cd "$SRC"
-      gh repo create "$OWNER/$NAME" --source=. $VISIBILITY --remote=origin --push
+      gh repo create "$NAME" --source=. $VISIBILITY --remote=origin --push
     )
   fi
 fi

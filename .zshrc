@@ -933,9 +933,11 @@ if command -v eza >/dev/null; then
   alias ls='eza --icons --group-directories-first'
   alias ll='eza -l --icons --group-directories-first'
   alias la='eza -la --icons --group-directories-first'
+  alias lsd='eza -la --icons --sort=mod --reverse'
   alias tree='eza --tree --icons'
 else
   alias l='ls -lah'
+  alias lsd='ls -laht'
 fi
 
 # Taskwarrior Ergonomic Aliases
