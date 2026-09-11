@@ -98,68 +98,18 @@ else
   printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
 fi
 
-# ── Codex: bootstrap global AGENTS.md if absent ──────────────────────────────
-CODEX_AGENTS="$HOME/.codex/AGENTS.md"
-if [[ ! -f "$CODEX_AGENTS" ]]; then
+# ── Codex: link global AGENTS.md from repo (or bootstrap) ───────────────────
+if [[ -f "$REPO_DIR/.codex/AGENTS.md" ]]; then
   mkdir -p "$HOME/.codex"
-  cat > "$CODEX_AGENTS" <<'AGENTS_EOF'
-# AGENTS.md — Global Agent Instructions
-
-## Superpowers (Mandatory — Start of Every Session)
-
-At the start of every conversation, read and follow the `using-superpowers` skill:
-
-```
-~/.codex/skills/using-superpowers/SKILL.md
-```
-
-This skill establishes how to discover and invoke all relevant skills **before** any
-response, action, or clarifying question. New feature? Use brainstorming.
-Bug? Use systematic-debugging. Code review? There's a skill for that.
-
-**This is non-negotiable.** Do not skip it. Do not assume you remember it.
-Read it fresh every session.
-
-## Platform: Codex
-
-Read `~/.codex/skills/using-superpowers/references/codex-tools.md` for
-Codex-specific tool mappings.
-AGENTS_EOF
-  printf '  bootstrapped: %s\n' "$CODEX_AGENTS"
-else
-  printf '  unchanged: %s\n' "$CODEX_AGENTS"
+  ln -sfn "$REPO_DIR/.codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
+  printf '  linked: %s -> %s\n' "$HOME/.codex/AGENTS.md" "$REPO_DIR/.codex/AGENTS.md"
 fi
 
-# ── Qoder: bootstrap global QODER.md if absent ───────────────────────────────
-QODER_MD="$HOME/.qoder/QODER.md"
-if [[ ! -f "$QODER_MD" ]]; then
+# ── Qoder: link global QODER.md from repo (or bootstrap) ────────────────────
+if [[ -f "$REPO_DIR/.qoder/QODER.md" ]]; then
   mkdir -p "$HOME/.qoder"
-  cat > "$QODER_MD" <<'QODER_EOF'
-# QODER.md — Global Qoder Agent Instructions
-
-## Superpowers (Mandatory — Start of Every Session)
-
-At the start of every conversation, read and follow the `using-superpowers` skill:
-
-```
-~/.qoder/skills/using-superpowers/SKILL.md
-```
-
-This skill establishes how to discover and invoke all relevant skills **before** any
-response, action, or clarifying question. New feature? Use brainstorming.
-Bug? Use systematic-debugging. Code review? There's a skill for that.
-
-**This is non-negotiable.** Do not skip it. Do not assume you remember it.
-Read it fresh every session.
-
-## Platform: Qoder
-
-Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for
-Qoder-specific tool mappings, if that file exists.
-QODER_EOF
-  printf '  bootstrapped: %s\n' "$QODER_MD"
-else
-  printf '  unchanged: %s\n' "$QODER_MD"
+  ln -sfn "$REPO_DIR/.qoder/QODER.md" "$HOME/.qoder/QODER.md"
+  printf '  linked: %s -> %s\n' "$HOME/.qoder/QODER.md" "$REPO_DIR/.qoder/QODER.md"
 fi
 
 # ── Claude Code: seed ~/.claude/settings.json with required permissions ───────
