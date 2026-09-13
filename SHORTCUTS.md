@@ -287,21 +287,21 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### H. Github workspace (`~/Github`)
 | Command / Alias | Action / Purpose |
 |---|---|
-| `ghn` | `cd ~/Github/n1ecC` — your GitHub repos |
-| `ghr [repo]` | List or `cd` into a specific n1ecC repo |
+| `ghn` | `cd ~/Github/ne1cc` — your GitHub repos |
+| `ghr [repo]` | List or `cd` into a specific ne1cc repo |
 | `ghroot` | `cd ~/Github` |
 | `ghex` / `ghws` / `ghcfg` | `cd` explore / workspace / config |
-| `gho` | `cd ~/Github/n1ecC/olist-lakehouse` |
-| `ghab` | `cd ~/Github/n1ecC/ab-testing-dagster` |
-| `ghdhs` | `cd ~/Github/n1ecC/dhs-stunting-pipeline` |
-| `ghtk` | `cd ~/Github/n1ecC/ticker-change` |
-| `ghsync` | Clone missing + pull all n1ecC repos (`sync-n1ecC`) |
+| `gho` | `cd ~/Github/ne1cc/olist-lakehouse` |
+| `ghab` | `cd ~/Github/ne1cc/ab-testing-dagster` |
+| `ghdhs` | `cd ~/Github/ne1cc/dhs-stunting-pipeline` |
+| `ghtk` | `cd ~/Github/ne1cc/ticker-change` |
+| `ghsync` | Clone missing + pull all ne1cc repos (`sync-ne1cc`) |
 | `ghsync-list` | Show local clone status and dirty repos |
-| `ghsync-pull` | Pull existing n1ecC repos only |
+| `ghsync-pull` | Pull existing ne1cc repos only |
 | `ghar [name]` | Archive project to `~/Github/archive/` |
-| `ghar --from-n1ecc <repo>` | Archive local n1ecC clone (excludes from sync) |
+| `ghar --from-ne1cc <repo>` | Archive local ne1cc clone (excludes from sync) |
 | `ghpin` | Open GitHub profile + portfolio pin instructions |
-| `sync-n1ecC` | Same as `ghsync` (also in `~/bin`) |
+| `sync-ne1cc` | Same as `ghsync` (also in `~/bin`) |
 | `gharchive` | Same as `ghar` (also in `~/bin`) |
 | `pin-portfolio` | Same as `ghpin` (also in `~/bin`) |
 | `setup-github-workspace` | Create full `~/Github` tree (macOS, Linux, WSL) — run by install/bootstrap |
@@ -523,12 +523,12 @@ Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (syml
 | [`mac-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
 | [`linux-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
 | [`wsl-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
-| [`setup.sh`](file:///Users/alex/Github/n1ecC/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
-| [`setup-github-workspace`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
-| [`sync-n1ecC`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/sync-n1ecC) | Clone/pull all github.com/n1ecC repos into `~/Github/n1ecC/`. |
-| [`gharchive`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
-| [`pin-portfolio`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
-| [`setup-github-profile`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
-| [`ghostty-new-session`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
-| [`clear-images`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
+| [`setup.sh`](file:///Users/alex/Github/ne1cc/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
+| [`setup-github-workspace`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
+| [`sync-ne1cc`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/sync-ne1cc) | Clone/pull all github.com/ne1cc repos into `~/Github/ne1cc/`. |
+| [`gharchive`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
+| [`pin-portfolio`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
+| [`setup-github-profile`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
+| [`ghostty-new-session`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
+| [`clear-images`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
 

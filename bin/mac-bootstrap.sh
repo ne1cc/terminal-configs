@@ -3,9 +3,9 @@
 # mac-bootstrap.sh — zero-to-hero provisioning for a new Apple Silicon Mac
 #
 # Usage (on a fresh machine):
-#   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/n1ecC/terminal-configs
-#   bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
+#   git clone https://github.com/ne1cc/terminal-configs.git \
+#       ~/Github/ne1cc/terminal-configs
+#   bash ~/Github/ne1cc/terminal-configs/bin/mac-bootstrap.sh
 # ==============================================================================
 
 set -e
