@@ -26,16 +26,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added — Antigravity / Gemini Skills & Markdown Rules
 - Added all 100+ Antigravity skills (including newly created `markdown-architect` and full domain suites) to `.gemini/skills/`.
 - Tracked global formatting rules `GEMINI.md` in repository root under `.gemini/GEMINI.md`.
-- Updated [setup.sh](file:///Users/alex/Github/config/terminal-configs/setup.sh), [install.sh](file:///Users/alex/Github/config/terminal-configs/install.sh), and [bin/mac-bootstrap.sh](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
+- Updated [setup.sh](setup.sh), [install.sh](install.sh), and [bin/mac-bootstrap.sh](bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
 
 ### Changed — Neovim Neo-tree Configuration
 - Configured `hijack_netrw_behavior = "open_default"` so opening directories opens the left Neo-tree sidebar instead of netrw/full-window buffer.
 - Added `VimEnter` autocommand to automatically open the Neo-tree sidebar on startup when opening directory paths or starting with an empty buffer, preserving seamless preview capabilities (`P`).
 
 ### Added — Claude Code Configuration
-- Unified global [CLAUDE.md](file:///home/alexander/Github/terminal-configs/claude-code/CLAUDE.md) incorporating the MSTSPAT (Minimal, Self-documenting, Type-exact, Secure, Performant, Accessible, and Testable) code quality standard, mandatory `<thinking>` planning tags, Stack Preferences (TypeScript/Next.js/bun, Python/uv), and Pacific Time timezone settings.
-- Integrated custom Claude Code slash commands [plan.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/plan.md), [cook.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/cook.md), [continue.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/continue.md), and [release.md](file:///home/alexander/Github/terminal-configs/claude-code/commands/release.md) under `claude-code/commands/`.
-- Updated [install.sh](file:///home/alexander/Github/terminal-configs/install.sh) and [bin/mac-bootstrap.sh](file:///home/alexander/Github/terminal-configs/bin/mac-bootstrap.sh) to automatically symlink CLAUDE.md and the commands to `~/.claude/` and `~/.claude/commands/`, with safe timestamped backup rotation for pre-existing configurations.
+- Unified global [CLAUDE.md](claude-code/CLAUDE.md) incorporating the MSTSPAT (Minimal, Self-documenting, Type-exact, Secure, Performant, Accessible, and Testable) code quality standard, mandatory `<thinking>` planning tags, Stack Preferences (TypeScript/Next.js/bun, Python/uv), and Pacific Time timezone settings.
+- Integrated custom Claude Code slash commands [plan.md](claude-code/commands/plan.md), [cook.md](claude-code/commands/cook.md), [continue.md](claude-code/commands/continue.md), and [release.md](claude-code/commands/release.md) under `claude-code/commands/`.
+- Updated [install.sh](install.sh) and [bin/mac-bootstrap.sh](bin/mac-bootstrap.sh) to automatically symlink CLAUDE.md and the commands to `~/.claude/` and `~/.claude/commands/`, with safe timestamped backup rotation for pre-existing configurations.
 
 ### Added — `.tmux.conf`
 - `default-terminal "tmux-256color"` + `terminal-overrides` for true 24-bit color inside tmux
