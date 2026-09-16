@@ -5,7 +5,6 @@
 ^CHANGELOG\.md$
 ^SHORTCUTS\.md$
 ^TMUX_SHORTCUTS\.md$
-^TMUX_LOGGING_SETUP\.md$
 ^\.gitignore$
 ^\.git$
 
