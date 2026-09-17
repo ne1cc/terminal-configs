@@ -20,4 +20,5 @@ while "$tmux_bin" has-session -t "$session_name" 2>/dev/null; do
 done
 
 cd "$HOME" || true
-exec "$tmux_bin" new-session -s "$session_name"
+zsh_bin="$(command -v zsh 2>/dev/null || echo "$HOME/.local/bin/zsh")"
+exec "$tmux_bin" new-session -s "$session_name" "$zsh_bin"
