@@ -144,16 +144,10 @@ white   = "#565f89"
 # SHELL / TMUX INTEGRATION
 # ==============================================================================
 [shell]
-# Launch tmux on every new Alacritty window, but DON'T mirror windows.
-# Logic:
-#   * no 'main' session yet            -> create it (first window)
-#   * 'main' exists but has no client  -> reattach (you reopened after closing)
-#   * 'main' is already attached       -> spin up a NEW independent session
-# This avoids tmux's multi-client mirroring (two clients on one session share the
-# same view) while keeping 'main' persistent across restarts. Routed through a
-# login zsh so .zprofile sets PATH (linuxbrew/tmux); tmux panes source .zshrc.
+# Launch a brand-new independent tmux session with a friendly timestamp on every window.
+# Avoids attaching to background/worktree sessions or multi-client window mirroring.
 program = "zsh"
-args = ["-l", "-c", "if ! tmux has-session -t main 2>/dev/null; then exec tmux new-session -s main; elif [ -z \"$(tmux list-clients -t main 2>/dev/null)\" ]; then exec tmux attach -t main; else exec tmux new-session; fi"]
+args = ["-l", "-c", "if command -v alacritty-new-session >/dev/null 2>&1; then exec alacritty-new-session; else s=$(date +%Y-%m-%d_%H-%M); exec tmux new-session -s \"$s\"; fi"]
 
 
 # ==============================================================================
