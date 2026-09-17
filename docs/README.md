@@ -3,7 +3,7 @@
 Getting-started guides and workflow references for everything in `terminal-configs`.
 
 **Quick load aliases:** `source ~/.zshrc`  
-**Canonical repo path:** `~/Github/n1ecC/terminal-configs`
+**Canonical repo path:** `~/Github/ne1cc/terminal-configs`
 
 ---
 

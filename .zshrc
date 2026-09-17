@@ -472,7 +472,7 @@ alias gnn='gh-ns-new'
 alias gnp='gh-ns-promote'
 alias gns='gh-ns-status'
 
-# Weekly GitHub mirror drift check (n1ecC ↔ ~/Github/n1ecC). Quiet; only prints problems.
+# Weekly GitHub mirror drift check (ne1cc ↔ ~/Github/ne1cc). Quiet; only prints problems.
 # Runs at most once per 7 days in interactive shells; skip with: export GH_MIRROR_CHECK=0
 if [[ -o interactive && "${GH_MIRROR_CHECK:-1}" != 0 ]] && command -v gh-mirror-check >/dev/null 2>&1; then
   (gh-mirror-check --quiet --if-stale 7 || true) &!
@@ -491,33 +491,33 @@ alias icloud='cd "$ICLOUD_DRIVE"'
 alias mdf='cd "$ICLOUD_MD"'
 
 # Github workspace (~/Github) — portfolio, explore, sync
-: "${DOTFILES:=$HOME/Github/n1ecC/terminal-configs}"
+: "${DOTFILES:=$HOME/Github/ne1cc/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
-: "${N1ECC_DIR:=$GITHUB_ROOT/n1ecC}"
-alias ghn='cd "$N1ECC_DIR"'
+: "${NE1CC_DIR:=$GITHUB_ROOT/ne1cc}"
+alias ghn='cd "$NE1CC_DIR"'
 alias ghex='cd "$GITHUB_ROOT/explore"'
 alias ghws='cd "$GITHUB_ROOT/workspace"'
 alias ghcfg='cd "$GITHUB_ROOT/config"'
 alias ghroot='cd "$GITHUB_ROOT"'
-alias ghsync='"$GITHUB_ROOT/_tools/sync-n1ecC"'
-alias ghsync-list='"$GITHUB_ROOT/_tools/sync-n1ecC" --list'
-alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-n1ecC" --pull'
+alias ghsync='"$GITHUB_ROOT/_tools/sync-ne1cc"'
+alias ghsync-list='"$GITHUB_ROOT/_tools/sync-ne1cc" --list'
+alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-ne1cc" --pull'
 alias ghpin='"$GITHUB_ROOT/_tools/pin-portfolio"'
 alias ghar='"$GITHUB_ROOT/_tools/gharchive"'
 
 # Portfolio repo quick-jumps
-alias gho='cd "$N1ECC_DIR/olist-lakehouse"'
-alias ghab='cd "$N1ECC_DIR/ab-testing-dagster"'
-alias ghdhs='cd "$N1ECC_DIR/dhs-stunting-pipeline"'
-alias ghtk='cd "$N1ECC_DIR/ticker-change"'
+alias gho='cd "$NE1CC_DIR/olist-lakehouse"'
+alias ghab='cd "$NE1CC_DIR/ab-testing-dagster"'
+alias ghdhs='cd "$NE1CC_DIR/dhs-stunting-pipeline"'
+alias ghtk='cd "$NE1CC_DIR/ticker-change"'
 
-# cd into any n1ecC repo: ghr [repo-name]
+# cd into any ne1cc repo: ghr [repo-name]
 ghr() {
   if [[ $# -eq 0 ]]; then
-    ls -1 "$N1ECC_DIR"
+    ls -1 "$NE1CC_DIR"
     return 0
   fi
-  cd "$N1ECC_DIR/$1" || {
+  cd "$NE1CC_DIR/$1" || {
     echo "Unknown repo: $1 (try: ghr with no args to list)"
     return 1
   }

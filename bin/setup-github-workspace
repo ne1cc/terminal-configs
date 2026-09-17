@@ -11,7 +11,7 @@ TEMPLATES="$DOTFILES/templates/github-workspace"
 
 # Top-level and nested directories — same tree on every platform.
 GITHUB_DIRS=(
-  "$GITHUB_ROOT/n1ecC"
+  "$GITHUB_ROOT/ne1cc"
   "$GITHUB_ROOT/config/dotfiles"
   "$GITHUB_ROOT/config/scripts"
   "$GITHUB_ROOT/config/analytics"
@@ -28,7 +28,7 @@ GITHUB_DIRS=(
 )
 
 GITHUB_SCRIPTS=(
-  sync-n1ecC
+  sync-ne1cc
   gharchive
   pin-portfolio
   setup-github-profile

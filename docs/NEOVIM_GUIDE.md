@@ -10,7 +10,7 @@ Overview of the AstroNvim-based setup: navigation, fuzzy find, git integration, 
 ## Quick start
 
 ```bash
-cd ~/Github/n1ecC/olist-lakehouse
+cd ~/Github/ne1cc/olist-lakehouse
 nvim .
 ```
 

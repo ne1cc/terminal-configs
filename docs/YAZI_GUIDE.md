@@ -10,7 +10,7 @@ Terminal file manager with optimized previews, MuPDF integration, and directory 
 ## Quick start
 
 ```bash
-cd ~/Github/n1ecC
+cd ~/Github/ne1cc
 y                     # browse files; exit returns to same directory
 ```
 

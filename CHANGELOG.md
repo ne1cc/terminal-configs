@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — GitHub handle rename (n1ecC → ne1cc)
+- Renamed the scaffolded workspace folder `~/Github/n1ecC/` → `~/Github/ne1cc/` across all scripts, configs, docs, agent memory, and templates: `.gitconfig` includeIf blocks, `.zshrc` / `.zprofile` (incl. `ghn`/`ghr`/`ghsync` aliases), `bin/setup-github-workspace`, `bin/gh-mirror-check` default owner, `bin/gharchive` (`--from-n1ecc` → `--from-ne1cc`), `bin/pin-portfolio`, `.config/sesh/sesh.toml`, and `templates/github-workspace/`.
+- Script rename: `bin/sync-n1ecC` → `bin/sync-ne1cc`; env var `N1ECC_DIR` → `NE1CC_DIR`.
+- After pulling, re-run `bin/setup-github-workspace` to refresh the `~/Github/_tools/sync-ne1cc` symlink.
+
 ### Added / Changed — Tmux Session & Window Management, Ghostty Multi-Session
 - `.tmux.conf`: Re-enabled interactive zoomed tree picker on `Prefix + w` (`choose-tree -Zw`) with pane details collapsed for clean navigation.
 - `.tmux.conf`: Added vim-style fold navigation keys in `tree-mode` (`h` collapse item, `l` expand item, `H` collapse all, `L` expand all).
