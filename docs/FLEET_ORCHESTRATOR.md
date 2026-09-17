@@ -161,7 +161,7 @@ fleet doctor
 
 ## 4. Shell Integration & Aliases
 
-Add the following to your shell configuration (pre-configured in [`.zshrc`](file:///Users/alex/Github/n1ecC/terminal-configs/.zshrc)):
+Add the following to your shell configuration (pre-configured in [`.zshrc`](file:///Users/alex/Github/ne1cc/terminal-configs/.zshrc)):
 
 | Alias | Command | Purpose |
 |---|---|---|

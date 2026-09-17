@@ -123,7 +123,7 @@ Also available from the palette and shell:
 
 ```bash
 tmux-sessionizer                    # interactive
-tmux-sessionizer ~/Github/n1ecC/olist-lakehouse   # direct
+tmux-sessionizer ~/Github/ne1cc/olist-lakehouse   # direct
 ```
 
 **Shell aliases:**

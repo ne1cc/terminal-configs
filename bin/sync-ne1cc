@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Sync all github.com/ne1cc repositories into ~/Github/ne1cc/
+# Usage:
+#   sync-ne1cc          # clone missing + fast-forward pull existing
+#   sync-ne1cc --list   # show local vs remote status
+#   sync-ne1cc --pull   # pull only, skip new clones
+
+set -euo pipefail
+
+NE1CC_DIR="${NE1CC_DIR:-$HOME/Github/ne1cc}"
+# Fallback support for N1ECC_DIR
+NE1CC_DIR="${N1ECC_DIR:-$NE1CC_DIR}"
+EXCLUDE_FILE="${GITHUB_ROOT:-$HOME/Github}/_tools/archive-exclude.txt"
+MODE="${1:---sync}"
+
+mkdir -p "$NE1CC_DIR"
+
+is_excluded() {
+  local name="$1"
+  [[ -f "$EXCLUDE_FILE" ]] && grep -vxE '^\s*(#|$)' "$EXCLUDE_FILE" | grep -qxF "$name"
+}
+
+list_repos() {
+  gh api user/repos --paginate \
+    -q '.[] | select(.fork == false) | select(.name != "SystemDashboard") | .name' \
+    | sort
+}
+
+clone_or_pull() {
+  local name="$1"
+  local path="${NE1CC_DIR}/${name}"
+  local https_url="https://github.com/ne1cc/${name}.git"
+
+  if [[ -d "${path}/.git" ]]; then
+    echo ">> pull  ${name}"
+    git -C "$path" remote set-url origin "$https_url"
+    git -C "$path" fetch origin --prune
+    current_branch="$(git -C "$path" symbolic-ref -q --short HEAD || true)"
+    if [[ -n "$current_branch" ]]; then
+      git -C "$path" pull --ff-only origin "$current_branch" || {
+        echo "   WARN: ${name} pull failed (local changes or diverged branch?)"
+      }
+    fi
+  else
+    if is_excluded "$name"; then
+      echo ">> skip  ${name} (archived locally — see archive-exclude.txt)"
+      return 0
+    fi
+    echo ">> clone ${name}"
+    gh repo clone "ne1cc/${name}" "$path"
+  fi
+}
+
+case "$MODE" in
+  --list)
+    echo "Local ne1cc repos in ${NE1CC_DIR}:"
+    while IFS= read -r name; do
+      if [[ -d "${NE1CC_DIR}/${name}/.git" ]]; then
+        branch="$(git -C "${NE1CC_DIR}/${name}" branch --show-current 2>/dev/null || echo "?")"
+        dirty=""
+        [[ -n "$(git -C "${NE1CC_DIR}/${name}" status --porcelain 2>/dev/null)" ]] && dirty=" *"
+        echo "  [ok] ${name} (${branch})${dirty}"
+      else
+        echo "  [--] ${name}  (not cloned)"
+      fi
+    done < <(list_repos)
+    ;;
+  --pull)
+    while IFS= read -r name; do
+      [[ -d "${NE1CC_DIR}/${name}/.git" ]] && clone_or_pull "$name"
+    done < <(list_repos)
+    ;;
+  --sync|*)
+    echo "Syncing ne1cc repos -> ${NE1CC_DIR}"
+    while IFS= read -r name; do
+      clone_or_pull "$name" || echo "   WARN: skipped ${name} due to error"
+    done < <(list_repos)
+    echo "Done."
+    ;;
+esac

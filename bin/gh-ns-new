@@ -4,7 +4,7 @@
 set -euo pipefail
 
 GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
-OWNER="${GH_NS_OWNER:-n1ecC}"
+OWNER="${GH_NS_OWNER:-ne1cc}"
 PROJECTS="${GITHUB_ROOT}/_local/projects"
 
 usage() {

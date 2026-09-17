@@ -10,7 +10,7 @@ Canonical home for all Git work on this machine.
 
 ```
 ~/Github/
-??? n1ecC/          # YOUR repos (github.com/n1ecC) — push from here
+??? ne1cc/          # YOUR repos (github.com/ne1cc) — push from here
 ??? config/         # Dotfiles & machine config
 ?   ??? dotfiles/
 ?   ??? scripts/
@@ -36,11 +36,11 @@ Created automatically by `setup-github-workspace` (runs on `install.sh`, `setup.
 
 | Alias | Action |
 |-------|--------|
-| `ghn` | `cd ~/Github/n1ecC` |
+| `ghn` | `cd ~/Github/ne1cc` |
 | `ghr <repo>` | `cd` into a repo (no args = list) |
 | `gho` / `ghab` / `ghdhs` / `ghtk` | Portfolio repo jumps |
 | `ghex` / `ghws` / `ghcfg` / `ghroot` | explore / workspace / config / root |
-| `ghsync` | Clone missing + pull all n1ecC repos |
+| `ghsync` | Clone missing + pull all ne1cc repos |
 | `ghsync-list` | Show clone status and dirty repos |
 | `ghsync-pull` | Pull only |
 | `ghar` | Archive a project to `archive/` |
@@ -62,8 +62,8 @@ git push origin main
 
 ## Conventions
 
-1. Only `n1ecC/` gets pushed to your GitHub account
-2. `explore/` is read-only — fork to `n1ecC/` if you keep changes
-3. `workspace/` stays local until promoted to `n1ecC/`
+1. Only `ne1cc/` gets pushed to your GitHub account
+2. `explore/` is read-only — fork to `ne1cc/` if you keep changes
+3. `workspace/` stays local until promoted to `ne1cc/`
 4. Large datasets go in `workspace/datasets/` (gitignored)
 5. Run `ghsync-pull` before interviews so portfolio repos are current

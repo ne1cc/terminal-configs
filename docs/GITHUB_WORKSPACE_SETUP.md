@@ -12,7 +12,7 @@ After setup, every machine has:
 
 ```
 ~/Github/
-├── n1ecC/              # Your github.com/n1ecC repos — push from here
+├── ne1cc/              # Your github.com/ne1cc repos — push from here
 ├── config/             # Local dotfiles, scripts, machine overrides
 ├── explore/            # Third-party clones (read-only)
 ├── workspace/          # Local-only work (msba, sandboxes, datasets)
@@ -33,7 +33,7 @@ Install these **before** bootstrap if they are not already present:
 |------|---------|---------|
 | **git** | Clone repos | macOS: Xcode CLT or Homebrew. Linux/WSL: `sudo apt install git` |
 | **zsh** | Shell | macOS: default. Linux/WSL: `sudo apt install zsh` |
-| **gh** | GitHub CLI (for `sync-n1ecC`) | [cli.github.com](https://cli.github.com/) |
+| **gh** | GitHub CLI (for `sync-ne1cc`) | [cli.github.com](https://cli.github.com/) |
 | **GNU Stow** | Dotfile symlinks | macOS: `brew install stow`. Linux/WSL: `sudo apt install stow` |
 
 Authenticate GitHub CLI once per machine:
@@ -50,9 +50,9 @@ gh auth status
 Every platform starts by cloning `terminal-configs` into the canonical path. Create the parent folder first:
 
 ```bash
-mkdir -p ~/Github/n1ecC
-git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
-cd ~/Github/n1ecC/terminal-configs
+mkdir -p ~/Github/ne1cc
+git clone https://github.com/ne1cc/terminal-configs.git ~/Github/ne1cc/terminal-configs
+cd ~/Github/ne1cc/terminal-configs
 ```
 
 Then run the **one** bootstrap script for your OS (sections below).
@@ -68,21 +68,21 @@ Works on both `/opt/homebrew` (Apple Silicon) and `/usr/local` (Intel). `.zprofi
 Installs Homebrew, optional Brewfile packages, Oh My Zsh, Powerlevel10k, dotfiles, Github workspace, and links all bin scripts.
 
 ```bash
-mkdir -p ~/Github/n1ecC
-git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
-bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
+mkdir -p ~/Github/ne1cc
+git clone https://github.com/ne1cc/terminal-configs.git ~/Github/ne1cc/terminal-configs
+bash ~/Github/ne1cc/terminal-configs/bin/mac-bootstrap.sh
 ```
 
 When prompted, answer **`y`** to install Brewfile packages (Ghostty, fnm, stow, gh, etc.) unless you want to install them manually later:
 
 ```bash
-brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
+brew bundle --file=~/Github/ne1cc/terminal-configs/Brewfile
 ```
 
 ### Option B — Dotfiles + workspace only (Homebrew already set up)
 
 ```bash
-cd ~/Github/n1ecC/terminal-configs
+cd ~/Github/ne1cc/terminal-configs
 ./install.sh
 ```
 
@@ -99,7 +99,7 @@ Or the portable installer with collision backups:
 source ~/.zshrc
 fnm install --lts                 # if Node not installed yet
 ghsync-list                       # list remote repos vs local clones
-ghsync                            # clone missing n1ecC repos
+ghsync                            # clone missing ne1cc repos
 ```
 
 Restart Ghostty (or your terminal) so `.zprofile` and `.zshrc` load cleanly.
@@ -113,9 +113,9 @@ Uses Linuxbrew, apt packages, Nerd Fonts, and sets zsh as the default shell when
 ### Full bootstrap (recommended on a new machine)
 
 ```bash
-mkdir -p ~/Github/n1ecC
-git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
-bash ~/Github/n1ecC/terminal-configs/bin/linux-bootstrap.sh
+mkdir -p ~/Github/ne1cc
+git clone https://github.com/ne1cc/terminal-configs.git ~/Github/ne1cc/terminal-configs
+bash ~/Github/ne1cc/terminal-configs/bin/linux-bootstrap.sh
 ```
 
 The script will:
@@ -157,9 +157,9 @@ Restart if prompted, then open **Ubuntu** from the Start menu.
 ### 2. Bootstrap inside WSL
 
 ```bash
-mkdir -p ~/Github/n1ecC
-git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
-bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
+mkdir -p ~/Github/ne1cc
+git clone https://github.com/ne1cc/terminal-configs.git ~/Github/ne1cc/terminal-configs
+bash ~/Github/ne1cc/terminal-configs/bin/wsl-bootstrap.sh
 ```
 
 `wsl-bootstrap.sh` runs the full Linux bootstrap, then adds:
@@ -195,7 +195,7 @@ Install **Ghostty** or **Alacritty** on the Windows side and point the font to J
 When `terminal-configs` changes on another machine:
 
 ```bash
-cd ~/Github/n1ecC/terminal-configs
+cd ~/Github/ne1cc/terminal-configs
 git pull
 ./install.sh
 source ~/.zshrc
@@ -221,7 +221,7 @@ setup-github-workspace
 | `install.sh` | Re-link after `git pull` | Stow dotfiles, link bin, TPM, Github workspace |
 | `setup.sh` | Portable install / conflicts | Backs up conflicts, links dotfiles + workspace |
 | `bin/setup-github-workspace` | Layout only | Creates `~/Github` tree + `_tools` symlinks |
-| `bin/sync-n1ecC` / `ghsync` | After setup | Clone/pull all n1ecC repos |
+| `bin/sync-ne1cc` / `ghsync` | After setup | Clone/pull all ne1cc repos |
 | `bin/gharchive` / `ghar` | As needed | Move projects to `~/Github/archive/` |
 | `bin/pin-portfolio` / `ghpin` | Once | Open GitHub profile pin instructions |
 | `bin/setup-github-profile` | Optional | Update GitHub bio via `gh api` |
@@ -237,19 +237,19 @@ Run these on any platform:
 ```bash
 # Dotfiles linked
 ls -l ~/.zshrc ~/.zprofile
-# Should point to ~/Github/n1ecC/terminal-configs/
+# Should point to ~/Github/ne1cc/terminal-configs/
 
 # Github layout
-ls ~/Github/n1ecC ~/Github/explore ~/Github/workspace ~/Github/_tools
+ls ~/Github/ne1cc ~/Github/explore ~/Github/workspace ~/Github/_tools
 
 # _tools symlinks
-ls -l ~/Github/_tools/sync-n1ecC
-# Should point to terminal-configs/bin/sync-n1ecC
+ls -l ~/Github/_tools/sync-ne1cc
+# Should point to terminal-configs/bin/sync-ne1cc
 
 # Aliases
 source ~/.zshrc
 ghroot    # cd ~/Github
-ghn       # cd ~/Github/n1ecC
+ghn       # cd ~/Github/ne1cc
 ghsync-list
 
 # Clone portfolio repos
@@ -271,7 +271,7 @@ Archive a local project:
 
 ```bash
 ghar my-old-sandbox              # from explore/ or workspace/
-ghar --from-n1ecc old-repo-name  # from n1ecC/ (excludes from future sync)
+ghar --from-ne1cc old-repo-name  # from ne1cc/ (excludes from future sync)
 ```
 
 ---
@@ -283,7 +283,7 @@ ghar --from-n1ecc old-repo-name  # from n1ecC/ (excludes from future sync)
 | `ghsync` fails with auth error | `gh auth login` then retry |
 | Stow conflicts on Linux | Re-run bootstrap and answer **y** to remove old symlinks, or use `./setup.sh` |
 | Aliases not found | `source ~/.zshrc` or open a new terminal |
-| `DOTFILES` path wrong | Check `~/.zprofile` — should be `$HOME/Github/n1ecC/terminal-configs` |
+| `DOTFILES` path wrong | Check `~/.zprofile` — should be `$HOME/Github/ne1cc/terminal-configs` |
 | WSL can't find `clip.exe` | Run `wsl --shutdown`, ensure `[interop]` in `/etc/wsl.conf` |
 | Wrong Homebrew on Mac | Apple Silicon: `/opt/homebrew`. Intel: `/usr/local`. Both handled in `.zprofile` |
 
