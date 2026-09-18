@@ -359,6 +359,33 @@ Format in clean GitHub-Flavored Markdown.
             desc = "Antigravity: Visualize docs/explanations/ as D3 graph -> GRAPH.html (zero AI cost)",
           },
 
+          -- Open HTML in browser (current buffer if .html, else GRAPH.html)
+          ["<leader>oh"] = {
+            function()
+              local file = vim.fn.expand("%:p")
+              local target
+
+              if file:match("%.html$") and vim.fn.filereadable(file) == 1 then
+                target = file
+              else
+                -- Fall back to the explanation graph
+                local root = get_project_root()
+                local graph = root .. "/docs/explanations/GRAPH.html"
+                if vim.fn.filereadable(graph) == 1 then
+                  target = graph
+                else
+                  vim.notify("No .html file in buffer and no GRAPH.html found. Run <Leader>av first.", vim.log.levels.WARN)
+                  return
+                end
+              end
+
+              local opener = vim.fn.has("mac") == 1 and "open" or "xdg-open"
+              vim.fn.jobstart({ opener, target }, { detach = true })
+              vim.notify("🌐 Opening in browser: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+            end,
+            desc = "Open current .html buffer (or GRAPH.html) in system browser",
+          },
+
         },
 
         v = {

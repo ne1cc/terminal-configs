@@ -401,6 +401,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ar` | Normal | **Review File**: Runs background `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<relpath>.md` and opens in `omd` |
 | `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`; saves per-file summaries to `docs/architecture/` and AI-synthesised `INDEX.md`; opens in `omd` |
 | `<Leader>av` | Normal | **Explanation Graph**: Runs `explain-viz` (zero AI cost); parses all `docs/explanations/*.md` cross-references; opens interactive D3.js `GRAPH.html` in browser |
+| `<Leader>oh` | Normal | **Open HTML in Browser**: Opens current `.html` buffer in the system browser; falls back to `docs/explanations/GRAPH.html` if buffer isn't HTML |
 | `<Leader>ow` | Normal | **OpenWiki Headless Documentation**: Runs background `openwiki code --update/--init --print` and opens `openwiki/quickstart.md` in `omd` |
 | `<Leader>at` | Normal | **Floating Terminal**: Spawns floating interactive Antigravity (`agyy`) session |
 | `<C-q>` | Terminal | **Close Floating Window**: Instantly dismiss active Antigravity terminal overlay |
