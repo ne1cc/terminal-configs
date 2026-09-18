@@ -180,9 +180,19 @@ Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a s
                 vim.fn.shellescape(doc_file)
               )
 
-              vim.notify("⏳ [Antigravity] Explaining " .. rel_path .. "...", vim.log.levels.INFO)
+              vim.notify("⏳ [Antigravity] Explaining " .. rel_path .. " in background...", vim.log.levels.INFO)
+              local err_output = {}
               vim.fn.jobstart({ "sh", "-c", runner_cmd }, {
                 detach = true,
+                stdout_buffered = true,
+                stderr_buffered = true,
+                on_stderr = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_output, line) end
+                    end
+                  end
+                end,
                 on_exit = function(_, exit_code, _)
                   vim.schedule(function()
                     if exit_code == 0 and vim.fn.filereadable(doc_file) == 1 then
@@ -197,9 +207,14 @@ Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a s
                         end
                       end
                       vim.notify("✓ [Antigravity] Explanation saved → " .. rel_path .. ".md", vim.log.levels.INFO)
-                      vim.fn.jobstart({ "omd", doc_file }, { detach = true })
+                      if vim.fn.executable("omd") == 1 then
+                        vim.fn.jobstart({ "omd", doc_file }, { detach = true })
+                      else
+                        vim.cmd("edit " .. vim.fn.fnameescape(doc_file))
+                      end
                     else
-                      vim.notify("❌ [Antigravity] Explanation failed (exit " .. exit_code .. ")", vim.log.levels.ERROR)
+                      local detail = #err_output > 0 and table.concat(err_output, " ") or ("exit code " .. exit_code)
+                      vim.notify("❌ [Antigravity] Explanation failed for " .. rel_path .. ": " .. detail, vim.log.levels.ERROR)
                     end
                   end)
                 end,
