@@ -8,13 +8,13 @@
 # Owners come from (first match wins):
 #   1) repeated --owner flags
 #   2) ~/Github/.mirror-owners  (one owner per line)
-#   3) default: n1ecC
+#   3) default: ne1cc
 #
 # Usage:
 #   gh-mirror-check
 #   gh-mirror-check --quiet
 #   gh-mirror-check --if-stale 7
-#   gh-mirror-check --owner n1ecC --owner my-org
+#   gh-mirror-check --owner ne1cc --owner my-org
 # ==============================================================================
 set -euo pipefail
 
@@ -53,7 +53,7 @@ if [[ ${#OWNERS[@]} -eq 0 ]]; then
   fi
 fi
 if [[ ${#OWNERS[@]} -eq 0 ]]; then
-  OWNERS=(n1ecC)
+  OWNERS=(ne1cc)
 fi
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"

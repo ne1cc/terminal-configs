@@ -25,7 +25,7 @@ cheat jq    # instant cheat sheet
 Zoxide learns from directories you visit. Jump with partial names:
 
 ```bash
-z olist              # ? ~/Github/n1ecC/olist-lakehouse
+z olist              # ? ~/Github/ne1cc/olist-lakehouse
 z term               # ? terminal-configs
 zi                   # fzf picker over frequent directories
 ```
@@ -177,7 +177,7 @@ Installed via `brew bundle` / bootstrap scripts:
 Install:
 
 ```bash
-brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
+brew bundle --file=~/Github/ne1cc/terminal-configs/Brewfile
 ```
 
 Or during bootstrap: `mac-bootstrap.sh` / `linux-bootstrap.sh`

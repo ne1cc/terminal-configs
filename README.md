@@ -76,7 +76,7 @@ Follow these steps to fully restore your environment on a fresh machine.
 On macOS:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew bundle --file=~/Github/n1ecC/terminal-configs/Brewfile
+brew bundle --file=~/Github/ne1cc/terminal-configs/Brewfile
 ```
 
 ### Step 2: Run the Portable Setup Script
@@ -89,14 +89,14 @@ The script detects macOS, Linux, and WSL; moves existing conflicting files to `~
 
 ```bash
 # macOS (Apple Silicon or Intel)
-git clone https://github.com/n1ecC/terminal-configs.git ~/Github/n1ecC/terminal-configs
-bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
+git clone https://github.com/ne1cc/terminal-configs.git ~/Github/ne1cc/terminal-configs
+bash ~/Github/ne1cc/terminal-configs/bin/mac-bootstrap.sh
 
 # Linux
-bash ~/Github/n1ecC/terminal-configs/bin/linux-bootstrap.sh
+bash ~/Github/ne1cc/terminal-configs/bin/linux-bootstrap.sh
 
 # Windows (WSL2)
-bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
+bash ~/Github/ne1cc/terminal-configs/bin/wsl-bootstrap.sh
 ```
 
 To restore packages automatically as part of setup:
@@ -375,7 +375,7 @@ A complete reference for every configured keyboard shortcut, alias, and shell fu
 | Command / Alias | Action / Purpose |
 |---|---|
 | `lg` | Launch Lazygit in current repository |
-| `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES` / `~/Github/n1ecC/terminal-configs`) |
+| `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES` / `~/Github/ne1cc/terminal-configs`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
 | `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
 | `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |

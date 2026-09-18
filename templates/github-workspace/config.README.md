@@ -1,6 +1,6 @@
 # config/ — Dotfiles & Machine Configuration
 
-Local machine setup, separate from portfolio repos in `../n1ecC/`.
+Local machine setup, separate from portfolio repos in `../ne1cc/`.
 
 ## What lives here
 
@@ -13,12 +13,12 @@ Local machine setup, separate from portfolio repos in `../n1ecC/`.
 | `external/` | none | Third-party config bundles |
 | `local/` | none | Machine-specific overrides — never commit |
 
-## What lives in n1ecC/
+## What lives in ne1cc/
 
-Repos you push to GitHub live in `../n1ecC/`:
+Repos you push to GitHub live in `../ne1cc/`:
 
-- `terminal-configs` ? `../n1ecC/terminal-configs`
-- All other n1ecC repos ? clone via `ghsync` / `sync-n1ecC`
+- `terminal-configs` ? `../ne1cc/terminal-configs`
+- All other ne1cc repos ? clone via `ghsync` / `sync-ne1cc`
 
 ## Symlinking dotfiles (optional)
 
