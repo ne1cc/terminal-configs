@@ -399,7 +399,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ae` | Normal | **Explain Current File**: Runs background `agyy` to explain active buffer; saves report to `docs/explanations/<relpath>.md` and opens in One Markdown (`omd`) |
 | `<Leader>ae` | Visual | **Explain Selection**: Runs background `agyy` to explain highlighted lines; saves to `docs/snippets/<file>_L<start>-L<end>_<timestamp>.md` with rich metadata and opens in `omd` |
 | `<Leader>ar` | Normal | **Review File**: Runs background `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<relpath>.md` and opens in `omd` |
-| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`; saves whole-repo index to `docs/explanations/INDEX.md` and opens in `omd` |
+| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`; saves per-file summaries to `docs/architecture/` and AI-synthesised `INDEX.md`; opens in `omd` |
 | `<Leader>ow` | Normal | **OpenWiki Headless Documentation**: Runs background `openwiki code --update/--init --print` and opens `openwiki/quickstart.md` in `omd` |
 | `<Leader>at` | Normal | **Floating Terminal**: Spawns floating interactive Antigravity (`agyy`) session |
 | `<C-q>` | Terminal | **Close Floating Window**: Instantly dismiss active Antigravity terminal overlay |

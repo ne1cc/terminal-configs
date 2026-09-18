@@ -176,12 +176,12 @@ Format in clean GitHub-Flavored Markdown.
             desc = "Antigravity (agyy): Review Current File (Background) -> docs/reviews/<relpath>.md & omd",
           },
 
-          -- Summarize Whole Repository -> docs/explanations/INDEX.md
+          -- Summarize Whole Repository -> docs/architecture/INDEX.md
           ["<leader>as"] = {
             function()
               local root = get_project_root()
-              local index_file = root .. "/docs/explanations/INDEX.md"
-              vim.notify("⏳ [Antigravity] Starting background whole-repo summarization...", vim.log.levels.INFO)
+              local index_file = root .. "/docs/architecture/INDEX.md"
+              vim.notify("⏳ [Antigravity] Starting background whole-repo summarization → docs/architecture/...", vim.log.levels.INFO)
 
               local cmd = string.format("cd %s && repo-summarize --open", vim.fn.shellescape(root))
               vim.fn.jobstart({ "sh", "-c", cmd }, {
@@ -189,7 +189,7 @@ Format in clean GitHub-Flavored Markdown.
                 on_exit = function(_, exit_code, _)
                   vim.schedule(function()
                     if exit_code == 0 and vim.fn.filereadable(index_file) == 1 then
-                      vim.notify("✓ [Antigravity] Repo summarization complete! Opening in One Markdown...", vim.log.levels.INFO)
+                      vim.notify("✓ [Antigravity] Repo summarization complete! Opening docs/architecture/INDEX.md...", vim.log.levels.INFO)
                     elseif exit_code ~= 0 then
                       vim.notify("❌ [Antigravity] Repo summarization failed (exit code " .. exit_code .. ")", vim.log.levels.ERROR)
                     end
@@ -197,7 +197,7 @@ Format in clean GitHub-Flavored Markdown.
                 end,
               })
             end,
-            desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/explanations/INDEX.md & omd",
+            desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/architecture/INDEX.md & omd",
           },
 
           -- Headless OpenWiki Execution -> openwiki/ & quickstart.md
