@@ -200,6 +200,43 @@ Format in clean GitHub-Flavored Markdown.
             desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/explanations/INDEX.md & omd",
           },
 
+          -- Headless OpenWiki Execution -> openwiki/ & quickstart.md
+          ["<leader>aw"] = {
+            function()
+              local root = get_project_root()
+              local has_openwiki = vim.fn.isdirectory(root .. "/openwiki") == 1
+              local subcmd = has_openwiki and "--update" or "--init"
+              local target_doc = root .. "/openwiki/quickstart.md"
+
+              vim.notify(
+                string.format("⏳ [OpenWiki] Running headless %s in background for %s...", subcmd, vim.fn.fnamemodify(root, ":t")),
+                vim.log.levels.INFO
+              )
+
+              local cmd = string.format("cd %s && openwiki code %s --print", vim.fn.shellescape(root), subcmd)
+              vim.fn.jobstart({ "sh", "-c", cmd }, {
+                detach = true,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 then
+                      vim.notify("✓ [OpenWiki] Documentation generation complete!", vim.log.levels.INFO)
+                      if vim.fn.filereadable(target_doc) == 1 then
+                        if vim.fn.executable("omd") == 1 then
+                          vim.fn.jobstart({ "omd", target_doc }, { detach = true })
+                        else
+                          vim.cmd("edit " .. vim.fn.fnameescape(target_doc))
+                        end
+                      end
+                    else
+                      vim.notify("❌ [OpenWiki] Execution failed (exit code " .. exit_code .. ")", vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
+            end,
+            desc = "OpenWiki: Run Headless Update/Init (Background) -> openwiki/ & omd",
+          },
+
           -- Interactive Terminal Chat
           ["<leader>at"] = {
             function()

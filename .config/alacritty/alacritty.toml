@@ -199,6 +199,14 @@ persist         = false
 mouse           = { enabled = true, mods = "Control" }
 regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
 
+[[hints.enabled]]
+command         = "open"
+hyperlinks      = true
+post_processing = true
+persist         = false
+mouse           = { enabled = true, mods = "Shift" }
+regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
+
 # ==============================================================================
 # KEYBOARD BINDINGS — FULL TMUX + TERMINAL CONFIGS PARITY
 # ==============================================================================
