@@ -682,6 +682,79 @@ wt-rm() {
 }
 
 # ==============================================================================
+# WORKTREE REBASE & SYNC (pairs with wmr, wma, wmo)
+# ==============================================================================
+
+# wtr [name] — rebase current worktree (or named worktree) onto origin/main
+wtr() {
+  local target="${1:-.}"
+  local dir
+  dir=$(git -C "$target" rev-parse --show-toplevel 2>/dev/null) || {
+    echo "❌ Not in a git repository or valid worktree"
+    return 1
+  }
+  local branch
+  branch=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [[ "$branch" == "main" || "$branch" == "HEAD" ]]; then
+    echo "ℹ️  On $branch — no rebase needed"
+    return 0
+  fi
+
+  echo "🔄 [wtr] Fetching origin/main and rebasing $branch..."
+  git -C "$dir" fetch origin main --quiet 2>&1
+  # --autostash safely shelves uncommitted edits, rebases, then reapplies them
+  if git -C "$dir" rebase --autostash origin/main; then
+    echo "✅ [wtr] $branch is up to date with origin/main"
+  else
+    echo "⚠️  [wtr] Conflict on $branch (rerere active)"
+    echo "   Resolve: git diff → git add <file> → git rebase --continue"
+    return 1
+  fi
+}
+
+# wts — sync all active worktrees across the repo onto origin/main
+# Run this right after a PR merges to main to keep all sibling worktrees fresh.
+wts() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "❌ Not inside a git repository"
+    return 1
+  }
+
+  echo "🔄 [wts] Fetching origin/main..."
+  git -C "$root" fetch origin main --quiet 2>&1 || {
+    echo "❌ Failed to fetch origin/main"
+    return 1
+  }
+
+  echo "🔄 [wts] Rebasing idle worktrees..."
+  git -C "$root" worktree list --porcelain \
+    | grep '^worktree ' \
+    | cut -d' ' -f2- \
+    | while read -r wt; do
+        local branch; branch=$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null)
+        [[ "$branch" == "main" || "$branch" == "HEAD" ]] && continue
+        local name; name=$(basename "$wt")
+
+        # Safety: if agent has uncommitted changes in this worktree, skip to avoid colliding
+        if [[ -n $(git -C "$wt" status --porcelain 2>/dev/null) ]]; then
+          echo "  ⏸️  $name ($branch) → skipped (agent has uncommitted edits)"
+          continue
+        fi
+
+        if git -C "$wt" rebase origin/main >/dev/null 2>&1; then
+          echo "  ✅ $name ($branch) → synced"
+        else
+          echo "  ⚠️  $name ($branch) → conflict! (cd $wt && git rebase --continue)"
+        fi
+      done
+  echo "🏁 [wts] All worktrees checked."
+}
+alias wt-sync='wts'
+alias wt-rebase-all='wts'
+alias wmrb='workmux rebase'
+
+# ==============================================================================
 # WORKMUX & SESH WORKFLOW INTEGRATIONS
 # ==============================================================================
 
@@ -707,7 +780,11 @@ bindkey -M vicmd '\es' sesh-sessions
 
 # Workmux: Zero-friction git worktrees + tmux windows
 alias wm='workmux'
-alias wma='workmux add'
+wma() {
+  workmux add "$@"
+  tmux select-layout tiled 2>/dev/null || true
+  tmux select-pane -t 1 2>/dev/null || true
+}
 alias wml='workmux list'
 alias wmls='workmux list'
 alias wmo='workmux open'
@@ -715,6 +792,20 @@ alias wmc='workmux close'
 alias wmm='workmux merge'
 alias wmr='workmux remove'
 alias wmrm='workmux remove'
+alias wmrg='workmux remove --gone'
+
+# wmp — prune dead tmux windows whose worktree directories no longer exist
+wmp() {
+  local target dir
+  tmux list-windows -a -F '#{session_name}:#{window_id} #{pane_current_path}' 2>/dev/null | while read -r target dir; do
+    if [[ -n "$dir" && ! -d "$dir" ]]; then
+      echo "🧹 Pruning orphaned window $target (directory gone: $dir)"
+      tmux kill-window -t "$target" 2>/dev/null || true
+    fi
+  done
+  return 0
+}
+alias wm-prune='wmp'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
 
@@ -722,10 +813,16 @@ alias wms='workmux sidebar'
 wmux() {
   if [ $# -eq 0 ]; then
     workmux
-  elif [[ "$1" =~ ^(add|open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
+  elif [[ "$1" == "add" ]]; then
+    workmux "$@"
+    tmux select-layout tiled 2>/dev/null || true
+    tmux select-pane -t 1 2>/dev/null || true
+  elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
     workmux "$@"
   else
     workmux add "$@"
+    tmux select-layout tiled 2>/dev/null || true
+    tmux select-pane -t 1 2>/dev/null || true
   fi
 }
 

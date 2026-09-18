@@ -59,6 +59,13 @@ if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   printf '  linked GEMINI.md (Home, ~/.gemini, and ~/.gemini/config)\n'
 fi
 
+if [[ -f "$REPO_DIR/AGENTS.md" ]]; then
+  mkdir -p "$HOME/.qoder" "$HOME/.agents"
+  ln -sfn "$REPO_DIR/AGENTS.md" "$HOME/.qoder/AGENTS.md"
+  ln -sfn "$REPO_DIR/AGENTS.md" "$HOME/.agents/AGENTS.md"
+  printf '  linked AGENTS.md (~/.qoder and ~/.agents)\n'
+fi
+
 link_skill_tree "$REPO_DIR/.gemini/skills" \
   "$HOME/.gemini/config/skills" \
   "$HOME/.claude/skills" \
