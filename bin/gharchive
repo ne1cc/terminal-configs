@@ -42,7 +42,7 @@ find_project() {
     return 0
   fi
 
-  for root in "$GITHUB_ROOT/explore" "$GITHUB_ROOT/workspace" "$GITHUB_ROOT/ne1cc"; do
+  for root in "$GITHUB_ROOT/explore" "$GITHUB_ROOT/workspace" "$GITHUB_ROOT/ne1cc" "$GITHUB_ROOT/n1ecC"; do
     [[ -d "$root/$name" ]] && candidates+=("$root/$name")
   done
 
@@ -116,7 +116,7 @@ do_archive() {
     exit 0
   fi
 
-  if [[ "$src" == "$GITHUB_ROOT/ne1cc/"* ]]; then
+  if [[ "$src" == "$GITHUB_ROOT/ne1cc/"* || "$src" == "$GITHUB_ROOT/n1ecC/"* ]]; then
     if [[ "$from_ne1cc" != "true" ]]; then
       echo "ERROR: '$name' is in ne1cc/ (your GitHub mirror)." >&2
       echo "Re-run with --from-ne1cc to archive locally." >&2
@@ -154,7 +154,7 @@ FROM_NE1CC=false
 case "${1:-}" in
   -h|--help) usage 0 ;;
   --list) list_archived; exit 0 ;;
-  --from-ne1cc)
+  --from-ne1cc|--from-n1ecc)
     FROM_NE1CC=true
     shift
     [[ $# -eq 1 ]] || usage 1
