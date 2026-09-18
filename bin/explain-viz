@@ -74,41 +74,122 @@ fi
 
 echo "Found ${#NODES[@]} explained files. Building graph..."
 
-# Build JSON nodes array
-NODES_JSON=""
-for rel in "${NODES[@]}"; do
-  [[ -n "$NODES_JSON" ]] && NODES_JSON+=","
-  NODES_JSON+="{\"id\":$(printf '%s' "$rel" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')}"
-done
+# Build the full nodes+links JSON in one Python3 call (fast — no subprocess-per-file)
+# Strategy for edges:
+#   1. Primary: parse actual source files for #include / import / require / use
+#   2. Fallback: if source not found, parse "Related Files" section from the .md
+# Matching: extract the basename of each include target and see if any explained
+# node ends with that basename (handles both relative and system includes).
+GRAPH_SCRIPT='
+import sys, os, re, json
 
-# Build JSON links array by parsing "Related Files" sections in each .md
-LINKS_JSON=""
-for rel in "${NODES[@]}"; do
-  doc="$EXPLAIN_DIR/${rel}.md"
-  [[ ! -f "$doc" ]] && continue
-  in_related=0
-  while IFS= read -r line; do
-    if echo "$line" | grep -q "^## Related Files"; then
-      in_related=1
-      continue
-    fi
-    if [[ $in_related -eq 1 ]]; then
-      # Stop at next ## heading
-      if echo "$line" | grep -q "^##"; then
-        in_related=0
-        continue
-      fi
-      # Match "- [dep](dep.md) ✓" pattern (linked, exists)
-      target="$(echo "$line" | sed -n 's/^- \[.*\](\(.*\)\.md).*/\1/p')"
-      if [[ -n "$target" ]]; then
-        [[ -n "$LINKS_JSON" ]] && LINKS_JSON+=","
-        src_json="$(printf '%s' "$rel" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')"
-        tgt_json="$(printf '%s' "$target" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')"
-        LINKS_JSON+="{\"source\":$src_json,\"target\":$tgt_json}"
-      fi
-    fi
-  done < "$doc"
-done
+target_dir = sys.argv[1]
+explain_dir = sys.argv[2]
+nodes = sys.argv[3:]
+
+node_set = set(nodes)
+
+base_to_nodes = {}
+for n in nodes:
+    b = os.path.basename(n)
+    base_to_nodes.setdefault(b, []).append(n)
+    stem, ext = os.path.splitext(b)
+    if ext in (".cpp", ".c", ".cc", ".cxx"):
+        for hext in (".h", ".hpp"):
+            base_to_nodes.setdefault(stem + hext, []).append(n)
+
+INCLUDE_RE = re.compile(
+    r"^\s*(?:"
+    r"#\s*include\s*[<\"]([^>\"]+)[>\"]"
+    r"|import\s+[\x27\"]([^\x27\"]+)[\x27\"]"
+    r"|from\s+(\S+)\s+import"
+    r"|require\s*\(?[\x27\"]([^\x27\"]+)[\x27\"]"
+    r"|use\s+([\w:]+)"
+    r")"
+)
+
+RELATED_RE = re.compile(r"^-\s*\[.*?\]\((.+?)\.md\)")
+
+def extract_includes(filepath):
+    targets = []
+    try:
+        with open(filepath, "r", errors="replace") as f:
+            for i, line in enumerate(f):
+                if i > 300:
+                    break
+                m = INCLUDE_RE.match(line)
+                if m:
+                    dep = next((g for g in m.groups() if g), None)
+                    if dep:
+                        targets.append(dep)
+    except Exception:
+        pass
+    return targets
+
+def extract_related_md(md_path):
+    targets = []
+    in_related = False
+    try:
+        with open(md_path, "r", errors="replace") as f:
+            for line in f:
+                if line.strip().startswith("## Related Files"):
+                    in_related = True
+                    continue
+                if in_related:
+                    if line.startswith("## "):
+                        break
+                    m = RELATED_RE.match(line.strip())
+                    if m:
+                        targets.append(m.group(1))
+    except Exception:
+        pass
+    return targets
+
+def resolve_include(dep, source_node):
+    dep_base = os.path.basename(dep)
+    candidates = base_to_nodes.get(dep_base, [])
+    if not candidates:
+        stem, ext = os.path.splitext(dep_base)
+        if ext in (".h", ".hpp"):
+            for cext in (".cpp", ".c", ".cc"):
+                candidates += base_to_nodes.get(stem + cext, [])
+    candidates = [c for c in candidates if c != source_node]
+    src_dir = os.path.dirname(source_node)
+    preferred = [c for c in candidates if c.startswith(src_dir)]
+    return preferred[0] if preferred else (candidates[0] if candidates else None)
+
+links_seen = set()
+links = []
+
+for node in nodes:
+    src_file = os.path.join(target_dir, node)
+    if os.path.isfile(src_file):
+        deps = extract_includes(src_file)
+    else:
+        deps = extract_related_md(os.path.join(explain_dir, node + ".md"))
+
+    for dep in deps:
+        target_node = resolve_include(dep, node)
+        if target_node and target_node in node_set:
+            key = (node, target_node)
+            if key not in links_seen:
+                links_seen.add(key)
+                links.append({"source": node, "target": target_node})
+
+result = {
+    "nodes": [{"id": n} for n in nodes],
+    "links": links
+}
+print(json.dumps(result))
+'
+
+GRAPH_JSON="$(python3 -c "$GRAPH_SCRIPT" "$TARGET_DIR" "$EXPLAIN_DIR" "${NODES[@]}")"
+
+NODES_JSON="$(echo "$GRAPH_JSON" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(",".join(json.dumps(n) for n in d["nodes"]))')"
+LINKS_JSON="$(echo "$GRAPH_JSON" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(",".join(json.dumps(l) for l in d["links"]))')"
+EDGE_COUNT="$(echo "$GRAPH_JSON" | python3 -c 'import sys,json; d=json.load(sys.stdin); print(len(d["links"]))')"
+
+echo "  Edges : $EDGE_COUNT cross-references detected from source"
 
 REPO_JSON="$(printf '%s' "$REPO_NAME" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')"
 
