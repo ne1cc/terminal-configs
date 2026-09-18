@@ -148,7 +148,17 @@ white   = "#565f89"
 
 
 # ==============================================================================
-# TERMINAL / ENVIRONMENT
+# SHELL / TMUX INTEGRATION
+# ==============================================================================
+[shell]
+# Launch a brand-new independent tmux session with a friendly timestamp on every window.
+# Avoids attaching to background/worktree sessions or multi-client window mirroring.
+program = "zsh"
+args = ["-l", "-c", "if command -v alacritty-new-session >/dev/null 2>&1; then exec alacritty-new-session; else s=$(date +%Y-%m-%d_%H-%M); exec tmux new-session -s \"$s\"; fi"]
+
+
+# ==============================================================================
+# SELECTION
 # ==============================================================================
 [selection]
 # Copy-on-select — selecting text immediately puts it on the system clipboard

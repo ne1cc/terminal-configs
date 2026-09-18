@@ -52,6 +52,12 @@ for dir in "${GITHUB_DIRS[@]}"; do
 done
 echo "  directories: ${#GITHUB_DIRS[@]} paths ensured"
 
+# Ensure backwards-compatible symlink for n1ecC -> ne1cc
+if [[ ! -e "$GITHUB_ROOT/n1ecC" ]]; then
+  ln -s "$GITHUB_ROOT/ne1cc" "$GITHUB_ROOT/n1ecC"
+  echo "  symlinked: n1ecC -> ne1cc"
+fi
+
 install_template "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
 install_template "$TEMPLATES/config.README.md" "$GITHUB_ROOT/config/README.md"
 install_template "$TEMPLATES/archive.MANIFEST.md" "$GITHUB_ROOT/archive/MANIFEST.md"

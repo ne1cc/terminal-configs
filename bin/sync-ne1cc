@@ -8,6 +8,8 @@
 set -euo pipefail
 
 NE1CC_DIR="${NE1CC_DIR:-$HOME/Github/ne1cc}"
+# Fallback support for N1ECC_DIR
+NE1CC_DIR="${N1ECC_DIR:-$NE1CC_DIR}"
 EXCLUDE_FILE="${GITHUB_ROOT:-$HOME/Github}/_tools/archive-exclude.txt"
 MODE="${1:---sync}"
 
