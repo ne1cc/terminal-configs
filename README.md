@@ -125,8 +125,8 @@ To restore packages automatically as part of setup:
 * Inline image rendering (`3rd/image.nvim` + `img-clip.nvim`), PDF viewing (`MuPDF`), and FzfLua picker.
 
 ### 🤖 Claude Code Workflows (Configuration as Code)
-* Integrates a version-controlled global [CLAUDE.md](file:///Users/alex/Github/config/terminal-configs/claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
-* Custom global slash commands in [commands/](file:///Users/alex/Github/config/terminal-configs/claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
+* Integrates a version-controlled global [CLAUDE.md](claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
+* Custom global slash commands in [commands/](claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
   * `/plan` — Strategic Planning: Discovers requirements, mapping dependencies, and creating/updating the `TODO.md` roadmap.
   * `/cook` — Focused Implementation: Executes tasks from `TODO.md` in dependency order, enforcing code quality standards.
   * `/continue` — Intelligent Resumption: Inspects git status and `TODO.md` progress to resume work cleanly.
@@ -138,7 +138,7 @@ To restore packages automatically as part of setup:
 
 ## ⚡ Master Shortcuts & Cheatsheet
 
-A complete reference for every configured keyboard shortcut, alias, and shell function. Also available standalone at [SHORTCUTS.md](file:///Users/alex/Github/config/terminal-configs/SHORTCUTS.md).
+A complete reference for every configured keyboard shortcut, alias, and shell function. Also available standalone at [SHORTCUTS.md](SHORTCUTS.md).
 
 ### 1. tmux Keybindings (Prefix: `Ctrl + Space`)
 

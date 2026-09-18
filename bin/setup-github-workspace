@@ -9,9 +9,9 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
 TEMPLATES="$DOTFILES/templates/github-workspace"
 
-# Top-level and nested directories — same tree on every platform.
+# Top-level and nested directories â€” same tree on every platform.
 GITHUB_DIRS=(
-  "/Users/alex/Github/ne1cc"
+  "$GITHUB_ROOT/ne1cc"
   "$GITHUB_ROOT/config/dotfiles"
   "$GITHUB_ROOT/config/scripts"
   "$GITHUB_ROOT/config/analytics"
@@ -52,6 +52,12 @@ for dir in "${GITHUB_DIRS[@]}"; do
 done
 echo "  directories: ${#GITHUB_DIRS[@]} paths ensured"
 
+# Ensure backwards-compatible symlink for n1ecC -> ne1cc
+if [[ ! -e "$GITHUB_ROOT/n1ecC" ]]; then
+  ln -s "$GITHUB_ROOT/ne1cc" "$GITHUB_ROOT/n1ecC"
+  echo "  symlinked: n1ecC -> ne1cc"
+fi
+
 install_template "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
 install_template "$TEMPLATES/config.README.md" "$GITHUB_ROOT/config/README.md"
 install_template "$TEMPLATES/archive.MANIFEST.md" "$GITHUB_ROOT/archive/MANIFEST.md"
@@ -63,7 +69,7 @@ install_template "$TEMPLATES/datasets.README.md" "$GITHUB_ROOT/workspace/dataset
 touch "$GITHUB_ROOT/_tools/archive-exclude.txt"
 
 for script in "${GITHUB_SCRIPTS[@]}"; do
-  if [[ -x "$DOTFILES/bin/$script" ]]; then
+  if [[ -e "$DOTFILES/bin/$script" ]]; then
     ln -sf "$DOTFILES/bin/$script" "$GITHUB_ROOT/_tools/$script"
     echo "  linked: _tools/$script"
     # Remove legacy duplicate scripts from before terminal-configs port.

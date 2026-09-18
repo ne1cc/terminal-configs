@@ -179,7 +179,7 @@ Add the following to your shell configuration (pre-configured in [`.zshrc`](file
 
 ---
 
-## 5. Configuration (`config/fleet.conf`)
+## 5. Configuration (`.config/fleet/fleet.conf`)
 
 Fleet automatically looks for configuration in:
 1. `--config <path>`

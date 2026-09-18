@@ -38,6 +38,7 @@ MENU=$(cat << 'ACTIONS'
 👻 Break Pane → Ghostty  | Move active pane to new tmux session in new Ghostty win | $HOME/bin/tmux-breakout-ghostty $(tmux display-message -p '#{pane_id}')
 📦 Stash Active Window   | Move current window into background 'stash' session    | tmux has-session -t stash 2>/dev/null || tmux new-session -ds stash -n scratch; tmux move-window -t stash:
 📥 Unstash Window        | Retrieve stashed window back into current session      | tmux list-windows -t stash -F '#I: #W' 2>/dev/null | fzf --reverse | cut -d: -f1 | xargs -I{} tmux move-window -s stash:{} -t #{session_name}:
+💻 Terminal Popup        | Toggle persistent centered floating terminal popup    | $HOME/bin/tmux-popup-term
 🤖 Claude Popup          | Toggle persistent centered Claude assistant popup      | tmux attach-session -t claude-popup || tmux new-session -s claude-popup 'claude'
 ⚡ Antigravity YOLO Popup| Toggle persistent centered Antigravity YOLO popup     | tmux attach-session -t agyy-popup || tmux new-session -s agyy-popup 'agy --dangerously-skip-permissions'
 🐙 Floating Lazygit      | Toggle centered 90% lazygit modal                      | lazygit

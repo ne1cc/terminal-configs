@@ -129,6 +129,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Alt + y` | **Open/re-attach to persistent Antigravity YOLO popup session (`agyy`)** | Active Session |
 | `Prefix + O` (`Shift + o`) | **Screen File & Stacktrace Jumper** (extract file paths on screen & jump in Neovim) | Active Window |
 | `Prefix + Alt + i` | **Instant Floating Scratchpad** (quick notes in `~/notes/scratchpad.md`) | Active Window |
+| `Prefix + t` / `Prefix + \`` / `Alt + \`` / `Alt + t` | **Instant Persistent Terminal Popup** (scratchpad shell, `cdhere` to sync dir) | Active Window |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
 | `Prefix + Ctrl + c` | New window named "Claude" running Claude in current directory | Active Session |
 | `Prefix + Ctrl + t` | **Agent Matrix Launcher** (interactive fzf modal for 2/3/4-pane AI grids) | Active Session |

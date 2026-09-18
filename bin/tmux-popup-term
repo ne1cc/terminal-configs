@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# tmux-popup-term — Instant persistent floating scratch terminal for tmux
+# Toggle with Prefix + t, Prefix + `, Alt + `, or Alt + t
+# ==============================================================================
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+CLIENT="${1:-}"
+TARGET_PATH="${2:-$PWD}"
+SESSION_NAME="popup-term"
+
+# Store target directory so the user can easily run `cdhere` inside the popup
+USER_TMP="${TMPDIR:-/tmp}/tmux-${UID:-$(id -u)}"
+mkdir -p "$USER_TMP"
+echo "$TARGET_PATH" > "$USER_TMP/last_dir"
+
+# 1. If the popup terminal is currently open and attached to a client, close it
+if tmux list-clients -F '#{client_session}' 2>/dev/null | grep -qx "$SESSION_NAME"; then
+    tmux detach-client -s "$SESSION_NAME" 2>/dev/null || true
+    if [ -n "$CLIENT" ]; then
+        tmux display-popup -c "$CLIENT" -C 2>/dev/null || true
+    else
+        tmux display-popup -C 2>/dev/null || true
+    fi
+    exit 0
+fi
+
+# 2. If the persistent session doesn't exist yet, initialize it
+if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    tmux new-session -d -s "$SESSION_NAME" -c "$TARGET_PATH"
+    # Hide the inner status bar so the popup terminal looks like a pure, sleek floating window
+    tmux set-option -t "$SESSION_NAME" status off
+fi
+
+# 3. Build popup arguments
+POPUP_ARGS=(
+    -w "85%"
+    -h "80%"
+    -E
+    -b "rounded"
+    -S "fg=#7DF9FF"
+    -T " ⚡ Terminal Popup (Prefix+t / M-t to toggle • exit to close) "
+)
+
+if [ -n "$CLIENT" ]; then
+    POPUP_ARGS+=(-c "$CLIENT")
+fi
+
+if [ -d "$TARGET_PATH" ]; then
+    POPUP_ARGS+=(-d "$TARGET_PATH")
+fi
+
+# 4. Display the popup attaching to the persistent scratch session
+exec tmux display-popup "${POPUP_ARGS[@]}" "tmux attach-session -t $SESSION_NAME"
