@@ -2,10 +2,10 @@
 # Move a local project folder into ~/Github/archive/ with a dated path + manifest entry.
 #
 # Usage:
-#   gharchive <name>              # search explore/, workspace/, n1ecC/
+#   gharchive <name>              # search explore/, workspace/, ne1cc/
 #   gharchive /full/path/to/dir   # explicit path
 #   gharchive --list              # show archived projects
-#   gharchive --from-ne1cc <name> # archive from ne1cc/ (sync-n1ecC skips unless excluded)
+#   gharchive --from-ne1cc <name> # archive from ne1cc/ (sync-ne1cc skips unless excluded)
 
 set -euo pipefail
 
@@ -47,7 +47,7 @@ find_project() {
   done
 
   if [[ ${#candidates[@]} -eq 0 ]]; then
-    echo "ERROR: Could not find '$name' in explore/, workspace/, or n1ecC/" >&2
+    echo "ERROR: Could not find '$name' in explore/, workspace/, or ne1cc/" >&2
     return 1
   fi
 
@@ -150,12 +150,12 @@ do_archive() {
   fi
 }
 
-FROM_N1ECC=false
+FROM_NE1CC=false
 case "${1:-}" in
   -h|--help) usage 0 ;;
   --list) list_archived; exit 0 ;;
   --from-ne1cc|--from-n1ecc)
-    FROM_N1ECC=true
+    FROM_NE1CC=true
     shift
     [[ $# -eq 1 ]] || usage 1
     SRC="$(find_project "$1")"

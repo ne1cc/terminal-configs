@@ -69,7 +69,7 @@ install_template "$TEMPLATES/datasets.README.md" "$GITHUB_ROOT/workspace/dataset
 touch "$GITHUB_ROOT/_tools/archive-exclude.txt"
 
 for script in "${GITHUB_SCRIPTS[@]}"; do
-  if [[ -x "$DOTFILES/bin/$script" ]]; then
+  if [[ -e "$DOTFILES/bin/$script" ]]; then
     ln -sf "$DOTFILES/bin/$script" "$GITHUB_ROOT/_tools/$script"
     echo "  linked: _tools/$script"
     # Remove legacy duplicate scripts from before terminal-configs port.

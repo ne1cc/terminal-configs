@@ -66,12 +66,12 @@ Set in `~/.zprofile` (loaded at login):
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GITHUB_ROOT` | `$HOME/Github` | Root of your dev workspace |
-| `N1ECC_DIR` | `$GITHUB_ROOT/ne1cc` | All your GitHub repos (push from here) |
+| `NE1CC_DIR` | `$GITHUB_ROOT/ne1cc` | All your GitHub repos (push from here) |
 
 Override for one-off runs:
 
 ```bash
-N1ECC_DIR=/tmp/test ghsync-list
+NE1CC_DIR=/tmp/test ghsync-list
 ```
 
 ---

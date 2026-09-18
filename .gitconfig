@@ -47,3 +47,6 @@
 	path = ~/Github/ne1cc/.gitconfig
 [includeIf "gitdir:~/Github/n1ecC/.git"]
 	path = ~/Github/ne1cc/.gitconfig
+[rerere]
+	enabled = true
+	autoupdate = true
