@@ -123,21 +123,20 @@ Full details: [claude-code/commands/README.md](../claude-code/commands/README.md
 ## Antigravity (Gemini CLI)
 
 ### Neovim Integration (`agyy`)
-Inside Neovim, Antigravity YOLO mode is integrated via floating terminal keybindings:
-- `<Leader>ae` (Normal): Explain active file architecture & logic (`agyy -i "Explain..."`)
-- `<Leader>ae` (Visual): Explain visually selected lines
-- `<Leader>ar` (Normal): Code review for bugs & performance regressions
-- `<Leader>at` (Normal): Toggle floating interactive `agyy` terminal
-- `<Ctrl-\>` (Terminal): Hide/reveal active floating terminal
-
-
+Inside Neovim, Antigravity runs non-intrusively in the background without terminal popup interruptions:
+- `<Leader>ae` (Normal): Deeply explains active file architecture & logic in background (`docs/explanations/<relpath>.md`), opens in One Markdown.
+- `<Leader>ae` (Visual): Explains visually selected buffer lines into an isolated snippets folder (`docs/snippets/<file>_L<start>-L<end>_<timestamp>.md`) with rich metadata, opens in One Markdown.
+- `<Leader>ar` (Normal): Deep code review for bugs & performance regressions in background (`docs/reviews/<relpath>.md`), opens in One Markdown.
+- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`) generating complete mirrored explanations, Mermaid system diagram, and `INDEX.md`.
+- `<Leader>at` (Normal): Floating interactive `agyy` chat terminal (`<C-q>` or `q` / `<Esc>` to dismiss).
 
 ### Commands
 
-| Alias | Action |
-|-------|--------|
+| Alias / Command | Action |
+|-----------------|--------|
 | `agy` | Run Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Skip tool approval prompts |
+| `reposum` / `repo-summarize` | Headless batch code summarization tool (`docs/explanations/INDEX.md` + One Markdown) |
 
 ### Audit ledger
 
