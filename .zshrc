@@ -368,6 +368,7 @@ snap() {
 alias agy-yolo='agy --dangerously-skip-permissions'
 alias agyy='agy --dangerously-skip-permissions'
 alias yolo='agy --dangerously-skip-permissions'
+alias reposum='repo-summarize'
 alias glog='glow -p ~/.gemini_history.md'
 alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nord"'
 

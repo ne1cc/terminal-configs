@@ -6,8 +6,28 @@ local function get_project_root()
   return root
 end
 
-local function run_agyy_and_view(prompt, doc_path)
-  -- Create floating buffer/window natively
+-- Runs a headless background task without popping up any terminal window.
+-- Notifies the user on start and on completion, then opens the result in One Markdown.
+local function run_headless_task(cmd_str, doc_path, task_desc)
+  vim.notify("⏳ [Antigravity] " .. task_desc .. "...", vim.log.levels.INFO)
+
+  vim.fn.jobstart({ "sh", "-c", cmd_str }, {
+    detach = true,
+    on_exit = function(_, exit_code, _)
+      vim.schedule(function()
+        if exit_code == 0 and doc_path and vim.fn.filereadable(doc_path) == 1 then
+          vim.notify("✓ [Antigravity] " .. task_desc .. " complete! Opening in One Markdown...", vim.log.levels.INFO)
+          vim.fn.jobstart({ "omd", doc_path }, { detach = true })
+        elseif exit_code ~= 0 then
+          vim.notify("❌ [Antigravity] " .. task_desc .. " failed (exit code " .. exit_code .. ")", vim.log.levels.ERROR)
+        end
+      end)
+    end,
+  })
+end
+
+local function run_agyy_interactive(prompt)
+  -- Create floating buffer/window natively only when explicit interactive chat is requested
   local width = math.floor(vim.o.columns * 0.85)
   local height = math.floor(vim.o.lines * 0.8)
   local row = math.floor((vim.o.lines - height) / 2)
@@ -39,14 +59,7 @@ local function run_agyy_and_view(prompt, doc_path)
 
   -- Launch terminal job
   local cmd = string.format("agyy -i %s", vim.fn.shellescape(prompt))
-  vim.fn.termopen(cmd, {
-    on_exit = function(_, exit_code, _)
-      if doc_path and vim.fn.filereadable(doc_path) == 1 then
-        vim.notify("Explanation saved to " .. doc_path .. ". Opening in One Markdown...", vim.log.levels.INFO)
-        vim.fn.jobstart({ "omd", doc_path }, { detach = true })
-      end
-    end,
-  })
+  vim.fn.termopen(cmd)
   vim.cmd("startinsert")
 end
 
@@ -75,9 +88,10 @@ return {
                 file,
                 doc_file
               )
-              run_agyy_and_view(prompt, doc_file)
+              local cmd = string.format("agyy -p %s", vim.fn.shellescape(prompt))
+              run_headless_task(cmd, doc_file, "Explaining " .. filename)
             end,
-            desc = "Antigravity (agyy): Explain Current File -> docs/explanations/*.md & open omd",
+            desc = "Antigravity (agyy): Explain Current File (Background) -> docs/explanations/*.md & omd",
           },
           ["<leader>ar"] = {
             function()
@@ -98,13 +112,23 @@ return {
                 file,
                 doc_file
               )
-              run_agyy_and_view(prompt, doc_file)
+              local cmd = string.format("agyy -p %s", vim.fn.shellescape(prompt))
+              run_headless_task(cmd, doc_file, "Reviewing " .. filename)
             end,
-            desc = "Antigravity (agyy): Review Current File -> docs/reviews/*.md & open omd",
+            desc = "Antigravity (agyy): Review Current File (Background) -> docs/reviews/*.md & omd",
+          },
+          ["<leader>as"] = {
+            function()
+              local root = get_project_root()
+              local index_file = root .. "/docs/explanations/INDEX.md"
+              local cmd = string.format("cd %s && repo-summarize --open", vim.fn.shellescape(root))
+              run_headless_task(cmd, index_file, "Summarizing repository files")
+            end,
+            desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/explanations/INDEX.md & omd",
           },
           ["<leader>at"] = {
             function()
-              run_agyy_and_view("Chat with user", nil)
+              run_agyy_interactive("Chat with user")
             end,
             desc = "Antigravity (agyy): Interactive Terminal",
           },
@@ -128,9 +152,10 @@ return {
                 file,
                 doc_file
               )
-              run_agyy_and_view(prompt, doc_file)
+              local cmd = string.format("agyy -p %s", vim.fn.shellescape(prompt))
+              run_headless_task(cmd, doc_file, "Explaining " .. filename .. " (lines " .. start_line .. "-" .. end_line .. ")")
             end,
-            desc = "Antigravity (agyy): Explain Selection -> docs/explanations/*.md & open omd",
+            desc = "Antigravity (agyy): Explain Selection (Background) -> docs/explanations/*.md & omd",
           },
         },
       },
