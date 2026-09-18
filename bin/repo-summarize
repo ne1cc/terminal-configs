@@ -166,79 +166,94 @@ fi
 # ---------------------------------------------------------------------------
 # Smart scoring: ensures directory breadth coverage across ALL top-level dirs.
 #
+# Bash 3.2 compatible (macOS default). Uses awk for the round-robin grouping
+# instead of bash 4 associative arrays.
+#
 # Strategy:
-#   1. Score each file: entrypoints/configs = 10, tests = 80, else 50
-#   2. Group by top-level directory
-#   3. Round-robin across directories so every module gets at least one rep
-#   4. Within each group, prefer files with higher-priority names
+#   1. Emit "score<TAB>top_dir<TAB>filepath" for every candidate
+#   2. awk groups by top_dir, sorts within each group by score, then round-robins
+#      across directories so every module gets at least one representative file
+#      before any module gets a second.
 # ---------------------------------------------------------------------------
-score_file() {
+score_file_line() {
   local p="$1"
-  local base
+  local base top_dir score
   base="$(basename "$p")"
-  # Entrypoints and well-known config files
-  if [[ "$base" =~ ^(main|app|index|server|cli|setup|init|entry|CMakeLists)\.(.*)?$ ]] || \
-     [[ "$base" == "CMakeLists.txt" ]]; then
-    echo "10 $p"
-  # Test files — lower priority
-  elif [[ "$p" =~ tests?/ ]] || [[ "$base" =~ _test\. ]] || [[ "$base" =~ \.test\. ]] || \
-       [[ "$base" =~ _spec\. ]]; then
-    echo "80 $p"
+  top_dir="${p%%/*}"
+  [[ "$top_dir" == "$p" ]] && top_dir="."
+
+  if [[ "$base" == "CMakeLists.txt" ]] || \
+     [[ "$base" =~ ^(main|app|index|server|cli|setup|init|entry)\. ]]; then
+    score=10
+  elif [[ "$p" =~ tests?/ ]] || [[ "$base" =~ _test\. ]] || \
+       [[ "$base" =~ \.test\. ]] || [[ "$base" =~ _spec\. ]]; then
+    score=80
   else
-    echo "50 $p"
+    score=50
   fi
+  printf '%d\t%s\t%s\n' "$score" "$top_dir" "$p"
 }
 
-# Group scored files by their top-level directory
-declare -A DIR_BUCKETS
-for f in "${ALL_CANDIDATES[@]}"; do
-  top_dir="${f%%/*}"
-  [[ "$top_dir" == "$f" ]] && top_dir="."   # root-level file
-  score_line="$(score_file "$f")"
-  DIR_BUCKETS["$top_dir"]+="${score_line}"$'\n'
-done
-
-# Sort each bucket by score, then interleave (round-robin) across buckets
-declare -A DIR_SORTED_ARRAYS
-for dir in "${!DIR_BUCKETS[@]}"; do
-  DIR_SORTED_ARRAYS["$dir"]="$(echo "${DIR_BUCKETS[$dir]}" | sort -k1,1n -k2,2 | awk '{print $2}')"
-done
-
-# Build final ordered list via round-robin across dirs
+# Build scored list then round-robin in awk (no bash 4 / no gawk needed)
+# Approach:
+#   1. Emit "score<TAB>top_dir<TAB>filepath" lines
+#   2. sort by top_dir then score → groups are contiguous per dir
+#   3. awk picks one file per dir per pass (round-robin) using SUBSEP separator
 SORTED_FILES=()
-declare -A DIR_REMAINING
-for dir in "${!DIR_SORTED_ARRAYS[@]}"; do
-  DIR_REMAINING["$dir"]="${DIR_SORTED_ARRAYS[$dir]}"
-done
-
-max_rounds=9999
-round=0
-while [[ $round -lt $max_rounds ]]; do
-  added=0
-  for dir in $(printf '%s\n' "${!DIR_REMAINING[@]}" | sort); do
-    remaining="${DIR_REMAINING[$dir]}"
-    if [[ -z "$remaining" ]]; then
-      continue
-    fi
-    next_file="$(echo "$remaining" | head -1)"
-    rest="$(echo "$remaining" | tail -n +2)"
-    SORTED_FILES+=("$next_file")
-    DIR_REMAINING["$dir"]="$rest"
-    added=1
-  done
-  [[ $added -eq 0 ]] && break
-  (( round++ )) || true
-done
+while IFS= read -r line; do
+  [[ -n "$line" ]] && SORTED_FILES+=("$line")
+done < <(
+  for f in "${ALL_CANDIDATES[@]}"; do
+    score_file_line "$f"
+  done \
+  | sort -t$'\t' -k2,2 -k1,1n -k3,3 \
+  | awk -F'\t' '
+  {
+    dir = $2
+    file = $3
+    # Store files per-dir as SUBSEP-separated list (POSIX awk safe)
+    if (bucket[dir] == "") {
+      ndirs++
+      dir_order[ndirs] = dir
+    }
+    bucket[dir] = (bucket[dir] == "") ? file : (bucket[dir] SUBSEP file)
+  }
+  END {
+    any = 1
+    while (any) {
+      any = 0
+      # Iterate dirs in sorted order (already pre-sorted by the shell sort above)
+      for (i = 1; i <= ndirs; i++) {
+        d = dir_order[i]
+        if (bucket[d] != "") {
+          any = 1
+          pos = index(bucket[d], SUBSEP)
+          if (pos > 0) {
+            print substr(bucket[d], 1, pos - 1)
+            bucket[d] = substr(bucket[d], pos + 1)
+          } else {
+            print bucket[d]
+            bucket[d] = ""
+          }
+        }
+      }
+    }
+  }
+'
+)
 
 # Apply MAX_FILES cap only if explicitly set
-if [[ "$MAX_FILES" -gt 0 ]]; then
-  FILES_TO_PROCESS=("${SORTED_FILES[@]:0:$MAX_FILES}")
-else
-  FILES_TO_PROCESS=("${SORTED_FILES[@]}")
+FILES_TO_PROCESS=()
+if [[ ${#SORTED_FILES[@]} -gt 0 ]]; then
+  if [[ "$MAX_FILES" -gt 0 ]]; then
+    FILES_TO_PROCESS=("${SORTED_FILES[@]:0:$MAX_FILES}")
+  else
+    FILES_TO_PROCESS=("${SORTED_FILES[@]}")
+  fi
 fi
 
 echo "Discovered ${#ALL_CANDIDATES[@]} candidate files. Processing ${#FILES_TO_PROCESS[@]} for summarization:"
-for f in "${FILES_TO_PROCESS[@]}"; do
+for f in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
   echo "  • $f"
 done
 echo ""
@@ -258,7 +273,7 @@ INDEX_ENTRIES=()
 # ---------------------------------------------------------------------------
 # Per-file summarization loop
 # ---------------------------------------------------------------------------
-for rel in "${FILES_TO_PROCESS[@]}"; do
+for rel in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
   doc_rel="docs/architecture/${rel}.md"
   doc_full="$TARGET_DIR/$doc_rel"
   mkdir -p "$(dirname "$doc_full")"
@@ -321,7 +336,7 @@ echo "🏗️  Generating architectural INDEX.md (AI synthesis of all summaries)
 
 # Feed all per-file summaries into one big context for the INDEX synthesis
 ALL_SUMMARIES=""
-for rel in "${INDEX_ENTRIES[@]}"; do
+for rel in "${INDEX_ENTRIES[@]+"${INDEX_ENTRIES[@]}"}"; do
   doc_full="$TARGET_DIR/docs/architecture/${rel}.md"
   if [[ -f "$doc_full" ]]; then
     ALL_SUMMARIES+="
