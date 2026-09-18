@@ -201,7 +201,7 @@ Format in clean GitHub-Flavored Markdown.
           },
 
           -- Headless OpenWiki Execution -> openwiki/ & quickstart.md
-          ["<leader>aw"] = {
+          ["<leader>ow"] = {
             function()
               local root = get_project_root()
               local has_openwiki = vim.fn.isdirectory(root .. "/openwiki") == 1

@@ -327,7 +327,7 @@ Prefix + Ctrl + t    # pick 3-agent matrix
 OpenWiki produces structured architectural documentation (`openwiki/quickstart.md`, component guides, and interactive dependency graphs) without interrupting your editor workflow.
 
 ### 1. Headless Generation in Neovim
-- Inside any project buffer, press **`<Leader>aw`** (Normal mode).
+- Inside any project buffer, press **`<Leader>ow`** (Normal mode).
 - Runs `openwiki code --update --print` (or `--init`) in the background via Neovim's detached job engine.
 - Zero terminal popups. When finished, Neovim displays a notification toast and immediately opens `openwiki/quickstart.md` in One Markdown (`omd`).
 
@@ -338,7 +338,8 @@ OpenWiki produces structured architectural documentation (`openwiki/quickstart.m
 ### 3. Interactive Architecture Visualization
 - From terminal or tmux, run:
   ```bash
-  openwiki-viz
+  owv
+  # or: openwiki-viz
   ```
 - Starts OpenWiki's interactive dependency browser and opens it in your default browser.
 
@@ -369,7 +370,7 @@ OpenWiki produces structured architectural documentation (`openwiki/quickstart.m
 Claude:       claude  cplan  creview  cgc  cbug  cinit
 Slash:        /plan  /cook  /continue  /release  /tech-dd
 Antigravity:  agy  agyy  glog  gdiff  agya  agyih
-OpenWiki:     <Leader>aw  owv / openwiki-viz  reposum  <Leader>as
+OpenWiki:     <Leader>ow  owv / openwiki-viz  reposum  <Leader>as
 Handoff:      handoff  Prefix+Shift+H
 tmux AI:      Prefix+a  Prefix+Alt+y  Prefix+Ctrl+t
 Lazygit:      lg → Ctrl+A  C  X  Q  N  O
