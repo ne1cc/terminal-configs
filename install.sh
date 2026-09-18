@@ -29,6 +29,10 @@ fi
 "$DOTFILES/bin/link-agent-skills.sh"
 "$DOTFILES/bin/setup-github-workspace"
 
+echo "Configuring Git rerere..."
+git config --global rerere.enabled true
+git config --global rerere.autoupdate true
+
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 if [[ ! -d "$TPM_DIR" ]]; then
   echo "Installing TPM → $TPM_DIR"

@@ -1,24 +1,31 @@
 # ==============================================================================
 # ALACRITTY CONFIGURATION — TMUX + VIBRANCY OPTIMIZED
-# Managed via GNU Stow: ~/Github/terminal-configs → $HOME
-# Platform: Linux (Wayland/X11 compositor required for blur)
+# Managed via GNU Stow / Windows Hardlinks: ~/terminal-configs -> $HOME
+# Platform: Windows (DirectWrite GPU / DWM Blur) & Linux (Wayland/X11)
 # ==============================================================================
+
+# ==============================================================================
+# ENVIRONMENT
+# ==============================================================================
+[env]
+TERM = "alacritty"
+COLORTERM = "truecolor"
 
 # ==============================================================================
 # WINDOW
 # ==============================================================================
 [window]
 
-# None: removes the OS titlebar entirely on Linux — tmux status bar at top
-# acts as the window header. On macOS use "Transparent" instead.
-# Drag the window by holding Super and clicking anywhere inside it.
-decorations = "None"
+# Full: native OS decorations with titlebar.
+decorations = "Full"
 
 # No padding — tmux status bars align flush to screen edges
 padding = { x = 0, y = 0 }
+dynamic_padding = false
 
-# Give tmux full canvas immediately on launch
-startup_mode = "Maximized"
+# Launch windowed with default dimensions
+startup_mode = "Windowed"
+dimensions = { columns = 140, lines = 38 }
 
 # Let tmux own the title; suppress Alacritty's own dynamic title updates
 dynamic_title = false
@@ -39,7 +46,7 @@ dynamic_title = false
 #     blur-strength = 8;
 #     blur-background = true;
 # ---------------------------------------------------------------------------
-opacity = 0.78
+opacity = 0.88
 blur = true
 
 
@@ -59,13 +66,16 @@ multiplier = 3
 # FONT
 # ==============================================================================
 [font]
-normal  = { family = "JetBrainsMono Nerd Font", style = "Regular" }
-bold    = { family = "JetBrainsMono Nerd Font", style = "Bold" }
-italic  = { family = "JetBrainsMono Nerd Font", style = "Italic" }
-size    = 13.0
+normal      = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold        = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic      = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+bold_italic = { family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
+size        = 13.0
 
-# Slightly tighter vertical cell to match Ghostty's adjust-cell-height = 3
-offset = { x = 0, y = 1 }
+# Zero offset ensures seamless border and box-drawing lines in tmux without tearing
+offset = { x = 0, y = 0 }
+glyph_offset = { x = 0, y = 0 }
+builtin_box_drawing = true
 
 
 # ==============================================================================
@@ -140,21 +150,6 @@ white   = "#565f89"
 # ==============================================================================
 # TERMINAL / ENVIRONMENT
 # ==============================================================================
-[terminal]
-# Launch tmux on every new Alacritty window, but DON'T mirror windows.
-# Logic:
-#   * no 'main' session yet            -> create it (first window)
-#   * 'main' exists but has no client  -> reattach (you reopened after closing)
-#   * 'main' is already attached       -> spin up a NEW independent session
-# This avoids tmux's multi-client mirroring (two clients on one session share the
-# same view) while keeping 'main' persistent across restarts. Routed through a
-# login zsh so .zprofile sets PATH (linuxbrew/tmux); tmux panes source .zshrc.
-shell = { program = "zsh", args = ["-l", "-c", "if ! tmux has-session -t main 2>/dev/null; then exec tmux new-session -s main; elif [ -z \"$(tmux list-clients -t main 2>/dev/null)\" ]; then exec tmux attach -t main; else exec tmux new-session; fi"] }
-
-
-# ==============================================================================
-# SELECTION
-# ==============================================================================
 [selection]
 # Copy-on-select — selecting text immediately puts it on the system clipboard
 # (mirrors Ghostty's copy-on-select = true). Inside tmux, the tmux mouse
@@ -178,7 +173,7 @@ hide_when_typing = true
 alphabet = "jfkdls;ahgurieowpq"
 
 [[hints.enabled]]
-command         = { program = "open", args = ["{hint}"] }
+command         = "open"
 hyperlinks      = true
 post_processing = true
 persist         = false
@@ -186,13 +181,38 @@ mouse           = { enabled = true, mods = "None" }
 binding         = { key = "U", mods = "Control|Shift" }
 regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
 
+[[hints.enabled]]
+command         = "open"
+hyperlinks      = true
+post_processing = true
+persist         = false
+mouse           = { enabled = true, mods = "Control" }
+regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
+
+# ==============================================================================
+# KEYBOARD BINDINGS — FULL TMUX + TERMINAL CONFIGS PARITY
+# ==============================================================================
+
+# Shift+Return — raw escape return for Neovim / Claude / multi-line prompts
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
 chars = "\u001B\r"
 
-# Ctrl+Tab / Ctrl+Shift+Tab — explicit CSI sequences so tmux can catch them.
-# Mirrors Ghostty: keybind = ctrl+tab=esc:[27;5;9~
+# Ctrl+Space — Explicit NUL byte ensuring Tmux prefix is never swallowed
+[[keyboard.bindings]]
+key = "Space"
+mods = "Control"
+chars = "\u0000"
+
+# Ctrl+Backspace — delete word backward in shell/CLI
+[[keyboard.bindings]]
+key = "Back"
+mods = "Control"
+chars = "\u0017"
+
+# Ctrl+Tab / Ctrl+Shift+Tab — explicit CSI sequences for Tmux pane cycling
+# (Mirrors Ghostty keybind = ctrl+tab=esc:[27;5;9~)
 [[keyboard.bindings]]
 key = "Tab"
 mods = "Control"
@@ -203,7 +223,7 @@ key = "Tab"
 mods = "Control|Shift"
 chars = "\u001B[27;6;9~"
 
-# Ctrl+Shift+H / Ctrl+Shift+L — explicit CSI sequences so tmux switches windows instead of panes
+# Ctrl+Shift+H / Ctrl+Shift+L — explicit CSI sequences for Tmux window switching
 [[keyboard.bindings]]
 key = "H"
 mods = "Control|Shift"
@@ -213,3 +233,135 @@ chars = "\u001B[27;6;72~"
 key = "L"
 mods = "Control|Shift"
 chars = "\u001B[27;6;76~"
+
+# Ctrl+Shift+Left / Ctrl+Shift+Right — move / swap active window position
+[[keyboard.bindings]]
+key = "Left"
+mods = "Control|Shift"
+chars = "\u001B[1;6D"
+
+[[keyboard.bindings]]
+key = "Right"
+mods = "Control|Shift"
+chars = "\u001B[1;6C"
+
+# Shift+Left / Shift+Right — previous / next window
+[[keyboard.bindings]]
+key = "Left"
+mods = "Shift"
+chars = "\u001B[1;2D"
+
+[[keyboard.bindings]]
+key = "Right"
+mods = "Shift"
+chars = "\u001B[1;2C"
+
+# Ctrl+PageUp / Ctrl+PageDown — previous / next window
+[[keyboard.bindings]]
+key = "PageUp"
+mods = "Control"
+chars = "\u001B[5;5~"
+
+[[keyboard.bindings]]
+key = "PageDown"
+mods = "Control"
+chars = "\u001B[6;5~"
+
+# ------------------------------------------------------------------------------
+# Ergonomic Tmux Accelerators (Direct trigger without manual Prefix chord)
+# ------------------------------------------------------------------------------
+# Alt+\ or Alt+D -> Tmux vertical split (side-by-side) [mirrors Ghostty Cmd+D]
+[[keyboard.bindings]]
+key = "Backslash"
+mods = "Alt"
+chars = "\u0000|"
+
+[[keyboard.bindings]]
+key = "D"
+mods = "Alt"
+chars = "\u0000|"
+
+# Alt+- or Alt+Shift+D -> Tmux horizontal split (stacked) [mirrors Ghostty Cmd+Shift+D]
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Alt"
+chars = "\u0000-"
+
+[[keyboard.bindings]]
+key = "D"
+mods = "Alt|Shift"
+chars = "\u0000-"
+
+# Alt+z -> Tmux toggle zoom (maximize/minimize active pane)
+[[keyboard.bindings]]
+key = "Z"
+mods = "Alt"
+chars = "\u0000z"
+
+# Alt+H / Alt+J / Alt+K / Alt+L -> Direct Pane Focus (mirrors Ghostty Cmd+H/J/K/L)
+[[keyboard.bindings]]
+key = "H"
+mods = "Alt"
+chars = "\u0000h"
+
+[[keyboard.bindings]]
+key = "J"
+mods = "Alt"
+chars = "\u0000j"
+
+[[keyboard.bindings]]
+key = "K"
+mods = "Alt"
+chars = "\u0000k"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Alt"
+chars = "\u0000l"
+
+# ------------------------------------------------------------------------------
+# Native Terminal Actions (Clipboard, Zoom, Fullscreen)
+# ------------------------------------------------------------------------------
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "Equals"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Plus"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Alt"
+action = "ToggleFullscreen"
+
+[[keyboard.bindings]]
+key = "F11"
+action = "ToggleFullscreen"
