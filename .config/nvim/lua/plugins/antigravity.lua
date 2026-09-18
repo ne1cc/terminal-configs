@@ -115,6 +115,29 @@ return {
               local file_content = table.concat(buf_lines, "\n")
               local filetype = vim.bo.filetype ~= "" and vim.bo.filetype or "text"
 
+              -- Extract import/include/require/use lines for cross-referencing
+              local imports = {}
+              for _, line in ipairs(buf_lines) do
+                local s = line:match("^%s*(.-)%s*$")
+                if s:match("^#include") or s:match("^import ") or
+                   s:match("^from .+ import") or s:match("^require") or
+                   s:match("^use ") then
+                  table.insert(imports, s)
+                end
+              end
+
+              -- Build Related Files list (link if doc exists, note if not)
+              local related_lines = {}
+              for _, imp in ipairs(imports) do
+                local dep = imp:match('["\']([^"\']+)["\']') or imp:match("<([^>]+)>") or imp
+                local dep_base = dep:match("([^/]+)$") or dep
+                if vim.fn.filereadable(root .. "/docs/explanations/" .. dep .. ".md") == 1 then
+                  table.insert(related_lines, "- [" .. dep .. "](" .. dep .. ".md) ✓")
+                else
+                  table.insert(related_lines, "- `" .. dep_base .. "` *(not yet explained)*")
+                end
+              end
+
               local prompt = string.format([[
 You are a senior principal systems architect. Provide a deep, comprehensive technical explanation of the source file `%s`.
 
@@ -123,20 +146,68 @@ Source File Content:
 %s
 ```
 
+Detected imports/dependencies:
+%s
+
 Structure your explanation with:
-1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities.
+1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities within the larger project.
 2. **Architecture & Design Patterns**: Internal structure, state management, and algorithmic patterns.
 3. **Public APIs & Interfaces**: Key classes, structs, methods, parameters, return types, and contracts.
-4. **Data Flow & Dependencies**: External imports, input pipelines, transformation logic, and side effects.
+4. **Data Flow & Dependencies**: For each detected dependency above, describe what this file gets from it and how data flows between them.
 5. **Notable Edge Cases & Constraints**: Error boundaries, concurrency, and operational trade-offs.
 
 Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a single outer code block.
-]], rel_path, filetype, file_content)
+]], rel_path, filetype, file_content,
+                #imports > 0 and table.concat(imports, "\n") or "(none detected)")
 
-              run_agyy_prompt_to_file(prompt, doc_file, "Explaining " .. rel_path)
+              -- Use shared helper; after it finishes, append Related Files section
+              local doc_dir = vim.fn.fnamemodify(doc_file, ":h")
+              vim.fn.mkdir(doc_dir, "p")
+
+              local tmp_prompt = vim.fn.tempname() .. ".txt"
+              local pf = io.open(tmp_prompt, "w")
+              if not pf then
+                vim.notify("❌ [Antigravity] Failed to create temp prompt file", vim.log.levels.ERROR)
+                return
+              end
+              pf:write(prompt)
+              pf:close()
+
+              local runner_cmd = string.format(
+                "PROMPT=$(cat %s); rm -f %s; agyy -p \"$PROMPT\" > %s 2>&1",
+                vim.fn.shellescape(tmp_prompt),
+                vim.fn.shellescape(tmp_prompt),
+                vim.fn.shellescape(doc_file)
+              )
+
+              vim.notify("⏳ [Antigravity] Explaining " .. rel_path .. "...", vim.log.levels.INFO)
+              vim.fn.jobstart({ "sh", "-c", runner_cmd }, {
+                detach = true,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 and vim.fn.filereadable(doc_file) == 1 then
+                      -- Append Related Files section without a second AI call
+                      if #related_lines > 0 then
+                        local af = io.open(doc_file, "a")
+                        if af then
+                          af:write("\n\n---\n\n## Related Files\n\n")
+                          af:write(table.concat(related_lines, "\n"))
+                          af:write("\n")
+                          af:close()
+                        end
+                      end
+                      vim.notify("✓ [Antigravity] Explanation saved → " .. rel_path .. ".md", vim.log.levels.INFO)
+                      vim.fn.jobstart({ "omd", doc_file }, { detach = true })
+                    else
+                      vim.notify("❌ [Antigravity] Explanation failed (exit " .. exit_code .. ")", vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
             end,
             desc = "Antigravity (agyy): Explain Current File (Background) -> docs/explanations/<relpath>.md & omd",
           },
+
 
           -- Review Current File -> docs/reviews/<relative_path>.md
           ["<leader>ar"] = {
@@ -265,6 +336,29 @@ Format in clean GitHub-Flavored Markdown.
             end,
             desc = "Antigravity (agyy): Interactive Terminal",
           },
+
+          -- Explanation Graph Visualization -> docs/explanations/GRAPH.html
+          ["<leader>av"] = {
+            function()
+              local root = get_project_root()
+              local out = root .. "/docs/explanations/GRAPH.html"
+              vim.notify("⏳ [Antigravity] Building explanation graph (zero-cost)...", vim.log.levels.INFO)
+              vim.fn.jobstart({ "sh", "-c", "explain-viz --open " .. vim.fn.shellescape(root) }, {
+                detach = true,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 then
+                      vim.notify("✓ [Antigravity] Graph → " .. out, vim.log.levels.INFO)
+                    else
+                      vim.notify("❌ [Antigravity] explain-viz failed (exit " .. exit_code .. ")", vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
+            end,
+            desc = "Antigravity: Visualize docs/explanations/ as D3 graph -> GRAPH.html (zero AI cost)",
+          },
+
         },
 
         v = {
