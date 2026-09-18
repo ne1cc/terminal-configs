@@ -306,10 +306,6 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `ghr [repo]` | List or `cd` into a specific ne1cc repo (alias for `ghn`) |
 | `ghroot` | `cd ~/Github` |
 | `ghex` / `ghws` / `ghcfg` | `cd` explore / workspace / config |
-| `gho` | `cd ~/Github/ne1cc/olist-lakehouse` |
-| `ghab` | `cd ~/Github/ne1cc/ab-testing-dagster` |
-| `ghdhs` | `cd ~/Github/ne1cc/dhs-stunting-pipeline` |
-| `ghtk` | `cd ~/Github/ne1cc/ticker-change` |
 | `ghsync` | Clone missing + pull all ne1cc repos (`sync-ne1cc`) |
 | `ghsync-list` | Show local clone status and dirty repos |
 | `ghsync-pull` | Pull existing ne1cc repos only |

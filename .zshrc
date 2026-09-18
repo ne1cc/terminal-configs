@@ -576,12 +576,6 @@ alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-ne1cc" --pull'
 alias ghpin='"$GITHUB_ROOT/_tools/pin-portfolio"'
 alias ghar='"$GITHUB_ROOT/_tools/gharchive"'
 
-# Portfolio repo quick-jumps
-alias gho='cd "$NE1CC_DIR/olist-lakehouse"'
-alias ghab='cd "$NE1CC_DIR/ab-testing-dagster"'
-alias ghdhs='cd "$NE1CC_DIR/dhs-stunting-pipeline"'
-alias ghtk='cd "$NE1CC_DIR/ticker-change"'
-
 # CareerOps Recruiting Workbench quick-jump
 rc() {
   cd "/Users/alex/Documents/Recruiting" || return 1
