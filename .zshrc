@@ -684,13 +684,9 @@ wt-tmux-attach() {
   tmux new-window -c "$dir" -n "$name" "zsh -ic 'claude --name $name; exec zsh'"
 }
 
-# wt-rm [branch] — remove a worktree (fzf picker if no arg)
+# wt-rm [branch] — remove a worktree (delegates to wmr picker & pruner)
 wt-rm() {
-  local branch=${1:-$(git worktree list 2>/dev/null | tail -n +2 \
-    | fzf --height=50% --reverse --prompt="remove> " | awk '{print $NF}' | tr -d '[]')}
-  [[ -z "$branch" ]] && return 0
-  local dir; dir=$(git worktree list | awk -v b="[$branch]" '$NF==b {print $1}')
-  git worktree remove --force "$dir" && git branch -d "$branch"
+  wmr "$@"
 }
 
 # ==============================================================================
@@ -1305,3 +1301,64 @@ wmo() {
     [ -n "$b" ] && workmux open "$b"
   fi
 }
+
+unalias wmr 2>/dev/null || true
+unalias wmrm 2>/dev/null || true
+wmr() {
+  if [ $# -gt 0 ]; then
+    workmux remove "$@" && git worktree prune
+    return
+  fi
+
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: Not inside a git repository." >&2
+    return 1
+  fi
+
+  local main_info main_branch main_path
+  main_info=$(git worktree list | head -n 1)
+  main_path=$(echo "$main_info" | awk '{print $1}')
+  main_branch=$(echo "$main_info" | sed -E 's/.*\[(.*)\].*/\1/')
+
+  local wt_list
+  wt_list=$(workmux list 2>/dev/null | awk -v mb="$main_branch" 'NR==1 || ($1 != mb && $1 != "")')
+
+  local count
+  count=$(echo "$wt_list" | tail -n +2 | wc -l | tr -d ' ')
+  if [ "$count" -eq 0 ]; then
+    echo "No removable worktrees found."
+    return 0
+  fi
+
+  local fzf_out
+  fzf_out=$(echo "$wt_list" | fzf -m \
+    --header-lines=1 \
+    --prompt="Select worktree(s) to remove > " \
+    --header="TAB: multi-select | ENTER: confirm removal | ESC: cancel" \
+    --reverse)
+
+  [ -z "$fzf_out" ] && return 0
+
+  local -a selected
+  selected=("${(@f)$(echo "$fzf_out" | awk '{print $1}')}")
+  [ ${#selected[@]} -eq 0 ] && return 0
+
+  # If currently inside one of the target worktrees, navigate back to repo root
+  local cur_dir wt_path wt_real
+  cur_dir=$(pwd -P)
+  for b in "${selected[@]}"; do
+    wt_path=$(workmux path "$b" 2>/dev/null || true)
+    if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+      wt_real=$(cd "$wt_path" 2>/dev/null && pwd -P || echo "$wt_path")
+      if [[ "$cur_dir" == "$wt_real"* ]]; then
+        cd "$main_path"
+        break
+      fi
+    fi
+  done
+
+  echo "Removing worktree(s): ${selected[*]}"
+  workmux remove "${selected[@]}" && git worktree prune
+}
+alias wmrm=wmr
+
