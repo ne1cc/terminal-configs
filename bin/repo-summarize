@@ -195,11 +195,16 @@ if ! command -v agyy >/dev/null 2>&1; then
 fi
 
 INDEX_ENTRIES=()
+MERMAID_ENTRIES=()
 
 for rel in "${FILES_TO_PROCESS[@]}"; do
   doc_rel="docs/explanations/${rel}.md"
   doc_full="$TARGET_DIR/$doc_rel"
   mkdir -p "$(dirname "$doc_full")"
+
+  ext="${rel##*.}"
+  base_clean="$(basename "$rel" | tr '.' '_' | tr '-' '_')"
+  MERMAID_ENTRIES+=("    $base_clean[\"$rel\"]")
 
   if [[ -f "$doc_full" && "$FORCE" != "true" ]]; then
     echo "⏩ Skip: $rel (already exists: $doc_rel)"
@@ -208,18 +213,31 @@ for rel in "${FILES_TO_PROCESS[@]}"; do
   fi
 
   echo "🧠 Summarizing: $rel -> $doc_rel ..."
-  
-  PROMPT="You are a senior systems architect. Provide a clear, thorough technical explanation of the source file '$rel' from repository '$REPO_NAME'.
-Structure your response with:
-1. **Purpose & Responsibilities**: What role does this file play in the project?
-2. **Architecture & Design**: How is the logic structured? Core patterns used?
-3. **Public APIs, Classes & Functions**: Key exported interfaces with parameter/return types.
-4. **Data Flow & Dependencies**: What does it import, process, and output?
-5. **Notable Edge Cases & Implementation Details**: Key quirks, concurrency, or performance considerations.
 
-Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire output in a top-level code block."
+  # Read file content safely
+  file_content="$(cat "$TARGET_DIR/$rel" 2>/dev/null || true)"
 
-  RESPONSE=$(agyy -p "$PROMPT" < "$TARGET_DIR/$rel" 2>/dev/null || agyy -p "$PROMPT (File content attached at: $TARGET_DIR/$rel)")
+  tmp_prompt="$(mktemp /tmp/agyy_prompt.XXXXXX)"
+  cat << EOF > "$tmp_prompt"
+You are a senior principal systems architect. Provide a deep, comprehensive technical explanation of the source file '$rel' from repository '$REPO_NAME'.
+
+Source File Content:
+\`\`\`$ext
+$file_content
+\`\`\`
+
+Structure your explanation with:
+1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities.
+2. **Architecture & Design Patterns**: Internal structure, state management, and algorithmic patterns.
+3. **Public APIs & Interfaces**: Key classes, structs, methods, parameters, return types, and contracts.
+4. **Data Flow & Dependencies**: External imports, input pipelines, transformation logic, and side effects.
+5. **Notable Edge Cases & Constraints**: Error boundaries, concurrency, and operational trade-offs.
+
+Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a single outer code block.
+EOF
+
+  RESPONSE="$(agyy -p "$(cat "$tmp_prompt")" 2>/dev/null || agyy -p "Explain architecture of $rel")"
+  rm -f "$tmp_prompt"
 
   cat << EOF > "$doc_full"
 # Architecture & Code Explanation: \`$rel\`
@@ -237,13 +255,22 @@ EOF
   echo "  ✓ Saved: $doc_rel"
 done
 
-# Generate Master INDEX.md
+# Generate Master INDEX.md with Mermaid Diagram
 cat << EOF > "$INDEX_FILE"
 # $REPO_NAME — Repository Architecture & File Explanations
 
 > Generated on $(date +"%Y-%m-%d %H:%M:%S") using [Antigravity \`agyy\`](https://github.com/ne1cc/terminal-configs)
 
-## Documented Files
+## 🗺️ System Map
+
+\`\`\`mermaid
+flowchart TD
+    subgraph Repo ["$REPO_NAME Modules"]
+$(printf '%s\n' "${MERMAID_ENTRIES[@]}")
+    end
+\`\`\`
+
+## 📚 Documented Files
 
 EOF
 

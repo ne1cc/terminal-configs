@@ -124,10 +124,10 @@ Full details: [claude-code/commands/README.md](../claude-code/commands/README.md
 
 ### Neovim Integration (`agyy`)
 Inside Neovim, Antigravity runs non-intrusively in the background without terminal popup interruptions:
-- `<Leader>ae` (Normal): Explain active file architecture & logic in background (`docs/explanations/<filename>.md`), opens in One Markdown.
-- `<Leader>ae` (Visual): Explain visually selected lines in background (`docs/explanations/<filename>_lines_X-Y.md`), opens in One Markdown.
-- `<Leader>ar` (Normal): Code review for bugs & performance regressions in background (`docs/reviews/<filename>.md`), opens in One Markdown.
-- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`) generating complete explanations and `INDEX.md`.
+- `<Leader>ae` (Normal): Deeply explains active file architecture & logic in background (`docs/explanations/<relpath>.md`), opens in One Markdown.
+- `<Leader>ae` (Visual): Explains visually selected buffer lines into an isolated snippets folder (`docs/snippets/<file>_L<start>-L<end>_<timestamp>.md`) with rich metadata, opens in One Markdown.
+- `<Leader>ar` (Normal): Deep code review for bugs & performance regressions in background (`docs/reviews/<relpath>.md`), opens in One Markdown.
+- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`) generating complete mirrored explanations, Mermaid system diagram, and `INDEX.md`.
 - `<Leader>at` (Normal): Floating interactive `agyy` chat terminal (`<C-q>` or `q` / `<Esc>` to dismiss).
 
 ### Commands
