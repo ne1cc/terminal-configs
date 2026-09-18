@@ -122,6 +122,16 @@ Full details: [claude-code/commands/README.md](../claude-code/commands/README.md
 
 ## Antigravity (Gemini CLI)
 
+### Neovim Integration (`agyy`)
+Inside Neovim, Antigravity YOLO mode is integrated via floating terminal keybindings:
+- `<Leader>ae` (Normal): Explain active file architecture & logic (`agyy -i "Explain..."`)
+- `<Leader>ae` (Visual): Explain visually selected lines
+- `<Leader>ar` (Normal): Code review for bugs & performance regressions
+- `<Leader>at` (Normal): Toggle floating interactive `agyy` terminal
+- `<Ctrl-\>` (Terminal): Hide/reveal active floating terminal
+
+
+
 ### Commands
 
 | Alias | Action |

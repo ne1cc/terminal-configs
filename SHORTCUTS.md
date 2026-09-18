@@ -390,7 +390,17 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>gB` | Normal | Open Fugitive git blame window (`:Git blame`) |
 | `<Leader>gP` | Normal | Push commits via Fugitive (`:Git push`) |
 
-### D. Markdown, Media, Images & PDFs
+### D. Antigravity AI (`agyy`) Assistant
+| Keybinding | Mode | Action |
+|---|---|---|
+| `<Leader>ae` | Normal | **Explain Current File**: Spawns floating `agyy` to explain active buffer; saves report to `docs/explanations/<filename>.md` and opens in One Markdown (`omd`) |
+| `<Leader>ae` | Visual | **Explain Selection**: Spawns floating `agyy` to explain highlighted lines; saves to `docs/explanations/<filename>_lines_<start>-<end>.md` and opens in `omd` |
+| `<Leader>ar` | Normal | **Review File**: Spawns floating `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<filename>.md` and opens in `omd` |
+| `<Leader>at` | Normal | **Floating Terminal**: Spawns floating interactive Antigravity (`agyy`) session |
+| `<C-q>` | Terminal | **Close Floating Window**: Instantly dismiss active Antigravity terminal overlay |
+| `q` / `<Esc>` | Normal | **Close Floating Window**: Dismiss active Antigravity terminal buffer |
+
+### E. Markdown, Media, Images & PDFs
 | Keybinding | Mode | Action |
 |---|---|---|
 | `<Leader>p` / `<Leader>pi` | Normal | **Paste image from clipboard** directly into Markdown (`img-clip.nvim`) |
@@ -412,14 +422,14 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `j` / `]i` | Normal (Image buffer) | View next image in folder gallery |
 | `k` / `[i` | Normal (Image buffer) | View previous image in folder gallery |
 
-### E. Neo-tree Sidebar Shortcuts
+### F. Neo-tree Sidebar Shortcuts
 | Keybinding | Context | Action |
 |---|---|---|
 | `<CR>` / `o` | Neo-tree | Open file or expand directory |
 | `P` | Neo-tree | Toggle floating preview of file under cursor |
 | `M` | Neo-tree | Open highlighted PDF directly in **MuPDF** |
 
-### F. Insert / Command Mode Line Editing
+### G. Insert / Command Mode Line Editing
 | Keybinding | Mode | Action |
 |---|---|---|
 | `Alt + K` | Insert / Command | Cut text from cursor to end of line into clipboard (`<C-o>d$`) |
