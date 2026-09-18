@@ -138,8 +138,25 @@ return {
                 end
               end
 
+              -- Load or reuse cached project overview to give AI repo context without wasting tokens
+              local project_overview = ""
+              local overview_candidates = { "AGENTS.md", "CLAUDE.md", "README.md" }
+              for _, candidate in ipairs(overview_candidates) do
+                local candidate_path = root .. "/" .. candidate
+                if vim.fn.filereadable(candidate_path) == 1 then
+                  local lines = vim.fn.readfile(candidate_path, "", 40) -- Read only the top 40 lines (overview & architecture)
+                  project_overview = table.concat(lines, "\n")
+                  break
+                end
+              end
+
               local prompt = string.format([[
 You are a senior principal systems architect. Provide a deep, comprehensive technical explanation of the source file `%s`.
+
+Repository Context (Target Repo: %s):
+```markdown
+%s
+```
 
 Source File Content:
 ```%s
@@ -150,14 +167,14 @@ Detected imports/dependencies:
 %s
 
 Structure your explanation with:
-1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities within the larger project.
+1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities within this repository architecture.
 2. **Architecture & Design Patterns**: Internal structure, state management, and algorithmic patterns.
 3. **Public APIs & Interfaces**: Key classes, structs, methods, parameters, return types, and contracts.
 4. **Data Flow & Dependencies**: For each detected dependency above, describe what this file gets from it and how data flows between them.
 5. **Notable Edge Cases & Constraints**: Error boundaries, concurrency, and operational trade-offs.
 
 Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a single outer code block.
-]], rel_path, filetype, file_content,
+]], rel_path, vim.fn.fnamemodify(root, ":t"), project_overview ~= "" and project_overview or "(Project root: " .. root .. ")", filetype, file_content,
                 #imports > 0 and table.concat(imports, "\n") or "(none detected)")
 
               -- Use shared helper; after it finishes, append Related Files section
