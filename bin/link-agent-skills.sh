@@ -95,14 +95,9 @@ if [[ -f "$REPO_DIR/.gemini/hooks.json" ]]; then
   printf '  linked hooks.json (~/.gemini/config/hooks.json)\n'
 fi
 
-# Ensure workmux does not prompt to install broken Antigravity lifecycle hooks
-mkdir -p "$HOME/.local/state/workmux"
+# Remove legacy declined setting so workmux tracks Antigravity status cleanly
 if [[ -f "$HOME/.local/state/workmux/setup.json" ]]; then
-  if ! grep -q '"agy"' "$HOME/.local/state/workmux/setup.json" 2>/dev/null; then
-    printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
-  fi
-else
-  printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
+  rm -f "$HOME/.local/state/workmux/setup.json"
 fi
 
 # ── Codex: link global AGENTS.md from repo (or bootstrap) ───────────────────
