@@ -212,9 +212,9 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | Command / Alias | Action / Purpose |
 |---|---|
 | `wm` / `wmux` | Base command for `workmux` (or `wmux <branch>` to create worktree directly) |
-| `wma <branch>` | **Workmux Add**: Create worktree branch, tmux window, and copy/symlink configs |
-| `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and immediately inject prompt into agent |
-| `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM and launch agent |
+| `wma <branch>` | **Workmux Add**: Create worktree branch without opening tmux windows/terminals |
+| `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and store prompt file |
+| `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM |
 | `wmo [branch]` | **Workmux Open**: Open/switch to worktree window (fuzzy-picks via `fzf` if branch omitted!) |
 | `wml` / `wmls` | **Workmux List**: List all active worktrees with agent status and branch diffs |
 | `wmm` | **Workmux Merge**: Merge current worktree branch into main and clean up window/directory |
