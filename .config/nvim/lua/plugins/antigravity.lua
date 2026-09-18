@@ -41,7 +41,7 @@ local function run_agyy_interactive(prompt)
     row = row,
     col = col,
     style = "minimal",
-    border = "curved",
+    border = "rounded",
     title = " Antigravity (agyy) ",
     title_pos = "center",
   })
