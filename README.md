@@ -1,41 +1,41 @@
-# 🖥️ macOS / Linux Terminal Configs & Dotfiles
+# macOS, Linux, and WSL Terminal Configs
 
 A premium, curated repository for my complete terminal environment, shell configuration, terminal multiplexer (tmux), GPU-accelerated terminal emulators (Ghostty & Alacritty), file manager (Yazi), Git TUI (Lazygit), and Neovim development environment.
 
 ---
 
-## 📖 Master Guides & Documentation
+## Master Guides and Documentation
 
 **Start here:** **[docs/README.md](docs/README.md)** — documentation hub with all workflow guides.
 
 ### Setup & GitHub
-* 🗂️ **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Bootstrap macOS, Linux, WSL
-* 🔗 **[Github Aliases Guide](docs/GITHUB_ALIASES_GUIDE.md)** — `ghsync`, `ghn`, `ghr`, archive, pins
+* **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Bootstrap macOS, Linux, WSL
+* **[Github Aliases Guide](docs/GITHUB_ALIASES_GUIDE.md)** — `ghsync`, `ghn`, `ghr`, archive, pins
 
 ### Terminal & shell
-* 🖥️ **[tmux Workflow Guide](docs/TMUX_WORKFLOW_GUIDE.md)** — Layouts, palette, AI panes, sessionizer
-* 🐚 **[Zsh & Git Workflow Guide](docs/ZSH_GIT_WORKFLOW_GUIDE.md)** — Git power moves, FZF, clipboard, worktrees
-* ⚡ **[Modern CLI Guide](docs/MODERN_CLI_GUIDE.md)** — Eza, Bat, Zoxide, Delta, Direnv
-* 🪟 **[Terminal Emulators Guide](docs/TERMINAL_EMULATORS_GUIDE.md)** — Ghostty, Alacritty, Karabiner
+* **[tmux Workflow Guide](docs/TMUX_WORKFLOW_GUIDE.md)** — Layouts, palette, AI panes, sessionizer
+* **[Zsh and Git Workflow Guide](docs/ZSH_GIT_WORKFLOW_GUIDE.md)** — Git power moves, FZF, clipboard, worktrees
+* **[Modern CLI Guide](docs/MODERN_CLI_GUIDE.md)** — Eza, Bat, Zoxide, Delta, Direnv
+* **[Terminal Emulators Guide](docs/TERMINAL_EMULATORS_GUIDE.md)** — Ghostty, Alacritty, Karabiner
 
 ### Editors & tools
-* ✍️ **[Neovim Guide](docs/NEOVIM_GUIDE.md)** — Overview + integrations
-* 📖 **[10X Neovim Session](docs/10X_NEOVIM_SESSION.md)** — Find code, trace bugs, edit fast
-* 🩺 **[LSP Shortcuts](docs/LSP_SHORTCUTS.md)** — Navigation, diagnostics, rename
-* 🐙 **[Lazygit Guide](docs/LAZYGIT_GUIDE.md)** — Git TUI + AI commit/review
-* 📁 **[Yazi Guide](docs/YAZI_GUIDE.md)** — Terminal file manager
+* **[Neovim Guide](docs/NEOVIM_GUIDE.md)** — Overview and integrations
+* **[10X Neovim Session](docs/10X_NEOVIM_SESSION.md)** — Find code, trace bugs, edit fast
+* **[LSP Shortcuts](docs/LSP_SHORTCUTS.md)** — Navigation, diagnostics, rename
+* **[Lazygit Guide](docs/LAZYGIT_GUIDE.md)** — Git TUI and AI commit/review
+* **[Yazi Guide](docs/YAZI_GUIDE.md)** — Terminal file manager
 
 ### AI & productivity
-* 🤖 **[AI Workflow Guide](docs/AI_WORKFLOW_GUIDE.md)** — Claude Code, Antigravity, handoffs, agent matrix
-* ✅ **[Taskwarrior Guide](docs/TASKWARRIOR_GUIDE.md)** — Task tracking + git hooks
+* **[AI Workflow Guide](docs/AI_WORKFLOW_GUIDE.md)** — Claude Code, Antigravity, handoffs, agent matrix
+* **[Taskwarrior Guide](docs/TASKWARRIOR_GUIDE.md)** — Task tracking and git hooks
 
 ### Quick reference (cheatsheets)
-* 🚀 **[Master Cheatsheet](SHORTCUTS.md)** — Every keybinding and alias in one file
-* 🗂️ **[tmux Shortcuts](TMUX_SHORTCUTS.md)** — Full tmux binding tables
+* **[Master Cheatsheet](SHORTCUTS.md)** — Every keybinding and alias in one file
+* **[tmux Shortcuts](TMUX_SHORTCUTS.md)** — Full tmux binding tables
 
 ---
 
-## 📦 What's Included
+## What's Included
 
 ```
 terminal-configs/
@@ -47,14 +47,14 @@ terminal-configs/
 │   ├── nvim/            # Complete Neovim environment (AstroNvim-based)
 │   ├── yazi/            # Yazi terminal file manager config & plugins
 │   └── starship.toml    # Cross-shell Starship prompt configuration
-├── bin/                 # Custom CLI binaries (tmux-sessionizer, snapshot utilities)
+├── bin/                 # Custom CLI binaries, including repo-summarize
 ├── claude-code/
 │   ├── CLAUDE.md        # Unified global instructions (merged MSTSPAT standards)
 │   └── commands/        # Custom slash commands (/plan, /cook, /continue, /release)
 ├── .gemini/
 │   ├── GEMINI.md        # Global Markdown and typography rules
 │   └── skills/          # Complete suite of Antigravity AI skills (100+ specialized agents)
-├── docs/                # Specialized workflow and shortcut guides
+├── docs/                # Workflow guides, explanations, reviews, and snippets
 ├── .inputrc             # GNU Readline keybindings
 ├── .p10k.zsh            # Powerlevel10k prompt settings
 ├── .tmux.conf           # tmux prefix binds, mouse copy, popups, & stashing
@@ -68,7 +68,7 @@ terminal-configs/
 
 ---
 
-## 🚀 Migration & Quick Start
+## Migration and Quick Start
 
 Follow these steps to fully restore your environment on a fresh machine.
 
@@ -106,25 +106,27 @@ To restore packages automatically as part of setup:
 
 ---
 
-## 🛠️ Configuration Details
+## Configuration Details
 
-### 🐚 Zsh (`.zshrc` & `.p10k.zsh`)
+### Zsh (`.zshrc` and `.p10k.zsh`)
 * Integrates **Powerlevel10k** and **Oh My Zsh**.
 * **Github workspace aliases:** `ghn`, `ghr`, `ghsync`, `ghar`, `ghpin`. See [SHORTCUTS.md § H](SHORTCUTS.md).
 * Includes developer workflow utilities: `groot`, `gwip`, `copylast`, `port`, `killport`, `serve`, `fkill`, `fo`.
 * Antigravity AI audit ledger previewers (`glog`, `gdiff`, `agya`, `agyih`).
 
-### 🗂️ Tmux (`.tmux.conf`)
+### Tmux (`.tmux.conf`)
 * Remaps prefix key to `Ctrl + Space`.
 * Seamless pane navigation with Neovim (`Ctrl + h/j/k/l`).
 * Interactive fuzzy popups for sessionizer, windows, panes, and stashed scratchpads (`Prefix + s/w/e/f`).
 * Floating Lazygit modal (`Prefix + Ctrl + g`) and Claude assistants.
 
-### ✍️ Neovim (`.config/nvim`)
+### Neovim (`.config/nvim`)
 * Customized AstroNvim structure with Tokyo Night theme.
 * Inline image rendering (`3rd/image.nvim` + `img-clip.nvim`), PDF viewing (`MuPDF`), and FzfLua picker.
+* Antigravity (`agyy`) integrations for background file explanations, code reviews, visual selections, and repository summaries. Results open in One Markdown under `docs/explanations/`, `docs/reviews/`, or `docs/snippets/`.
+* `<Leader>as` runs the headless `repo-summarize` workflow and writes a mirrored explanation index at `docs/explanations/INDEX.md`.
 
-### 🤖 Claude Code Workflows (Configuration as Code)
+### Claude Code Workflows (Configuration as Code)
 * Integrates a version-controlled global [CLAUDE.md](claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.
 * Custom global slash commands in [commands/](claude-code/commands/) symlinked to `~/.claude/commands/` for use in any project:
   * `/plan` — Strategic Planning: Discovers requirements, mapping dependencies, and creating/updating the `TODO.md` roadmap.
@@ -136,7 +138,7 @@ To restore packages automatically as part of setup:
 
 ---
 
-## ⚡ Master Shortcuts & Cheatsheet
+## Master Shortcuts and Cheatsheet
 
 A complete reference for every configured keyboard shortcut, alias, and shell function. Also available standalone at [SHORTCUTS.md](SHORTCUTS.md).
 
