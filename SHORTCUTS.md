@@ -379,9 +379,12 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ff` | Normal | Find Files (FzfLua) |
 | `<Leader>fg` | Normal | Live Grep / Ripgrep (FzfLua) |
 | `<Leader>fb` | Normal | List and switch open buffers |
+| `<Leader>fn` | Normal | **Find Notifications / Notification History** (`Snacks.notifier`) |
 | `<Leader>fh` | Normal | Search Neovim help tags |
 | `<Leader>fs` | Normal | Search LSP document symbols |
 | `<Leader>fr` | Normal | Search LSP references |
+| `<Leader>uh` | Normal | **Show Notification History** (`Snacks.notifier.show_history()`) |
+| `<Leader>uH` | Normal | **Dismiss All Active Notifications** (`Snacks.notifier.hide()`) |
 | `Ctrl + q` | Fzf Modal | Select all items & populate quickfix list |
 
 ### C. Git & Lazygit Integration
