@@ -1,2 +1,2 @@
-# n1ecC repo names to skip when running sync-n1ecC (archived locally via ghar --from-n1ecc)
+# ne1cc repo names to skip when running sync-ne1cc (archived locally via ghar --from-ne1cc)
 # One repo name per line. Lines starting with # are ignored.

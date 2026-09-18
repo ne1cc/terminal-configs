@@ -11,7 +11,7 @@ Git TUI with Tokyo Night theme, Delta diffs, AI-assisted commits, and GitHub CLI
 ## Quick start
 
 ```bash
-cd ~/Github/n1ecC/olist-lakehouse
+cd ~/Github/ne1cc/olist-lakehouse
 lg
 ```
 

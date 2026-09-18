@@ -8,9 +8,9 @@
 #   - Font installation on the Windows side
 #
 # Usage:
-#   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/n1ecC/terminal-configs
-#   bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
+#   git clone https://github.com/ne1cc/terminal-configs.git \
+#       ~/Github/ne1cc/terminal-configs
+#   bash ~/Github/ne1cc/terminal-configs/bin/wsl-bootstrap.sh
 # ==============================================================================
 
 set -e

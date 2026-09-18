@@ -7,11 +7,11 @@
 #   gh-ns-promote /path/to/project
 #   gh-ns-promote --name my-repo
 #   gh-ns-promote --public
-#   gh-ns-promote --owner n1ecC
+#   gh-ns-promote --owner ne1cc
 set -euo pipefail
 
 GITHUB_ROOT="${GITHUB_ROOT:-$HOME/Github}"
-OWNER="${GH_NS_OWNER:-n1ecC}"
+OWNER="${GH_NS_OWNER:-ne1cc}"
 VISIBILITY="--private"
 NAME=""
 SRC=""
@@ -94,7 +94,7 @@ if [[ -n "$existing_url" ]]; then
       ;;
   esac
 else
-  # Resolve GitHub owner (handles case or alias differences like n1ecC vs ne1cc)
+  # Resolve GitHub owner (handles case or alias differences like ne1cc vs ne1cc)
   gh_owner="$OWNER"
   auth_user=$(gh api user -q .login 2>/dev/null || true)
   if ! gh user view "$gh_owner" >/dev/null 2>&1 && [[ -n "$auth_user" ]]; then

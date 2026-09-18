@@ -39,10 +39,10 @@
 	cm = commit -m
 
 # Namespace identities (GitHub-mirror layout under ~/Github/<owner>/)
-[includeIf "gitdir:~/Github/n1ecC/"]
-	path = ~/Github/n1ecC/.gitconfig
-[includeIf "gitdir:~/Github/n1ecC/.git"]
-	path = ~/Github/n1ecC/.gitconfig
+[includeIf "gitdir:~/Github/ne1cc/"]
+	path = ~/Github/ne1cc/.gitconfig
+[includeIf "gitdir:~/Github/ne1cc/.git"]
+	path = ~/Github/ne1cc/.gitconfig
 [rerere]
 	enabled = true
 	autoupdate = true
