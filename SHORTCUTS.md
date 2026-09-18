@@ -183,7 +183,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `agy` | Run Google Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Run Antigravity bypassing tool approval prompts (`--dangerously-skip-permissions`) |
 | `reposum` / `repo-summarize` | Headless batch code summarization tool; writes explanations to `docs/explanations/*.md` and opens `INDEX.md` in One Markdown |
-| `openwiki-viz` | Launches interactive OpenWiki dependency graph and architecture visualization |
+| `owv` / `openwiki-viz` | Launches interactive OpenWiki dependency graph and architecture visualization |
 | `glog` | Markdown preview of the Antigravity audit ledger (`~/.gemini_history.md`) |
 | `gdiff` | Side-by-side syntax-highlighted diff of Antigravity session history |
 | `agya` | Export, render, and preview the latest Antigravity session audit report |

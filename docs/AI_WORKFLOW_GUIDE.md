@@ -369,7 +369,7 @@ OpenWiki produces structured architectural documentation (`openwiki/quickstart.m
 Claude:       claude  cplan  creview  cgc  cbug  cinit
 Slash:        /plan  /cook  /continue  /release  /tech-dd
 Antigravity:  agy  agyy  glog  gdiff  agya  agyih
-OpenWiki:     <Leader>aw  openwiki-viz  reposum  <Leader>as
+OpenWiki:     <Leader>aw  owv / openwiki-viz  reposum  <Leader>as
 Handoff:      handoff  Prefix+Shift+H
 tmux AI:      Prefix+a  Prefix+Alt+y  Prefix+Ctrl+t
 Lazygit:      lg → Ctrl+A  C  X  Q  N  O
