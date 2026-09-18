@@ -303,6 +303,40 @@ Format in clean GitHub-Flavored Markdown.
             desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/architecture/INDEX.md & omd",
           },
 
+
+          -- Check Repo Summarization Progress
+          ["<leader>aS"] = {
+            function()
+              local root = get_project_root()
+              local progress_file = root .. "/docs/architecture/.progress.json"
+              if vim.fn.filereadable(progress_file) == 1 then
+                local lines = vim.fn.readfile(progress_file)
+                local json_str = table.concat(lines, "\n")
+                local ok, data = pcall(vim.json.decode, json_str)
+                if ok and data then
+                  local msg = string.format(
+                    "📊 [Antigravity Progress] %d / %d files (%d%%)\nStatus: %s\nCurrent: %s\nUpdated: %s",
+                    data.processed or 0,
+                    data.total_files or 0,
+                    data.percent or 0,
+                    data.status or "unknown",
+                    data.current_file or "none",
+                    data.updated_at or ""
+                  )
+                  vim.notify(msg, vim.log.levels.INFO, { title = "Repo Summarizer" })
+                  return
+                end
+              end
+
+              -- Fallback: count markdown files in docs/architecture
+              local existing = vim.fn.globpath(root .. "/docs/architecture", "**/*.md", false, true)
+              local count = #existing
+              vim.notify(string.format("ℹ️ [Antigravity] No active progress file. Found %d generated architecture doc(s).", count), vim.log.levels.INFO)
+            end,
+            desc = "Antigravity (agyy): Check Repo Summarization Progress",
+          },
+
+
           -- Headless OpenWiki Execution -> openwiki/ & quickstart.md
           ["<leader>ow"] = {
             function()

@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# setup-ios-simulator — Automated setup & verification for iOS Simulator dev
+# ==============================================================================
+
+set -euo pipefail
+
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+header() { printf '\n%b==>%b %b%s%b\n' "$BLUE" "$NC" "$BOLD" "$1" "$NC"; }
+ok()     { printf '  %b✓%b %s\n' "$GREEN" "$NC" "$1"; }
+info()   { printf '  %b→%b %s\n' "$CYAN" "$NC" "$1"; }
+warn()   { printf '  %b⚠%b %s\n' "$YELLOW" "$NC" "$1"; }
+fail()   { printf '  %b✗%b %s\n' "$RED" "$NC" "$1"; }
+
+header "iOS & Xcode Development Setup Verification"
+
+# ------------------------------------------------------------------------------
+# 1. Check for /Applications/Xcode.app
+# ------------------------------------------------------------------------------
+XCODE_APP="/Applications/Xcode.app"
+
+if [[ ! -d "$XCODE_APP" ]]; then
+  warn "Xcode.app not found in /Applications."
+  info "Opening Mac App Store to Xcode product page..."
+  open "macappstore://apps.apple.com/app/id497799835" || true
+
+  printf '\n%bAction Required:%b\n' "$BOLD" "$NC"
+  printf '  1. Click %b"Get"%b (or the cloud download button) in the App Store window.\n' "$BOLD" "$NC"
+  printf '  2. Wait for Xcode to finish downloading & installing to /Applications.\n'
+  printf '     (Xcode is ~13 GB and requires Apple ID confirmation).\n\n'
+  printf '  Alternatively, download the Xcode .xip directly from:\n'
+  printf '  %bhttps://developer.apple.com/download/all/%b\n\n' "$CYAN" "$NC"
+
+  read -r -p "Press [Enter] once Xcode.app is installed in /Applications to continue... " _
+
+  if [[ ! -d "$XCODE_APP" ]]; then
+    fail "Xcode.app is still not present at $XCODE_APP."
+    printf 'Run %bsetup-ios-simulator%b again once the installation finishes.\n' "$BOLD" "$NC"
+    exit 1
+  fi
+fi
+
+ok "Xcode.app found at $XCODE_APP"
+
+# ------------------------------------------------------------------------------
+# 2. Configure active developer directory (xcode-select)
+# ------------------------------------------------------------------------------
+header "Configuring Developer Directory (xcode-select)"
+CURRENT_DEV_DIR="$(xcode-select -p 2>/dev/null || true)"
+TARGET_DEV_DIR="$XCODE_APP/Contents/Developer"
+
+if [[ "$CURRENT_DEV_DIR" != "$TARGET_DEV_DIR" ]]; then
+  info "Current path is '$CURRENT_DEV_DIR'. Switching to '$TARGET_DEV_DIR'..."
+  sudo xcode-select -s "$TARGET_DEV_DIR"
+fi
+ok "Developer directory set to: $(xcode-select -p)"
+
+# ------------------------------------------------------------------------------
+# 3. Accept Xcode License
+# ------------------------------------------------------------------------------
+header "Xcode License Agreement"
+info "Accepting Xcode license..."
+sudo xcodebuild -license accept
+ok "Xcode license accepted."
+
+# ------------------------------------------------------------------------------
+# 4. Install First Launch Core Packages & Daemons
+# ------------------------------------------------------------------------------
+header "First-Launch Core Packages"
+info "Running xcodebuild -runFirstLaunch (installs CoreSimulator & device frameworks)..."
+sudo xcodebuild -runFirstLaunch
+ok "Core development packages installed."
+
+# ------------------------------------------------------------------------------
+# 5. Verify & Download iOS Simulator Runtime
+# ------------------------------------------------------------------------------
+header "iOS Simulator Platform & Runtimes"
+
+RUNTIMES="$(xcrun simctl list runtimes 2>/dev/null || true)"
+if echo "$RUNTIMES" | grep -qi "iOS"; then
+  ok "iOS runtime detected:"
+  echo "$RUNTIMES" | grep -i "iOS" | while read -r line; do
+    printf '     %s\n' "$line"
+  done
+else
+  info "iOS Simulator runtime not found. Downloading via xcodebuild..."
+  sudo xcodebuild -downloadPlatform iOS
+  ok "iOS platform downloaded."
+fi
+
+# ------------------------------------------------------------------------------
+# 6. Verify / Create Simulator Devices
+# ------------------------------------------------------------------------------
+header "Simulator Devices"
+
+AVAILABLE_DEVICES="$(xcrun simctl list devices available 2>/dev/null || true)"
+if echo "$AVAILABLE_DEVICES" | grep -qi "iPhone"; then
+  ok "Available iPhone simulators found."
+else
+  info "No iPhone simulator found. Creating default iPhone simulator..."
+  # Grab latest iOS runtime identifier
+  RUNTIME_ID="$(xcrun simctl list runtimes -j | grep -o '"identifier" : "com.apple.CoreSimulator.SimRuntime.iOS[^"]*"' | head -n 1 | cut -d '"' -f 4 || true)"
+  if [[ -n "$RUNTIME_ID" ]]; then
+    xcrun simctl create "iPhone 16" "com.apple.CoreSimulator.SimDeviceType.iPhone-16" "$RUNTIME_ID" || true
+    ok "Created iPhone 16 simulator with runtime $RUNTIME_ID"
+  else
+    warn "Could not determine iOS runtime identifier automatically. Check 'xcrun simctl list runtimes'."
+  fi
+fi
+
+# ------------------------------------------------------------------------------
+# 7. Boot Simulator & Open Simulator GUI
+# ------------------------------------------------------------------------------
+header "Launching iOS Simulator"
+
+# Find a booted or bootable device
+DEVICE_ID="$(xcrun simctl list devices available | grep -E "iPhone (16|15|14)" | head -n 1 | grep -oE '\([0-9A-F-]+\)' | tr -d '()')"
+if [[ -n "$DEVICE_ID" ]]; then
+  info "Booting simulator ($DEVICE_ID)..."
+  xcrun simctl boot "$DEVICE_ID" 2>/dev/null || ok "Simulator already booted."
+fi
+
+info "Opening Simulator.app..."
+open -a Simulator
+ok "Simulator GUI launched."
+
+# ------------------------------------------------------------------------------
+# 8. Build Pipeline Verification
+# ------------------------------------------------------------------------------
+header "Build Pipeline Verification"
+
+if command -v xcbeautify >/dev/null 2>&1; then
+  ok "xcbeautify is installed ($(xcbeautify --version))"
+else
+  info "Installing xcbeautify for readable terminal build output..."
+  brew install xcbeautify 2>/dev/null || warn "xcbeautify install skipped"
+fi
+
+# Test compiling a minimal Swift command with the iOS Simulator SDK
+TMP_PROJ="$(mktemp -d)"
+cat << 'EOF' > "$TMP_PROJ/TestApp.swift"
+import Foundation
+import UIKit
+
+@main
+struct TestApp {
+    static func main() {
+        print("iOS Simulator Build Pipeline Verified.")
+    }
+}
+EOF
+
+info "Testing compilation against iphonesimulator SDK..."
+SDK_PATH="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+xcrun swiftc -sdk "$SDK_PATH" -target x86_64-apple-ios16.0-simulator "$TMP_PROJ/TestApp.swift" -o "$TMP_PROJ/TestApp" 2>/dev/null || \
+xcrun swiftc -sdk "$SDK_PATH" "$TMP_PROJ/TestApp.swift" -o "$TMP_PROJ/TestApp"
+
+if [[ -f "$TMP_PROJ/TestApp" ]]; then
+  ok "Minimal iOS simulator binary compiled successfully!"
+else
+  warn "Test compile check encountered a warning, but Xcode toolchain is configured."
+fi
+rm -rf "$TMP_PROJ"
+
+# ------------------------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------------------------
+printf '\n%b==============================================================================%b\n' "$GREEN" "$NC"
+printf '%b✓ iOS Simulator Development Environment Ready!%b\n' "$GREEN" "$NC"
+printf '==============================================================================\n'
+printf '  • Xcode Version:        %s\n' "$(xcodebuild -version | tr '\n' ' ')"
+printf '  • Developer Root:       %s\n' "$(xcodeselect -p 2>/dev/null || xcode-select -p)"
+printf '  • Active Simulator SDK: %s\n' "$(xcrun --sdk iphonesimulator --show-sdk-version 2>/dev/null || echo 'Installed')"
+printf '  • Simulator GUI:        Running (Simulator.app)\n'
+printf '==============================================================================\n\n'

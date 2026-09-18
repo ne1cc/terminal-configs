@@ -3,7 +3,13 @@
 # Launched by Ghostty when opening windows (Cmd+N).
 # Creates a brand new, uniquely named tmux session so each new window has its own independent session.
 
-tmux_bin="$(command -v tmux 2>/dev/null || echo "/opt/homebrew/bin/tmux")"
+export PATH="$HOME/.homebrew/bin:/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+tmux_bin="$(command -v tmux 2>/dev/null || {
+    for p in "$HOME/.homebrew/bin/tmux" /opt/homebrew/bin/tmux /usr/local/bin/tmux /usr/bin/tmux; do
+        [[ -x "$p" ]] && echo "$p" && break
+    done
+})"
 
 # Using YYYY-MM-DD_HH-MM format because tmux parses colons ':' as window/pane delimiters (session:window.pane)
 base_name="$(date +%Y-%m-%d_%H-%M)"

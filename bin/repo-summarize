@@ -17,6 +17,7 @@
 #   repo-summarize --max-files N        # process up to N files (default: all)
 #   repo-summarize --force              # overwrite existing summaries
 #   repo-summarize --filter <substr>    # only process files matching substr
+#   repo-summarize --status             # show progress of current / background run
 # ==============================================================================
 
 set -euo pipefail
@@ -24,12 +25,13 @@ set -euo pipefail
 OPEN_IN_OMD=false
 DRY_RUN=false
 FORCE=false
+CHECK_STATUS=false
 MAX_FILES=0   # 0 = no cap (process all files)
 TARGET_DIR=""
 FILTER=""
 
 usage() {
-  sed -n '2,21p' "$0" | sed 's/^# \?//'
+  sed -n '2,22p' "$0" | sed 's/^# \?//'
   exit "${1:-0}"
 }
 
@@ -38,6 +40,7 @@ while [[ $# -gt 0 ]]; do
     -o|--open) OPEN_IN_OMD=true; shift ;;
     -n|--dry-run) DRY_RUN=true; shift ;;
     -f|--force) FORCE=true; shift ;;
+    -s|--status) CHECK_STATUS=true; shift ;;
     -m|--max-files)
       MAX_FILES="${2:-0}"
       shift 2
@@ -78,6 +81,37 @@ cd "$TARGET_DIR"
 REPO_NAME="$(basename "$TARGET_DIR")"
 DOCS_DIR="$TARGET_DIR/docs/architecture"
 INDEX_FILE="$DOCS_DIR/INDEX.md"
+PROGRESS_FILE="$DOCS_DIR/.progress.json"
+
+# Fast path: query status of running / last summarization
+if "$CHECK_STATUS"; then
+  if [[ ! -f "$PROGRESS_FILE" ]]; then
+    existing_count=$(find "$DOCS_DIR" -name "*.md" ! -name "INDEX.md" 2>/dev/null | wc -l | tr -d ' ')
+    echo "No active .progress.json in $DOCS_DIR."
+    echo "Generated architecture docs: $existing_count files."
+    exit 0
+  fi
+
+  if command -v jq >/dev/null 2>&1; then
+    st="$(jq -r .status "$PROGRESS_FILE")"
+    tot="$(jq -r .total_files "$PROGRESS_FILE")"
+    proc="$(jq -r .processed "$PROGRESS_FILE")"
+    pct="$(jq -r .percent "$PROGRESS_FILE")"
+    cur="$(jq -r .current_file "$PROGRESS_FILE")"
+    upd="$(jq -r .updated_at "$PROGRESS_FILE")"
+    
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo " 📊 Repo Summarize Progress: $REPO_NAME"
+    echo " Status    : $st"
+    echo " Progress  : $proc / $tot files ($pct%)"
+    echo " Current   : $cur"
+    echo " Updated   : $upd"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  else
+    cat "$PROGRESS_FILE"
+  fi
+  exit 0
+fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo " 📚 Antigravity Headless Repo Summarizer (agyy)"
@@ -269,11 +303,32 @@ if ! command -v agyy >/dev/null 2>&1; then
 fi
 
 INDEX_ENTRIES=()
+TOTAL_FILES=${#FILES_TO_PROCESS[@]}
+CURRENT_INDEX=0
 
+write_progress() {
+  local status="$1"
+  local current_file="$2"
+  local pct=0
+  if [[ "$TOTAL_FILES" -gt 0 ]]; then
+    pct=$(( CURRENT_INDEX * 100 / TOTAL_FILES ))
+  fi
+  cat <<EOF > "$PROGRESS_FILE"
+{
+  "status": "$status",
+  "total_files": $TOTAL_FILES,
+  "processed": $CURRENT_INDEX,
+  "percent": $pct,
+  "current_file": "$current_file",
+  "updated_at": "$(date +"%Y-%m-%d %H:%M:%S")"
+}
+EOF
+}
 # ---------------------------------------------------------------------------
 # Per-file summarization loop
 # ---------------------------------------------------------------------------
 for rel in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
+  CURRENT_INDEX=$(( CURRENT_INDEX + 1 ))
   doc_rel="docs/architecture/${rel}.md"
   doc_full="$TARGET_DIR/$doc_rel"
   mkdir -p "$(dirname "$doc_full")"
@@ -281,12 +336,14 @@ for rel in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
   ext="${rel##*.}"
 
   if [[ -f "$doc_full" && "$FORCE" != "true" ]]; then
-    echo "⏩ Skip: $rel (already exists)"
+    echo "⏩ [$CURRENT_INDEX/$TOTAL_FILES] Skip: $rel (already exists)"
+    write_progress "running" "$rel (cached)"
     INDEX_ENTRIES+=("$rel")
     continue
   fi
 
-  echo "🧠 Summarizing: $rel → $doc_rel ..."
+  echo "🧠 [$CURRENT_INDEX/$TOTAL_FILES] Summarizing: $rel → $doc_rel ..."
+  write_progress "running" "$rel"
 
   file_content="$(cat "$TARGET_DIR/$rel" 2>/dev/null || true)"
 
@@ -325,7 +382,7 @@ $RESPONSE
 EOF
 
   INDEX_ENTRIES+=("$rel")
-  echo "  ✓ Saved: $doc_rel"
+  echo "  ✓ [$CURRENT_INDEX/$TOTAL_FILES] Saved: $doc_rel"
 done
 
 # ---------------------------------------------------------------------------
@@ -333,6 +390,7 @@ done
 # ---------------------------------------------------------------------------
 echo ""
 echo "🏗️  Generating architectural INDEX.md (AI synthesis of all summaries)..."
+write_progress "synthesizing_index" "INDEX.md"
 
 # Feed all per-file summaries into one big context for the INDEX synthesis
 ALL_SUMMARIES=""
@@ -370,6 +428,7 @@ EOF
 INDEX_RESPONSE="$(agyy -p "$(cat "$tmp_index_prompt")" 2>/dev/null || echo "*(INDEX synthesis failed — see per-file docs above)*")"
 rm -f "$tmp_index_prompt"
 
+
 cat <<EOF > "$INDEX_FILE"
 # $REPO_NAME — Architectural Overview
 
@@ -380,6 +439,8 @@ cat <<EOF > "$INDEX_FILE"
 
 $INDEX_RESPONSE
 EOF
+
+write_progress "complete" "INDEX.md"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
