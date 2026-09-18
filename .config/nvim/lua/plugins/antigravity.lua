@@ -213,9 +213,26 @@ Format in clean GitHub-Flavored Markdown.
                 vim.log.levels.INFO
               )
 
+              local err_lines = {}
               local cmd = string.format("cd %s && openwiki code %s --print", vim.fn.shellescape(root), subcmd)
               vim.fn.jobstart({ "sh", "-c", cmd }, {
                 detach = true,
+                stdout_buffered = true,
+                stderr_buffered = true,
+                on_stdout = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_lines, line) end
+                    end
+                  end
+                end,
+                on_stderr = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_lines, line) end
+                    end
+                  end
+                end,
                 on_exit = function(_, exit_code, _)
                   vim.schedule(function()
                     if exit_code == 0 then
@@ -228,7 +245,11 @@ Format in clean GitHub-Flavored Markdown.
                         end
                       end
                     else
-                      vim.notify("❌ [OpenWiki] Execution failed (exit code " .. exit_code .. ")", vim.log.levels.ERROR)
+                      local err_msg = table.concat(err_lines, " "):gsub("^%s*(.-)%s*$", "%1")
+                      if err_msg == "" then
+                        err_msg = "exit code " .. exit_code
+                      end
+                      vim.notify("❌ [OpenWiki] " .. err_msg, vim.log.levels.ERROR)
                     end
                   end)
                 end,
