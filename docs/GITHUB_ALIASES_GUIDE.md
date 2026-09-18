@@ -119,15 +119,6 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 | `ghr` | List all folders in `~/Github/ne1cc/` |
 | `ghr <repo>` | `cd ~/Github/ne1cc/<repo>` |
 
-### Portfolio quick-jumps
-
-| Alias | Repo |
-|-------|------|
-| `gho` | `olist-lakehouse` |
-| `ghab` | `ab-testing-dagster` |
-| `ghdhs` | `dhs-stunting-pipeline` |
-| `ghtk` | `ticker-change` |
-
 ### Sync & maintenance
 
 | Alias | Runs | Purpose |
@@ -317,7 +308,7 @@ ghr my-new-project
 ### Active development
 
 ```bash
-ghab                     # cd ab-testing-dagster
+ghn ticker               # fuzzy jump to ticker-change
 # ... edit ...
 git add -A && git commit -m "fix CI"
 git push origin main
@@ -404,7 +395,7 @@ source ~/.zshrc
 ```bash
 # Navigate
 ghroot    ghn    ghex    ghws    ghcfg
-ghr [repo]    gho    ghab    ghdhs    ghtk
+ghn [repo]    ghr [repo]
 
 # Sync
 ghsync-list          # status

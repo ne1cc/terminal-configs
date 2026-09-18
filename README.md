@@ -110,7 +110,7 @@ To restore packages automatically as part of setup:
 
 ### 🐚 Zsh (`.zshrc` & `.p10k.zsh`)
 * Integrates **Powerlevel10k** and **Oh My Zsh**.
-* **Github workspace aliases:** `ghn`, `ghr`, `ghsync`, `ghar`, `ghpin`, portfolio jumps (`gho`, `ghab`, `ghdhs`, `ghtk`). See [SHORTCUTS.md § H](SHORTCUTS.md).
+* **Github workspace aliases:** `ghn`, `ghr`, `ghsync`, `ghar`, `ghpin`. See [SHORTCUTS.md § H](SHORTCUTS.md).
 * Includes developer workflow utilities: `groot`, `gwip`, `copylast`, `port`, `killport`, `serve`, `fkill`, `fo`.
 * Antigravity AI audit ledger previewers (`glog`, `gdiff`, `agya`, `agyih`).
 
