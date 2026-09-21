@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# openwiki-viz: Launch interactive OpenWiki visualization
+# Opens the interactive dependency graph and documentation browser.
+# ==============================================================================
+set -euo pipefail
+
+# Determine project root (git root or cwd)
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$PROJECT_ROOT"
+
+if [[ ! -d "openwiki" ]]; then
+  echo "⚠️  No 'openwiki/' directory found in $PROJECT_ROOT."
+  echo "👉 Run 'openwiki code --init --print' or '<Leader>aw' in Neovim first to generate documentation."
+  exit 1
+fi
+
+echo "🚀 Starting OpenWiki visualizer for $(basename "$PROJECT_ROOT")..."
+exec openwiki visualize

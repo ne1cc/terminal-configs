@@ -115,28 +115,131 @@ return {
               local file_content = table.concat(buf_lines, "\n")
               local filetype = vim.bo.filetype ~= "" and vim.bo.filetype or "text"
 
+              -- Extract import/include/require/use lines for cross-referencing
+              local imports = {}
+              for _, line in ipairs(buf_lines) do
+                local s = line:match("^%s*(.-)%s*$")
+                if s:match("^#include") or s:match("^import ") or
+                   s:match("^from .+ import") or s:match("^require") or
+                   s:match("^use ") then
+                  table.insert(imports, s)
+                end
+              end
+
+              -- Build Related Files list (link if doc exists, note if not)
+              local related_lines = {}
+              for _, imp in ipairs(imports) do
+                local dep = imp:match('["\']([^"\']+)["\']') or imp:match("<([^>]+)>") or imp
+                local dep_base = dep:match("([^/]+)$") or dep
+                if vim.fn.filereadable(root .. "/docs/explanations/" .. dep .. ".md") == 1 then
+                  table.insert(related_lines, "- [" .. dep .. "](" .. dep .. ".md) ✓")
+                else
+                  table.insert(related_lines, "- `" .. dep_base .. "` *(not yet explained)*")
+                end
+              end
+
+              -- Load or reuse cached project overview to give AI repo context without wasting tokens
+              local project_overview = ""
+              local overview_candidates = { "AGENTS.md", "CLAUDE.md", "README.md" }
+              for _, candidate in ipairs(overview_candidates) do
+                local candidate_path = root .. "/" .. candidate
+                if vim.fn.filereadable(candidate_path) == 1 then
+                  local lines = vim.fn.readfile(candidate_path, "", 40) -- Read only the top 40 lines (overview & architecture)
+                  project_overview = table.concat(lines, "\n")
+                  break
+                end
+              end
+
               local prompt = string.format([[
 You are a senior principal systems architect. Provide a deep, comprehensive technical explanation of the source file `%s`.
+
+Repository Context (Target Repo: %s):
+```markdown
+%s
+```
 
 Source File Content:
 ```%s
 %s
 ```
 
+Detected imports/dependencies:
+%s
+
 Structure your explanation with:
-1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities.
+1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities within this repository architecture.
 2. **Architecture & Design Patterns**: Internal structure, state management, and algorithmic patterns.
 3. **Public APIs & Interfaces**: Key classes, structs, methods, parameters, return types, and contracts.
-4. **Data Flow & Dependencies**: External imports, input pipelines, transformation logic, and side effects.
+4. **Data Flow & Dependencies**: For each detected dependency above, describe what this file gets from it and how data flows between them.
 5. **Notable Edge Cases & Constraints**: Error boundaries, concurrency, and operational trade-offs.
 
 Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a single outer code block.
-]], rel_path, filetype, file_content)
+]], rel_path, vim.fn.fnamemodify(root, ":t"), project_overview ~= "" and project_overview or "(Project root: " .. root .. ")", filetype, file_content,
+                #imports > 0 and table.concat(imports, "\n") or "(none detected)")
 
-              run_agyy_prompt_to_file(prompt, doc_file, "Explaining " .. rel_path)
+              -- Use shared helper; after it finishes, append Related Files section
+              local doc_dir = vim.fn.fnamemodify(doc_file, ":h")
+              vim.fn.mkdir(doc_dir, "p")
+
+              local tmp_prompt = vim.fn.tempname() .. ".txt"
+              local pf = io.open(tmp_prompt, "w")
+              if not pf then
+                vim.notify("❌ [Antigravity] Failed to create temp prompt file", vim.log.levels.ERROR)
+                return
+              end
+              pf:write(prompt)
+              pf:close()
+
+              local runner_cmd = string.format(
+                "PROMPT=$(cat %s); rm -f %s; agyy -p \"$PROMPT\" > %s 2>&1",
+                vim.fn.shellescape(tmp_prompt),
+                vim.fn.shellescape(tmp_prompt),
+                vim.fn.shellescape(doc_file)
+              )
+
+              vim.notify("⏳ [Antigravity] Explaining " .. rel_path .. " in background...", vim.log.levels.INFO)
+              local err_output = {}
+              vim.fn.jobstart({ "sh", "-c", runner_cmd }, {
+                detach = true,
+                stdout_buffered = true,
+                stderr_buffered = true,
+                on_stderr = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_output, line) end
+                    end
+                  end
+                end,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 and vim.fn.filereadable(doc_file) == 1 then
+                      -- Append Related Files section without a second AI call
+                      if #related_lines > 0 then
+                        local af = io.open(doc_file, "a")
+                        if af then
+                          af:write("\n\n---\n\n## Related Files\n\n")
+                          af:write(table.concat(related_lines, "\n"))
+                          af:write("\n")
+                          af:close()
+                        end
+                      end
+                      vim.notify("✓ [Antigravity] Explanation saved → " .. rel_path .. ".md", vim.log.levels.INFO)
+                      if vim.fn.executable("omd") == 1 then
+                        vim.fn.jobstart({ "omd", doc_file }, { detach = true })
+                      else
+                        vim.cmd("edit " .. vim.fn.fnameescape(doc_file))
+                      end
+                    else
+                      local detail = #err_output > 0 and table.concat(err_output, " ") or ("exit code " .. exit_code)
+                      vim.notify("❌ [Antigravity] Explanation failed for " .. rel_path .. ": " .. detail, vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
             end,
             desc = "Antigravity (agyy): Explain Current File (Background) -> docs/explanations/<relpath>.md & omd",
           },
+
 
           -- Review Current File -> docs/reviews/<relative_path>.md
           ["<leader>ar"] = {
@@ -176,12 +279,12 @@ Format in clean GitHub-Flavored Markdown.
             desc = "Antigravity (agyy): Review Current File (Background) -> docs/reviews/<relpath>.md & omd",
           },
 
-          -- Summarize Whole Repository -> docs/explanations/INDEX.md
+          -- Summarize Whole Repository -> docs/architecture/INDEX.md
           ["<leader>as"] = {
             function()
               local root = get_project_root()
-              local index_file = root .. "/docs/explanations/INDEX.md"
-              vim.notify("⏳ [Antigravity] Starting background whole-repo summarization...", vim.log.levels.INFO)
+              local index_file = root .. "/docs/architecture/INDEX.md"
+              vim.notify("⏳ [Antigravity] Starting background whole-repo summarization → docs/architecture/...", vim.log.levels.INFO)
 
               local cmd = string.format("cd %s && repo-summarize --open", vim.fn.shellescape(root))
               vim.fn.jobstart({ "sh", "-c", cmd }, {
@@ -189,7 +292,7 @@ Format in clean GitHub-Flavored Markdown.
                 on_exit = function(_, exit_code, _)
                   vim.schedule(function()
                     if exit_code == 0 and vim.fn.filereadable(index_file) == 1 then
-                      vim.notify("✓ [Antigravity] Repo summarization complete! Opening in One Markdown...", vim.log.levels.INFO)
+                      vim.notify("✓ [Antigravity] Repo summarization complete! Opening docs/architecture/INDEX.md...", vim.log.levels.INFO)
                     elseif exit_code ~= 0 then
                       vim.notify("❌ [Antigravity] Repo summarization failed (exit code " .. exit_code .. ")", vim.log.levels.ERROR)
                     end
@@ -197,7 +300,65 @@ Format in clean GitHub-Flavored Markdown.
                 end,
               })
             end,
-            desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/explanations/INDEX.md & omd",
+            desc = "Antigravity (agyy): Summarize Whole Repo (Background) -> docs/architecture/INDEX.md & omd",
+          },
+
+          -- Headless OpenWiki Execution -> openwiki/ & quickstart.md
+          ["<leader>ow"] = {
+            function()
+              local root = get_project_root()
+              local has_openwiki = vim.fn.isdirectory(root .. "/openwiki") == 1
+              local subcmd = has_openwiki and "--update" or "--init"
+              local target_doc = root .. "/openwiki/quickstart.md"
+
+              vim.notify(
+                string.format("⏳ [OpenWiki] Running headless %s in background for %s...", subcmd, vim.fn.fnamemodify(root, ":t")),
+                vim.log.levels.INFO
+              )
+
+              local err_lines = {}
+              local cmd = string.format("cd %s && openwiki code %s --print", vim.fn.shellescape(root), subcmd)
+              vim.fn.jobstart({ "sh", "-c", cmd }, {
+                detach = true,
+                stdout_buffered = true,
+                stderr_buffered = true,
+                on_stdout = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_lines, line) end
+                    end
+                  end
+                end,
+                on_stderr = function(_, data, _)
+                  if data then
+                    for _, line in ipairs(data) do
+                      if line ~= "" then table.insert(err_lines, line) end
+                    end
+                  end
+                end,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 then
+                      vim.notify("✓ [OpenWiki] Documentation generation complete!", vim.log.levels.INFO)
+                      if vim.fn.filereadable(target_doc) == 1 then
+                        if vim.fn.executable("omd") == 1 then
+                          vim.fn.jobstart({ "omd", target_doc }, { detach = true })
+                        else
+                          vim.cmd("edit " .. vim.fn.fnameescape(target_doc))
+                        end
+                      end
+                    else
+                      local err_msg = table.concat(err_lines, " "):gsub("^%s*(.-)%s*$", "%1")
+                      if err_msg == "" then
+                        err_msg = "exit code " .. exit_code
+                      end
+                      vim.notify("❌ [OpenWiki] " .. err_msg, vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
+            end,
+            desc = "OpenWiki: Run Headless Update/Init (Background) -> openwiki/ & omd",
           },
 
           -- Interactive Terminal Chat
@@ -207,6 +368,56 @@ Format in clean GitHub-Flavored Markdown.
             end,
             desc = "Antigravity (agyy): Interactive Terminal",
           },
+
+          -- Explanation Graph Visualization -> docs/explanations/GRAPH.html
+          ["<leader>av"] = {
+            function()
+              local root = get_project_root()
+              local out = root .. "/docs/explanations/GRAPH.html"
+              vim.notify("⏳ [Antigravity] Building explanation graph (zero-cost)...", vim.log.levels.INFO)
+              vim.fn.jobstart({ "sh", "-c", "explain-viz --open " .. vim.fn.shellescape(root) }, {
+                detach = true,
+                on_exit = function(_, exit_code, _)
+                  vim.schedule(function()
+                    if exit_code == 0 then
+                      vim.notify("✓ [Antigravity] Graph → " .. out, vim.log.levels.INFO)
+                    else
+                      vim.notify("❌ [Antigravity] explain-viz failed (exit " .. exit_code .. ")", vim.log.levels.ERROR)
+                    end
+                  end)
+                end,
+              })
+            end,
+            desc = "Antigravity: Visualize docs/explanations/ as D3 graph -> GRAPH.html (zero AI cost)",
+          },
+
+          -- Open HTML in browser (current buffer if .html, else GRAPH.html)
+          ["<leader>oh"] = {
+            function()
+              local file = vim.fn.expand("%:p")
+              local target
+
+              if file:match("%.html$") and vim.fn.filereadable(file) == 1 then
+                target = file
+              else
+                -- Fall back to the explanation graph
+                local root = get_project_root()
+                local graph = root .. "/docs/explanations/GRAPH.html"
+                if vim.fn.filereadable(graph) == 1 then
+                  target = graph
+                else
+                  vim.notify("No .html file in buffer and no GRAPH.html found. Run <Leader>av first.", vim.log.levels.WARN)
+                  return
+                end
+              end
+
+              local opener = vim.fn.has("mac") == 1 and "open" or "xdg-open"
+              vim.fn.jobstart({ opener, target }, { detach = true })
+              vim.notify("🌐 Opening in browser: " .. vim.fn.fnamemodify(target, ":t"), vim.log.levels.INFO)
+            end,
+            desc = "Open current .html buffer (or GRAPH.html) in system browser",
+          },
+
         },
 
         v = {

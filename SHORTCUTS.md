@@ -155,6 +155,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `y` | Copy-Mode | Yank selection to system clipboard & exit copy-mode |
 | `Y` | Copy-Mode | Yank entire line to system clipboard & exit copy-mode |
 | `Mouse Drag` | Mouse | Auto-copies selected text to system clipboard with notification toast |
+| `Shift + Left Click` | Mouse | **Open Hyperlink Under Cursor**: Instantly opens clicked URL / file path in browser or system handler (Tmux & Alacritty) |
 
 ### J. Session Persistence & Logging
 | Keybinding | Scope | Description |
@@ -182,6 +183,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `agy` | Run Google Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Run Antigravity bypassing tool approval prompts (`--dangerously-skip-permissions`) |
 | `reposum` / `repo-summarize` | Headless batch code summarization tool; writes explanations to `docs/explanations/*.md` and opens `INDEX.md` in One Markdown |
+| `owv` / `openwiki-viz` | Launches interactive OpenWiki dependency graph and architecture visualization |
 | `glog` | Markdown preview of the Antigravity audit ledger (`~/.gemini_history.md`) |
 | `gdiff` | Side-by-side syntax-highlighted diff of Antigravity session history |
 | `agya` | Export, render, and preview the latest Antigravity session audit report |
@@ -377,9 +379,12 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ff` | Normal | Find Files (FzfLua) |
 | `<Leader>fg` | Normal | Live Grep / Ripgrep (FzfLua) |
 | `<Leader>fb` | Normal | List and switch open buffers |
+| `<Leader>fn` | Normal | **Find Notifications / Notification History** (`Snacks.notifier`) |
 | `<Leader>fh` | Normal | Search Neovim help tags |
 | `<Leader>fs` | Normal | Search LSP document symbols |
 | `<Leader>fr` | Normal | Search LSP references |
+| `<Leader>uh` | Normal | **Show Notification History** (`Snacks.notifier.show_history()`) |
+| `<Leader>uH` | Normal | **Dismiss All Active Notifications** (`Snacks.notifier.hide()`) |
 | `Ctrl + q` | Fzf Modal | Select all items & populate quickfix list |
 
 ### C. Git & Lazygit Integration
@@ -391,12 +396,16 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>gB` | Normal | Open Fugitive git blame window (`:Git blame`) |
 | `<Leader>gP` | Normal | Push commits via Fugitive (`:Git push`) |
 
-### D. Antigravity AI (`agyy`) Assistant
+### D. Antigravity AI (`agyy`) & OpenWiki Assistant
 | Keybinding | Mode | Action |
 |---|---|---|
-| `<Leader>ae` | Normal | **Explain Current File**: Spawns floating `agyy` to explain active buffer; saves report to `docs/explanations/<filename>.md` and opens in One Markdown (`omd`) |
-| `<Leader>ae` | Visual | **Explain Selection**: Spawns floating `agyy` to explain highlighted lines; saves to `docs/explanations/<filename>_lines_<start>-<end>.md` and opens in `omd` |
-| `<Leader>ar` | Normal | **Review File**: Spawns floating `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<filename>.md` and opens in `omd` |
+| `<Leader>ae` | Normal | **Explain Current File**: Runs background `agyy` to explain active buffer; extracts imports for cross-references; saves to `docs/explanations/<relpath>.md` with a **Related Files** section; opens in `omd` |
+| `<Leader>ae` | Visual | **Explain Selection**: Runs background `agyy` to explain highlighted lines; saves to `docs/snippets/<file>_L<start>-L<end>_<timestamp>.md` with rich metadata and opens in `omd` |
+| `<Leader>ar` | Normal | **Review File**: Runs background `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<relpath>.md` and opens in `omd` |
+| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`; saves per-file summaries to `docs/architecture/` and AI-synthesised `INDEX.md`; opens in `omd` |
+| `<Leader>av` | Normal | **Explanation Graph**: Runs `explain-viz` (zero AI cost); parses all `docs/explanations/*.md` cross-references; opens interactive D3.js `GRAPH.html` in browser |
+| `<Leader>oh` | Normal | **Open HTML in Browser**: Opens current `.html` buffer in the system browser; falls back to `docs/explanations/GRAPH.html` if buffer isn't HTML |
+| `<Leader>ow` | Normal | **OpenWiki Headless Documentation**: Runs background `openwiki code --update/--init --print` and opens `openwiki/quickstart.md` in `omd` |
 | `<Leader>at` | Normal | **Floating Terminal**: Spawns floating interactive Antigravity (`agyy`) session |
 | `<C-q>` | Terminal | **Close Floating Window**: Instantly dismiss active Antigravity terminal overlay |
 | `q` / `<Esc>` | Normal | **Close Floating Window**: Dismiss active Antigravity terminal buffer |

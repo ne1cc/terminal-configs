@@ -320,12 +320,43 @@ Prefix + Ctrl + t    # pick 3-agent matrix
 
 ---
 
+---
+
+## OpenWiki & Headless Repository Insights
+
+OpenWiki produces structured architectural documentation (`openwiki/quickstart.md`, component guides, and interactive dependency graphs) without interrupting your editor workflow.
+
+### 1. Headless Generation in Neovim
+- Inside any project buffer, press **`<Leader>ow`** (Normal mode).
+- Runs `openwiki code --update --print` (or `--init`) in the background via Neovim's detached job engine.
+- Zero terminal popups. When finished, Neovim displays a notification toast and immediately opens `openwiki/quickstart.md` in One Markdown (`omd`).
+
+### 2. Whole-Repo Summarization
+- Inside Neovim, press **`<Leader>as`** or run `reposum` / `repo-summarize --open` from your shell.
+- Analyzes repository structure, generating `docs/explanations/*.md` and opening `docs/explanations/INDEX.md` in One Markdown.
+
+### 3. Interactive Architecture Visualization
+- From terminal or tmux, run:
+  ```bash
+  owv
+  # or: openwiki-viz
+  ```
+- Starts OpenWiki's interactive dependency browser and opens it in your default browser.
+
+### 4. Neovim MCP Integration (`mcphub.nvim`)
+- Configured in `.config/nvim/lua/plugins/mcphub.lua`.
+- Connects local and global MCP servers (including OpenWiki MCP) to Neovim.
+- AI chat integrations (CodeCompanion / Avante) are staged with explicit human approval guardrails (`requires_approval = true`).
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
 | `claude` not found | Install Claude Code CLI; check `$PATH` |
 | `agy` not found | Install Antigravity CLI |
+| `openwiki` not found | Run `npm install -g openwiki` (Node >= 22.22.0) |
 | Slash commands missing | Run `./install.sh` to symlink `~/.claude/commands/` |
 | Lazygit AI key fails | Ensure `claude`, `agy`, `codex` on `$PATH` |
 | Handoff empty git section | Must run inside git repo |
@@ -339,7 +370,9 @@ Prefix + Ctrl + t    # pick 3-agent matrix
 Claude:       claude  cplan  creview  cgc  cbug  cinit
 Slash:        /plan  /cook  /continue  /release  /tech-dd
 Antigravity:  agy  agyy  glog  gdiff  agya  agyih
+OpenWiki:     <Leader>ow  owv / openwiki-viz  reposum  <Leader>as
 Handoff:      handoff  Prefix+Shift+H
 tmux AI:      Prefix+a  Prefix+Alt+y  Prefix+Ctrl+t
-Lazygit:      lg ? Ctrl+A  C  X  Q  N  O
+Lazygit:      lg → Ctrl+A  C  X  Q  N  O
 ```
+

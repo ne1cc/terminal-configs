@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# tmux-agent-window-status — Detects AI agents across all panes in each window
+#
+# Inspects running commands (claude, claude.exe, agy, agyy, qoder, qodercli, codex)
+# and workmux status flags in a window.
+# Returns:
+#   "🤖 " if any pane in that window is running an AI agent or workmux has an active agent
+#   "💬 " if workmux marks waiting for input
+#   "✅ " if workmux marks done
+#   ""   otherwise
+# ==============================================================================
+
+win_id="${1:-}"
+[[ -z "$win_id" ]] && exit 0
+
+# 1. First check if workmux has set a specific status icon on the window
+wm_status="$(tmux show-window-options -v -t "$win_id" @workmux_status 2>/dev/null || true)"
+if [[ -n "$wm_status" && "$wm_status" != "null" ]]; then
+  echo "$wm_status "
+  exit 0
+fi
+
+# 2. Inspect all active pane commands in this window
+cmds="$(tmux list-panes -t "$win_id" -F "#{pane_current_command}" 2>/dev/null || true)"
+
+if echo "$cmds" | grep -qE '^(claude|claude\.exe|agy|agyy|qoder|qodercli|codex)$'; then
+  echo "🤖 "
+  exit 0
+fi
+
+# 3. Also check pane titles / full process trees for agents launched in subshells
+titles="$(tmux list-panes -t "$win_id" -F "#{pane_title}" 2>/dev/null || true)"
+if echo "$titles" | grep -qE '(claude|agyy|qoder)'; then
+  echo "🤖 "
+  exit 0
+fi
+
+exit 0
