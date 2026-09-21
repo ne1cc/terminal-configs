@@ -1,6 +1,6 @@
 [user]
 	email = viciousshrapnel@gmail.com
-	name = Alex Sun
+	name = LÍX
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

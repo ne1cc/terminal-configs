@@ -50,6 +50,9 @@ fi
 export EDITOR="nvim"
 export VISUAL="nvim"
 
+# Increase file descriptor limits (prevents EMFILE errors in Neovim/Neo-tree, etc.)
+ulimit -n 65536 200000
+
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
 

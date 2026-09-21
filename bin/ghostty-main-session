@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# ghostty-main-session:
+# Launched by Ghostty for the initial terminal surface.
+# Attaches to or creates the persistent 'main' tmux session.
+
+export PATH="$HOME/.homebrew/bin:/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+tmux_bin="$(command -v tmux 2>/dev/null || {
+    for p in "$HOME/.homebrew/bin/tmux" /opt/homebrew/bin/tmux /usr/local/bin/tmux /usr/bin/tmux; do
+        [[ -x "$p" ]] && echo "$p" && break
+    done
+})"
+
+if [[ -z "$tmux_bin" ]]; then
+    echo "tmux: command not found" >&2
+    exec zsh
+fi
+
+exec "$tmux_bin" new-session -A -s main
