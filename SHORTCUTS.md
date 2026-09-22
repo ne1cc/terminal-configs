@@ -155,7 +155,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `y` | Copy-Mode | Yank selection to system clipboard & exit copy-mode |
 | `Y` | Copy-Mode | Yank entire line to system clipboard & exit copy-mode |
 | `Mouse Drag` | Mouse | Auto-copies selected text to system clipboard with notification toast |
-| `Shift + Left Click` | Mouse | **Open Hyperlink Under Cursor**: Instantly opens clicked URL / file path in browser or system handler (Tmux & Alacritty) |
+| `Shift + Left Click` | Mouse | **Open Link / File Under Cursor**: Instantly opens clicked URL, Markdown link, OSC 8 hyperlink, or file path in browser/system handler (Ghostty, Tmux & Alacritty) |
 
 ### J. Session Persistence & Logging
 | Keybinding | Scope | Description |
