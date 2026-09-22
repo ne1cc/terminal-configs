@@ -27,7 +27,7 @@ fi
 "$DOTFILES/bin/link-stow-extras.sh"
 "$DOTFILES/bin/link-claude-code.sh"
 "$DOTFILES/bin/link-agent-skills.sh"
-"$DOTFILES/bin/setup-github-workspace"
+"$DOTFILES/bin/setup-github-workspace" --rename
 
 echo "Configuring Git rerere..."
 git config --global rerere.enabled true

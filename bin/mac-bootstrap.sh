@@ -86,7 +86,7 @@ ok "Claude Code global configuration linked."
 "$DOTFILES/bin/link-agent-skills.sh"
 ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
 
-"$DOTFILES/bin/setup-github-workspace"
+"$DOTFILES/bin/setup-github-workspace" --rename
 ok "Github workspace layout and _tools symlinks configured."
 
 # ------------------------------------------------------------------------------

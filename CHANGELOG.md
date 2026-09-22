@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Automatic Outdated Repository Rename Detection (`sync-ne1cc` / `ghsync`)
+- `bin/sync-ne1cc`: Added `detect_and_rename_outdated` to dynamically follow GitHub API redirects for renamed repositories, automatically rename local folders in `~/Github/ne1cc/`, and update origin git remotes.
+- `bin/sync-ne1cc`: Added `--rename` flag, `gh` auth status check, and integrated automatic rename detection into `--sync` and `--pull`.
+- `bin/setup-github-workspace`: Added `--rename` option to run rename sweep during workspace initialization.
+- `setup.sh`, `install.sh`, `bin/mac-bootstrap.sh`: Integrated `--rename` into the setup workflow so local repositories stay in sync with remote names.
+
 ### Changed — GitHub handle rename (n1ecC → ne1cc)
 - Renamed the scaffolded workspace folder `~/Github/n1ecC/` → `~/Github/ne1cc/` across all scripts, configs, docs, agent memory, and templates: `.gitconfig` includeIf blocks, `.zshrc` / `.zprofile` (incl. `ghn`/`ghr`/`ghsync` aliases), `bin/setup-github-workspace`, `bin/gh-mirror-check` default owner, `bin/gharchive` (`--from-n1ecc` → `--from-ne1cc`), `bin/pin-portfolio`, `.config/sesh/sesh.toml`, and `templates/github-workspace/`.
 - Script rename: `bin/sync-n1ecC` → `bin/sync-ne1cc`; env var `N1ECC_DIR` → `NE1CC_DIR`.

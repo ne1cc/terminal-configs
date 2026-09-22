@@ -149,9 +149,9 @@ fi
 
 if [[ -x "$REPO_DIR/bin/setup-github-workspace" ]]; then
   if "$DRY_RUN"; then
-    printf '[dry-run] %s/bin/setup-github-workspace\n' "$REPO_DIR"
+    printf '[dry-run] %s/bin/setup-github-workspace --rename\n' "$REPO_DIR"
   else
-    "$REPO_DIR/bin/setup-github-workspace"
+    "$REPO_DIR/bin/setup-github-workspace" --rename
   fi
 fi
 

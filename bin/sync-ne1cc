@@ -14,6 +14,16 @@ MODE="${1:---sync}"
 
 mkdir -p "$NE1CC_DIR"
 
+if ! command -v gh >/dev/null 2>&1; then
+  echo "   WARN: gh CLI not installed. Skipping ne1cc sync."
+  exit 0
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+  echo "   WARN: gh CLI not authenticated. Run 'gh auth login' to enable repo sync."
+  exit 0
+fi
+
 is_excluded() {
   local name="$1"
   [[ -f "$EXCLUDE_FILE" ]] && grep -vxE '^\s*(#|$)' "$EXCLUDE_FILE" | grep -qxF "$name"
