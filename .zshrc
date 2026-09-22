@@ -1235,9 +1235,32 @@ fkill() {
   fi
 }
 
+fcd() {
+  local dir
+  if [[ $# -eq 0 ]]; then
+    dir=$(fd --type d --strip-cwd-prefix --hidden --follow --exclude .git 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    dir=$(fd --type d --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  fi
+}
+
 fo() {
   local file
-  file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  if [[ $# -eq 0 ]]; then
+    file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    file=$(fd --type f --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}' \
+          --prompt="open> ")
+  fi
   [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
 }
 

@@ -114,10 +114,22 @@ if [[ "$PLATFORM" == "macOS" && -d "$REPO_DIR/.config/karabiner" ]]; then
   link_path "$REPO_DIR/.config/karabiner" "$CONFIG_DIR/karabiner"
 fi
 
-for script in "$REPO_DIR"/bin/*; do
-  [[ -f "$script" ]] || continue
-  link_path "$script" "$HOME/bin/$(basename "$script")"
-done
+repo_bin="$(cd "$REPO_DIR/bin" && pwd -P)"
+if [[ -L "$HOME/bin" || -d "$HOME/bin" ]]; then
+  home_bin="$(cd "$HOME/bin" 2>/dev/null && pwd -P || echo "")"
+else
+  home_bin=""
+fi
+
+if [[ -n "$home_bin" && "$home_bin" == "$repo_bin" ]]; then
+  printf '  unchanged: %s (already points at repo bin)\n' "$HOME/bin"
+else
+  run mkdir -p "$HOME/bin"
+  for script in "$REPO_DIR"/bin/*; do
+    [[ -f "$script" ]] || continue
+    link_path "$script" "$HOME/bin/$(basename "$script")"
+  done
+fi
 
 if [[ -d "$REPO_DIR/claude-code" ]]; then
   if "$DRY_RUN"; then

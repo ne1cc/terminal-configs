@@ -2,6 +2,12 @@
 # sesh-picker — interactive fuzzy session picker using sesh and fzf
 set -euo pipefail
 
+exec 2>>/tmp/sesh.log
+echo "--- $(date) ---" >&2
+echo "TERM=${TERM:-}, TMUX=${TMUX:-}, TERMINFO_DIRS=${TERMINFO_DIRS:-}" >&2
+
+trap 'ret=$?; if [ $ret -ne 0 ]; then echo "sesh-picker error exit: $ret" >&2; echo "Error ($ret). Closing in 4s..."; sleep 4; fi' EXIT
+
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 
 session=$(sesh list -t -c -z | fzf \
