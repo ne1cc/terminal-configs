@@ -499,13 +499,7 @@ alias mdf='cd "$ICLOUD_MD"'
 # Github workspace (~/Github) — portfolio, explore, sync
 : "${DOTFILES:=$HOME/Github/ne1cc/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
-if [[ -d "$GITHUB_ROOT/ne1cc" ]]; then
-  export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
-  export N1ECC_DIR="$GITHUB_ROOT/ne1cc"
-else
-  export NE1CC_DIR="$GITHUB_ROOT/n1ecC"
-  export N1ECC_DIR="$GITHUB_ROOT/n1ecC"
-fi
+export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
 
 # Smart jump into ne1cc repos:
 #   ghn                 -> interactive fzf picker with git preview, cds directly into selected repo
@@ -515,7 +509,6 @@ fi
 ghn() {
   local target_dir
   local repo_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}"
-  [[ ! -d "$repo_dir" && -d "$HOME/Github/n1ecC" ]] && repo_dir="$HOME/Github/n1ecC"
 
   if [[ "$1" == "--root" || "$1" == "-r" ]]; then
     cd "$repo_dir"
@@ -576,7 +569,6 @@ alias ghcfg='cd "$GITHUB_ROOT/config"'
 alias ghroot='cd "$GITHUB_ROOT"'
 alias ghsync='"$GITHUB_ROOT/_tools/sync-ne1cc"'
 alias sync-ne1cc='"$GITHUB_ROOT/_tools/sync-ne1cc"'
-alias sync-n1ecC='"$GITHUB_ROOT/_tools/sync-ne1cc"'
 alias ghsync-list='"$GITHUB_ROOT/_tools/sync-ne1cc" --list'
 alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-ne1cc" --pull'
 alias ghpin='"$GITHUB_ROOT/_tools/pin-portfolio"'
