@@ -115,6 +115,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `f` | Extract URLs from pane → fzf picker → open in browser | Copy Mode |
 | `i` | Exit copy-mode (return to normal mode) | Copy Mode |
 | `Mouse Drag Release` | Select text and auto-copy to system clipboard + status toast | Copy Mode |
+| `Shift + Left Click` | Open URL, Markdown link, OSC 8 hyperlink, or file path under cursor | Normal / Copy Mode |
 | `Escape` | Cancel selection / exit copy-mode | Copy Mode |
 
 ### Git Worktree & AI Workflows

@@ -35,3 +35,8 @@ tmux_archive_*.log
 .worktrees/
 .workmux/
 
+# Python cache
+__pycache__/
+*.pyc
+
+
