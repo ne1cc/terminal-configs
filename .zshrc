@@ -841,7 +841,7 @@ bindkey -M vicmd '\es' sesh-sessions
 # Workmux: Zero-friction git worktrees (headless, no new terminals/windows launched)
 alias wm='workmux'
 wma() {
-  workmux add --headless "$@"
+  command wma "$@"
 }
 alias wml='workmux list'
 alias wmls='workmux list'
@@ -880,11 +880,11 @@ wmux() {
     workmux
   elif [[ "$1" == "add" ]]; then
     shift
-    workmux add --headless "$@"
+    wma "$@"
   elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
     workmux "$@"
   else
-    workmux add --headless "$@"
+    wma "$@"
   fi
 }
 
