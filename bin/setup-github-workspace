@@ -73,4 +73,10 @@ for script in "${GITHUB_SCRIPTS[@]}"; do
   fi
 done
 
+if [[ "${1:-}" == "--sync" ]]; then
+  "$DOTFILES/bin/sync-ne1cc"
+elif [[ "${1:-}" == "--rename" ]]; then
+  "$DOTFILES/bin/sync-ne1cc" --rename
+fi
+
 echo "Done. Run: source ~/.zshrc  then  ghsync-list"
