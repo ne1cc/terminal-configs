@@ -16,8 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added / Changed — Tmux Session & Window Management, Ghostty Multi-Session
 - `.tmux.conf`: Re-enabled interactive zoomed tree picker on `Prefix + w` (`choose-tree -Zw`) with pane details collapsed for clean navigation.
 - `.tmux.conf`: Added vim-style fold navigation keys in `tree-mode` (`h` collapse item, `l` expand item, `H` collapse all, `L` expand all).
-- `bin/ghostty-new-session`: Added script to spawn fresh, uniquely-timestamped (`YYYY-MM-DD_HH-MM`) tmux sessions when launching new Ghostty windows (`Cmd+N`).
-- `.config/ghostty/config`: Configured `initial-command = tmux new-session -A -s main` and `command = /Users/alex/bin/ghostty-new-session` so the initial surface attaches to `main` while subsequent windows spawn isolated sessions.
+- `bin/ghostty-new-session`: Enhanced to export package manager paths, search cross-platform tmux locations, and support optional session name arguments (e.g. `main`), fixing macOS Ghostty launch failure when tmux is not in minimal system PATH.
+- `.config/ghostty/config`: Configured `initial-command = ~/bin/ghostty-main-session` and `command = ~/bin/ghostty-new-session` so the initial surface attaches to `main` while subsequent windows spawn isolated sessions without hardcoded paths.
 - `.zshrc`: Updated `ghostty-new()` timestamp naming format.
 - Documentation: Fully audited and updated `SHORTCUTS.md`, `TMUX_SHORTCUTS.md`, `docs/TMUX_WORKFLOW_GUIDE.md`, and `docs/TERMINAL_EMULATORS_GUIDE.md` covering all pane breaking, joining, session moving, and tree navigation shortcuts. Cleaned documentation to UTF-8 encoding.
 
