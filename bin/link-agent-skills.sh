@@ -8,13 +8,15 @@
 #   ~/.agents/skills          (cross-runtime alias: Copilot CLI, Gemini)
 #   ~/.qoder/skills           (Qoder CLI)
 #   ~/.codex/skills           (Codex / ChatGPT)
+#   ~/.config/opencode/skills (OpenCode / T3 Code)
 #
 # Cursor-only skills (.cursor/skills-cursor) → ~/.cursor/skills-cursor/
 # Cursor rules (.cursor/rules/*.mdc)         → ~/.cursor/rules/
 #
 # Global instruction files bootstrapped (if absent):
-#   ~/.codex/AGENTS.md        (instructs Codex to invoke using-superpowers at session start)
-#   ~/.qoder/QODER.md         (instructs Qoder to invoke using-superpowers at session start)
+#   ~/.codex/AGENTS.md           (instructs Codex to invoke using-superpowers at session start)
+#   ~/.qoder/QODER.md            (instructs Qoder to invoke using-superpowers at session start)
+#   ~/.config/opencode/AGENTS.md (instructs OpenCode / T3 to invoke using-superpowers at session start)
 
 set -euo pipefail
 
@@ -50,7 +52,7 @@ link_skill_tree() {
 
 printf '==> Linking agent skills from %s\n' "$REPO_DIR"
 
-mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor" "$HOME/.qoder/skills"
+mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor" "$HOME/.qoder/skills" "$HOME/.config/opencode/skills"
 
 if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
@@ -71,9 +73,12 @@ link_skill_tree "$REPO_DIR/.gemini/skills" \
   "$HOME/.claude/skills" \
   "$HOME/.agents/skills" \
   "$HOME/.qoder/skills" \
-  "$HOME/.codex/skills"
+  "$HOME/.codex/skills" \
+  "$HOME/.config/opencode/skills"
 
-link_skill_tree "$REPO_DIR/.claude/skills" "$HOME/.claude/skills"
+link_skill_tree "$REPO_DIR/.claude/skills" \
+  "$HOME/.claude/skills" \
+  "$HOME/.config/opencode/skills"
 link_skill_tree "$REPO_DIR/.cursor/skills-cursor" "$HOME/.cursor/skills-cursor"
 
 # Link .cursor/rules/*.mdc into ~/.cursor/rules/
@@ -112,6 +117,13 @@ if [[ -f "$REPO_DIR/.qoder/QODER.md" ]]; then
   mkdir -p "$HOME/.qoder"
   ln -sfn "$REPO_DIR/.qoder/QODER.md" "$HOME/.qoder/QODER.md"
   printf '  linked: %s -> %s\n' "$HOME/.qoder/QODER.md" "$REPO_DIR/.qoder/QODER.md"
+fi
+
+# ── OpenCode / T3: link global AGENTS.md from repo ─────────────────────────
+if [[ -f "$REPO_DIR/.opencode/AGENTS.md" ]]; then
+  mkdir -p "$HOME/.config/opencode"
+  ln -sfn "$REPO_DIR/.opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+  printf '  linked: %s -> %s\n' "$HOME/.config/opencode/AGENTS.md" "$REPO_DIR/.opencode/AGENTS.md"
 fi
 
 # ── Claude Code: seed ~/.claude/settings.json with required permissions ───────
