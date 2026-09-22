@@ -1,8 +1,8 @@
 # First terminal surface creates/attaches to the persistent 'main' session:
-initial-command = /Users/alex/bin/ghostty-main-session
+initial-command = ~/bin/ghostty-main-session
 
 # Subsequent surfaces (Cmd+N, new windows) launch a brand new tmux session:
-command = /Users/alex/bin/ghostty-new-session
+command = ~/bin/ghostty-new-session
 
 # Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
 keybind = ctrl+tab=text:\x1b[27;5;9~
