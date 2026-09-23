@@ -77,6 +77,14 @@ if [[ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then
     export PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 elif [[ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]]; then
     export PUPPETEER_EXECUTABLE_PATH="/Applications/Chromium.app/Contents/MacOS/Chromium"
+elif command -v google-chrome >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome)"
+elif command -v google-chrome-stable >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome-stable)"
+elif command -v chromium >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium)"
+elif command -v chromium-browser >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium-browser)"
 fi
 
 
@@ -583,7 +591,7 @@ alias ghar='"$GITHUB_ROOT/_tools/gharchive"'
 
 # CareerOps Recruiting Workbench quick-jump
 rc() {
-  cd "/Users/alex/Documents/Recruiting" || return 1
+  cd "$HOME/Documents/Recruiting" || return 1
   case "$1" in
     agyy|agy-yolo|yolo)
       shift

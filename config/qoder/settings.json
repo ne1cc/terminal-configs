@@ -97,7 +97,7 @@
   "permissions": {
     "additionalDirectories": [],
     "trustDirectories": [
-      "/Users/alex"
+      "~"
     ]
   },
   "security": {

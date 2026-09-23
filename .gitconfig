@@ -13,7 +13,6 @@
 
 [core]
 	pager = delta
-	hooksPath = /Users/alex/.claude/bin/git-hooks
 
 [init]
 	defaultBranch = main

@@ -6,12 +6,26 @@ local function get_chrome_executable()
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    "/snap/bin/chromium",
   }
   for _, path in ipairs(candidates) do
     if vim.fn.filereadable(path) == 1 then
       vim.env.PUPPETEER_EXECUTABLE_PATH = path
       return path
     end
+  end
+  if vim.fn.executable("google-chrome") == 1 then
+    local p = vim.fn.exepath("google-chrome")
+    vim.env.PUPPETEER_EXECUTABLE_PATH = p
+    return p
+  elseif vim.fn.executable("chromium") == 1 then
+    local p = vim.fn.exepath("chromium")
+    vim.env.PUPPETEER_EXECUTABLE_PATH = p
+    return p
   end
   return nil
 end

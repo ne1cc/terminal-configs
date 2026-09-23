@@ -3,4 +3,18 @@
 # Chrome's sandbox inside mermaid-cli. Pass a config that runs headless Chrome
 # with --no-sandbox; it only ever renders local, user-authored diagrams.
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec /home/linuxbrew/.linuxbrew/bin/mmdc -p "$dir/puppeteer.json" "$@"
+real_mmdc=""
+if [[ -x "/opt/homebrew/bin/mmdc" ]]; then
+  real_mmdc="/opt/homebrew/bin/mmdc"
+elif [[ -x "/home/linuxbrew/.linuxbrew/bin/mmdc" ]]; then
+  real_mmdc="/home/linuxbrew/.linuxbrew/bin/mmdc"
+elif command -v mmdc >/dev/null 2>&1; then
+  real_mmdc="$(command -v mmdc)"
+fi
+
+if [[ -n "$real_mmdc" && "$real_mmdc" != "$0" ]]; then
+  exec "$real_mmdc" -p "$dir/puppeteer.json" "$@"
+else
+  echo "mmdc not found. Install via: brew install mermaid-cli" >&2
+  exit 1
+fi

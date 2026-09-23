@@ -108,7 +108,56 @@ Running `./setup.sh` (or any bootstrap script) automatically enforces:
 
 ---
 
-## 5. Post-Provisioning Verification Checklist
+## 5. Recent Feature & Workflow Parity Ledger
+
+All workstations provisioned with `terminal-configs` enjoy 100% parity across these advanced workflows:
+
+### A. Headless Worktree Creation (`wma` / `wmux add`)
+- **Behavior**: Run `wma <branch-name>` from any Git repository to instantly provision an isolated git worktree at `.worktrees/<branch-name>`.
+- **Zero-Window Spawning**: When executed from a command-line or subagent session, `wma` initializes the worktree, copies `.env` / baseline configs, and tracks the branch headlessly without spawning unwanted tmux windows or GUI terminal windows.
+- **Interactive Switching**: To switch to the worktree later, simply use `sesh-picker` (`Prefix + T` or `Ctrl-A T`) or `cd .worktrees/<branch-name>`.
+
+### B. Live Agent Robot Indicator Deduplication
+- **Behavior**: When running agentic coding sessions (Claude Code, Antigravity CLI `agy`, Qoder), tmux window tabs display live status badges.
+- **Deduplication**: Monitored via `bin/tmux-agent-window-status`. Window status formats dynamically coordinate with workmux `@workmux_status` hooks so that **exactly one** robot icon (`🤖`) appears per window tab, preventing duplicate visual clutter.
+
+### C. Universal Mouse Link & File Path Opening
+- **Shift-Click (`Shift-MouseDown1`)**: Click any URL in tmux terminal output to open it immediately in the system browser (`open`, `xdg-open`, or `wslview`).
+- **Shift-Drag (`Shift-MouseDrag1`)**: Highlight any file path, compiler stacktrace, or grep match on screen. It is extracted by `bin/tmux-open-path` and immediately opened in Neovim at the exact line number.
+
+### D. TokyoNight High-Resolution Architecture & Diagram Engine
+- **Neovim Diagram Preview**: Backed by `diagram.nvim`, `mermaid-cli` (`mmdc`), and a local headless Chrome Puppeteer engine.
+- **Keybindings**:
+  - `<leader>md`: Dedicated diagram preview tab (press `q` to exit, `o` to open in external viewer).
+  - `<leader>mo`: Render and open directly in macOS Preview / Linux image viewer (`vim.ui.open`).
+  - `<leader>mb`: Toggle diagram rendering in-buffer.
+  - `<leader>ic`: Flush terminal image cache and clear Kitty graphics protocol overlays.
+- **High-Fidelity Typography**: Styled with TokyoNight `#1a1b26` background, JetBrainsMono Nerd Font typography, 3.0x retina scaling, and 1800px wide viewports via `.config/nvim/mermaid.json`.
+- **Interactive Visualizers**:
+  - `<Leader>av` (`bin/explain-viz`): Interactive Mermaid architecture visualization of any codebase in terminal or browser.
+  - `<Leader>ow` (`bin/openwiki-viz`): Live interactive Vimwiki graph visualizer.
+
+### E. Canonical `ne1cc` GitHub Namespace & Self-Healing Mirrors
+- **Namespace Standard**: Local disk mirrors GitHub by owner at `~/Github/ne1cc/<repo>`.
+- **Dynamic Redirect Following**: `sync-ne1cc --rename` queries the GitHub API to detect repos that were renamed upstream, automatically renames local folders, and updates `origin` remotes.
+
+---
+
+## 6. Cross-Platform Compatibility Matrix & System Fallbacks
+
+| Subsystem | macOS (Apple Silicon / Intel) | Linux (Ubuntu / Debian) | Windows (WSL2) |
+|---|---|---|---|
+| **Package Manager** | Homebrew (`Brewfile`) | Linuxbrew (`Brewfile.linux`) + `apt` | Linuxbrew (`Brewfile.linux`) + `apt` |
+| **Clipboard** | `pbcopy` / `pbpaste` | `xclip` / `xsel` | `clip.exe` / `wslview` |
+| **System Openers** | `open` / `vim.ui.open` | `xdg-open` / `vim.ui.open` | `wslview` / `vim.ui.open` |
+| **Puppeteer Chrome** | `/Applications/Google Chrome.app/...` | `/usr/bin/google-chrome`, `/usr/bin/chromium` | Windows Chrome or Linux Chromium (`--no-sandbox`) |
+| **AppArmor Sandbox** | N/A (macOS native) | `.config/nvim/bin/mmdc` passes `--no-sandbox` | `.config/nvim/bin/mmdc` passes `--no-sandbox` |
+| **Nerd Fonts** | Homebrew font cask | `~/.local/share/fonts/` | Copied to Windows `/AppData/Local/.../Fonts` |
+| **Key Remapping** | Karabiner-Elements (`karabiner.json`) | Native compositor / X11 | Windows PowerToys Keyboard Manager |
+
+---
+
+## 7. Post-Provisioning Verification Checklist
 
 Run these quick checks on the newly provisioned workstation:
 
@@ -117,7 +166,7 @@ Run these quick checks on the newly provisioned workstation:
 source ~/.zshrc
 
 # 2. Verify Homebrew / Linuxbrew & core CLI tools
-which eza bat zoxide fzf lazygit yazi sesh workmux wma
+which eza bat zoxide fzf lazygit yazi sesh workmux wma mmdc
 
 # 3. Verify tmux & status line
 tmux new-session -d -s test-verify
@@ -133,25 +182,28 @@ cd ~ && rm -rf /tmp/test-wt
 
 # 5. Verify agent skills linking
 ls -la ~/.gemini/config/skills ~/.claude/skills ~/.agents/skills
+
+# 6. Verify diagram rendering engine
+echo 'graph TD; A-->B;' | mmdc -i - -o /tmp/test_diagram.png && file /tmp/test_diagram.png && rm /tmp/test_diagram.png
 ```
 
 ---
 
-## 6. Keeping Workstations Synchronized (Drift Prevention)
+## 8. Keeping Workstations Synchronized (Drift Prevention)
 
 When updates or modifications are made on one workstation, propagate them to others seamlessly:
 
 ```bash
-# Pull latest changes on any machine
+# 1. Pull latest changes on any machine
 cd ~/Github/ne1cc/terminal-configs
 git pull
 
-# Run the idempotent setup installer
+# 2. Run the idempotent setup installer
 ./setup.sh
 
-# If new Homebrew packages or formulas were added:
+# 3. If new Homebrew packages or formulas were added:
 ./setup.sh --install-packages
 
-# Reload shell configuration
+# 4. Reload shell configuration
 source ~/.zshrc
 ```

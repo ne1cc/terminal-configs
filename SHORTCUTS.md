@@ -519,7 +519,7 @@ Launched via `y` (shell wrapper that switches directory on exit) or `yazi`:
 
 ## 7. Karabiner-Elements Window Management
 
-Configured in [`.config/karabiner/karabiner.json`](file:///Users/alex/Github/config/terminal-configs/.config/karabiner/karabiner.json):
+Configured in [`.config/karabiner/karabiner.json`](.config/karabiner/karabiner.json):
 
 | Keybinding | Action |
 |---|---|
@@ -531,35 +531,35 @@ Configured in [`.config/karabiner/karabiner.json`](file:///Users/alex/Github/con
 
 ## 8. Custom CLI Helper Binaries & Scripts
 
-Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (symlinked to `~/bin`):
+Located in [`bin/`](bin/) (symlinked to `~/bin`):
 
 | Script | Purpose |
 |---|---|
-| [`fleet`](file:///Users/alex/Github/config/terminal-configs/bin/fleet) | Production Multi-Agent Git Worktree & Tmux Swarm Orchestrator (`claude`, `agy`, `qoder`). |
-| [`tmux-palette`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
-| [`tmux-open-path`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
-| [`tmux-scratchpad`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |
-| [`tmux-ports`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-ports) | Interactive listening ports inspector, process killer, and localhost opener. |
-| [`tmux-cheat`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-cheat) | Interactive developer cheatsheet and documentation HUD (`cheat.sh`). |
-| [`tmux-dotfiles`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-dotfiles) | Fuzzy dotfiles switcher and live config editor with auto-reload. |
-| [`tmux-sessionizer`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
-| [`tmux-agent-matrix`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
-| [`session-handoff`](file:///Users/alex/Github/config/terminal-configs/bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |
-| [`tmux-workspace`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-workspace) | Instant declarative IDE-like workspace layouts (`dev`, `ai`, `triage`). |
-| [`tmux-join-panes`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
-| [`tmux-save-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
-| [`tmux-restore-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |
-| [`macos-defaults.sh`](file:///Users/alex/Github/config/terminal-configs/bin/macos-defaults.sh) | Applies macOS performance defaults (fast key repeat, Finder tweaks, disable animations). |
-| [`git-install-taskwarrior-hook`](file:///Users/alex/Github/config/terminal-configs/bin/git-install-taskwarrior-hook) | Configures git post-commit hooks to update Taskwarrior items automatically. |
-| [`mac-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
-| [`linux-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
-| [`wsl-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
-| [`setup.sh`](file:///Users/alex/Github/ne1cc/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
-| [`setup-github-workspace`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
-| [`sync-ne1cc`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/sync-ne1cc) | Clone/pull all github.com/ne1cc repos into `~/Github/ne1cc/`. |
-| [`gharchive`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
-| [`pin-portfolio`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
-| [`setup-github-profile`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
-| [`ghostty-new-session`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
-| [`clear-images`](file:///Users/alex/Github/ne1cc/terminal-configs/bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
+| [`fleet`](bin/fleet) | Production Multi-Agent Git Worktree & Tmux Swarm Orchestrator (`claude`, `agy`, `qoder`). |
+| [`tmux-palette`](bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
+| [`tmux-open-path`](bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
+| [`tmux-scratchpad`](bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |
+| [`tmux-ports`](bin/tmux-ports) | Interactive listening ports inspector, process killer, and localhost opener. |
+| [`tmux-cheat`](bin/tmux-cheat) | Interactive developer cheatsheet and documentation HUD (`cheat.sh`). |
+| [`tmux-dotfiles`](bin/tmux-dotfiles) | Fuzzy dotfiles switcher and live config editor with auto-reload. |
+| [`tmux-sessionizer`](bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
+| [`tmux-agent-matrix`](bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
+| [`session-handoff`](bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |
+| [`tmux-workspace`](bin/tmux-workspace) | Instant declarative IDE-like workspace layouts (`dev`, `ai`, `triage`). |
+| [`tmux-join-panes`](bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
+| [`tmux-save-named`](bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
+| [`tmux-restore-named`](bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |
+| [`macos-defaults.sh`](bin/macos-defaults.sh) | Applies macOS performance defaults (fast key repeat, Finder tweaks, disable animations). |
+| [`git-install-taskwarrior-hook`](bin/git-install-taskwarrior-hook) | Configures git post-commit hooks to update Taskwarrior items automatically. |
+| [`mac-bootstrap.sh`](bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
+| [`linux-bootstrap.sh`](bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
+| [`wsl-bootstrap.sh`](bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
+| [`setup.sh`](setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
+| [`setup-github-workspace`](bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
+| [`sync-ne1cc`](bin/sync-ne1cc) | Clone/pull all github.com/ne1cc repos into `~/Github/ne1cc/`. |
+| [`gharchive`](bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
+| [`pin-portfolio`](bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
+| [`setup-github-profile`](bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
+| [`ghostty-new-session`](bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
+| [`clear-images`](bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
 

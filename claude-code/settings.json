@@ -72,7 +72,7 @@
     "gitkraken": {
       "source": {
         "source": "directory",
-        "path": "/Users/alex/.claude/plugins/marketplaces/gitkraken"
+        "path": "~/.claude/plugins/marketplaces/gitkraken"
       }
     },
     "mattpocock": {
