@@ -172,10 +172,19 @@ if "$INSTALL_PACKAGES"; then
   run brew bundle --file="$BREWFILE"
 fi
 
+if command -v git >/dev/null 2>&1; then
+  run git config --global rerere.enabled true
+  run git config --global rerere.autoupdate true
+fi
+
 if ! "$SKIP_PLUGINS"; then
   if command -v git >/dev/null 2>&1 && [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     run mkdir -p "$HOME/.tmux/plugins"
     run git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+  fi
+
+  if [[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]]; then
+    run "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
   fi
 
   if command -v nvim >/dev/null 2>&1; then

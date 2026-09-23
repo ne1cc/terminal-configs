@@ -39,4 +39,8 @@ tmux_archive_*.log
 __pycache__/
 *.pyc
 
+# Scratch directories
+.scratch/
+
+
 

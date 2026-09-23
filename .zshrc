@@ -72,6 +72,13 @@ fi
 # Claude Code Agent Teams (Experimental Multi-Agent Orchestrator)
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
+# Mermaid CLI / Puppeteer Chrome Engine for high-res diagram rendering
+if [[ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+elif [[ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Chromium.app/Contents/MacOS/Chromium"
+fi
+
 
 # ==============================================================================
 # 6. TMUX UTILITIES

@@ -25,6 +25,7 @@ Getting-started guides and workflow references for everything in `terminal-confi
 
 | Guide | What it covers |
 |-------|----------------|
+| [ENVIRONMENT_PROVISIONING.md](ENVIRONMENT_PROVISIONING.md) | 1:1 High-fidelity provisioning across macOS, Linux, WSL2, zero drift |
 | [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md) | Bootstrap macOS/Linux/WSL, `~/Github` layout, verify setup |
 | [GITHUB_ALIASES_GUIDE.md](GITHUB_ALIASES_GUIDE.md) | `ghsync`, `ghsync-pull`, `ghar`, `ghpin`, daily GitHub workflow |
 

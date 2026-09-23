@@ -5,7 +5,7 @@ end
 return {
   {
     "3rd/image.nvim",
-    ft = { "markdown", "vimwiki" },
+    ft = { "markdown", "vimwiki", "mermaid", "mmd" },
     opts = {
       backend = "kitty",
       processor = "magick_cli",
@@ -18,7 +18,8 @@ return {
           filetypes = { "markdown", "vimwiki" },
         },
       },
-      max_height_window_percentage = 50,
+      max_height_window_percentage = 85,
+      max_width_window_percentage = 95,
       editor_only_render_when_focused = true,
       tmux_show_only_in_active_window = true,
       window_overlap_clear_enabled = true,
