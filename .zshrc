@@ -51,7 +51,8 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 
 # Increase file descriptor limits (prevents EMFILE errors in Neovim/Neo-tree, etc.)
-ulimit -n 65536 200000
+ulimit -n 65536 2>/dev/null || true
+ulimit -f unlimited 2>/dev/null || true
 
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
@@ -411,9 +412,16 @@ alias mu="mupdf"
 unalias om 2>/dev/null
 unalias mt 2>/dev/null
 if [[ "$OSTYPE" == darwin* ]]; then
+    export ONEMARKDOWN_DIR="$HOME/Library/Mobile Documents/iCloud~com~coderforart~One-Markdown/Documents"
+    alias cdom='cd "$ONEMARKDOWN_DIR"'
+    alias cdonemarkdown='cd "$ONEMARKDOWN_DIR"'
+
     function om {
         local target="${1:-}"
-        [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
+        if [[ -z "$target" ]]; then
+            cd "$ONEMARKDOWN_DIR" || return 1
+            return 0
+        fi
         open -a "One Markdown" "$target"
     }
     function mt {
@@ -492,6 +500,8 @@ alias gnf='gh-ns-fork'
 alias gnn='gh-ns-new'
 alias gnp='gh-ns-promote'
 alias gns='gh-ns-status'
+alias gwc='git-work-clone'
+alias gwclone='git-work-clone'
 
 # Weekly GitHub mirror drift check (ne1cc ↔ ~/Github/ne1cc). Quiet; only prints problems.
 # Runs at most once per 7 days in interactive shells; skip with: export GH_MIRROR_CHECK=0
@@ -515,6 +525,58 @@ alias mdf='cd "$ICLOUD_MD"'
 : "${DOTFILES:=$HOME/Github/ne1cc/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
 export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
+export WORK_DIR="$GITHUB_ROOT/sun-alexander-dev"
+
+# Auto-route 'git clone' for personal (ne1cc) and work (sun-alexander-dev)
+git() {
+  if [[ "$1" == "clone" ]]; then
+    local -a args=("${@[2,-1]}")
+    local has_work=0
+    local has_personal=0
+    local repo_url=""
+    local dir_specified=0
+    local prev=""
+
+    for arg in "${args[@]}"; do
+      if [[ "$prev" =~ ^-(b|o|u|c|-branch|-origin|-upload-pack|-config|-template|-depth|-reference|-filter|-server-option)$ ]]; then
+        prev=""
+        continue
+      fi
+      if [[ "$arg" == -* ]]; then
+        prev="$arg"
+        continue
+      fi
+      if [[ -z "$repo_url" ]]; then
+        repo_url="$arg"
+        if [[ "$arg" == *github-work:* || "$arg" == *github-work/* ]]; then
+          has_work=1
+        elif [[ "$arg" =~ (github\.com[:/]ne1cc/) ]]; then
+          has_personal=1
+        fi
+      else
+        dir_specified=1
+      fi
+    done
+
+    if [[ "$dir_specified" -eq 0 && -n "$repo_url" ]]; then
+      local clean_url="${repo_url%.git}"
+      local repo_name="${clean_url##*/}"
+      repo_name="${repo_name##*:}"
+      if [[ "$has_work" -eq 1 ]]; then
+        local target_dir="${WORK_DIR:-$HOME/Github/sun-alexander-dev}/$repo_name"
+        echo "⚡ [work-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      elif [[ "$has_personal" -eq 1 ]]; then
+        local target_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}/$repo_name"
+        echo "⚡ [personal-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      fi
+    fi
+  fi
+  command git "$@"
+}
 
 # Smart jump into ne1cc repos:
 #   ghn                 -> interactive fzf picker with git preview, cds directly into selected repo

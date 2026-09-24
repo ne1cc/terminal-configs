@@ -319,6 +319,14 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `gharchive` | Same as `ghar` (also in `~/bin`) |
 | `pin-portfolio` | Same as `ghpin` (also in `~/bin`) |
 | `setup-github-workspace` | Create full `~/Github` tree (macOS, Linux, WSL) — run by install/bootstrap |
+| `gnc [owner/]<repo>` | Clone repo into `~/Github/<owner>/<repo>` (defaults to `ne1cc` if owner omitted) |
+| `gwc [org/]<repo>` | Clone work repo into `~/Github/sun-alexander-dev/<repo>` via `github-work` SSH host |
+| `gwclone` / `git work-clone`| Shorthand & Git subcommand for work clone (`~/bin/git-work-clone`) |
+| `gnn <name>` | Start local-only project in `~/Github/_local/projects/<name>` |
+| `gnp` | Promote local project → create on GitHub, push, and move to `~/Github/ne1cc/<name>` |
+| `gns` | Show local WIP projects and mirror drift |
+| `gmc` / `gh-mirror` | Check mirror drift between GitHub and local `~/Github/ne1cc/` |
+| `gnf <owner>/<repo>` | Fork repo to your account and clone under your namespace |
 
 ### I. Application Launchers & File Handlers
 | Command / Alias | Action / Purpose |
@@ -326,7 +334,8 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `lg` | Launch Lazygit in current repository |
 | `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
-| `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
+| `cdom` / `cdonemarkdown` | Change directory to iCloud Drive **One Markdown** folder (`$ONEMARKDOWN_DIR`) |
+| `om [file.md]` | Open file in **One Markdown** (or `cd` into One Markdown folder if no argument) |
 | `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |
 | `prev` / `preview` | Open file in Apple **Preview** |
 | `finder` | Open current directory in macOS Finder |
@@ -556,6 +565,9 @@ Located in [`bin/`](bin/) (symlinked to `~/bin`):
 | [`wsl-bootstrap.sh`](bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
 | [`setup.sh`](setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
 | [`setup-github-workspace`](bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
+| [`setup-multi-account-gh`](bin/setup-multi-account-gh) | Automated dual GitHub setup & verification (personal `ne1cc` + work `sun-alexander-dev`). |
+| [`git-work-clone`](bin/git-work-clone) | Clones work repos via `github-work` SSH host into `~/Github/sun-alexander-dev/` (`gwc`, `gwclone`). |
+| [`gh-ns-clone`](bin/gh-ns-clone) | Clones repo into owner mirror; defaults to `ne1cc` if owner omitted (`gnc`). |
 | [`sync-ne1cc`](bin/sync-ne1cc) | Clone/pull all github.com/ne1cc repos into `~/Github/ne1cc/`. |
 | [`gharchive`](bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
 | [`pin-portfolio`](bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
