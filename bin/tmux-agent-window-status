@@ -5,16 +5,25 @@
 # Inspects running commands (claude, claude.exe, agy, agyy, qoder, qodercli, codex)
 # and workmux status flags in a window.
 # Returns:
-#   "🤖 " if any pane in that window is running an AI agent or workmux has an active agent
-#   "💬 " if workmux marks waiting for input
-#   "✅ " if workmux marks done
-#   ""   otherwise
+#   " 🤖" if any pane in that window is running an AI agent actively working
+#   " 💬" if agent/workmux is waiting for prompt/permission
+#   " ✅" if agent in that window finished running and is waiting for user input
+#   ""   for regular shells (no agent) or inactive windows
 # ==============================================================================
 
 win_id="${1:-}"
 [[ -z "$win_id" ]] && exit 0
 
-# 1. First check if workmux has set a specific status icon on the window
+# 1. First, check if any pane in this window is running an AI agent.
+# Regular shells (zsh, bash, nvim, btop, etc.) without an agent must NOT display anything.
+agent_pane="$(tmux list-panes -t "$win_id" -F "#{pane_id} #{pane_current_command} #{pane_title}" 2>/dev/null | grep -E '(claude|claude\.exe|agy|agyy|qoder|qodercli|codex)' | head -n 1 | awk '{print $1}')"
+
+if [[ -z "$agent_pane" ]]; then
+  # No AI agent process in any pane of this window: regular shell -> output nothing
+  exit 0
+fi
+
+# 2. Check if workmux has set a specific status icon on the window
 wm_status="$(tmux show-window-options -v -t "$win_id" @workmux_status 2>/dev/null || true)"
 
 # Defense-in-depth: if the window format itself already includes @workmux_status
@@ -29,23 +38,44 @@ if [[ "$fmt" == *"@workmux_status"* || "$cur_fmt" == *"@workmux_status"* ]]; the
 fi
 
 if [[ -n "$wm_status" && "$wm_status" != "null" ]]; then
-  echo " $wm_status"
-  exit 0
+  case "$wm_status" in
+    working|🤖)
+      echo " 🤖"
+      exit 0
+      ;;
+    waiting|💬)
+      echo " 💬"
+      exit 0
+      ;;
+    done|✅)
+      echo " ✅"
+      exit 0
+      ;;
+    clear|"")
+      ;;
+    *)
+      echo " $wm_status"
+      exit 0
+      ;;
+  esac
 fi
 
-# 2. Inspect all active pane commands in this window
-cmds="$(tmux list-panes -t "$win_id" -F "#{pane_current_command}" 2>/dev/null || true)"
+# 3. If an agent process is present but @workmux_status wasn't explicitly set,
+# inspect the agent pane's recent terminal buffer to detect if it is actively running or waiting for input.
+tail_lines="$(tmux capture-pane -p -t "$agent_pane" 2>/dev/null | tail -n 10 || true)"
 
-if echo "$cmds" | grep -qE '^(claude|claude\.exe|agy|agyy|qoder|qodercli|codex)$'; then
+# If active braille spinner or "Running command" / "Thinking" / active operation is present, it's actively working
+if echo "$tail_lines" | grep -qE '([⣾⣽⣻⢿⡿⣟⣯⣷⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]|Running command|Thinking\.\.\.|Thought for|Thought Process|Reading file|Editing file|Searching)'; then
   echo " 🤖"
   exit 0
 fi
 
-# 3. Also check pane titles / full process trees for agents launched in subshells
-titles="$(tmux list-panes -t "$win_id" -F "#{pane_title}" 2>/dev/null || true)"
-if echo "$titles" | grep -qE '(claude|agy|agyy|qoder|codex)'; then
-  echo " 🤖"
+# If waiting at the prompt (e.g. ">" or "❯" prompt, "? for shortcuts", "type / for commands", or "(Type /help)"):
+if echo "$tail_lines" | grep -qE '(\? for shortcuts|type / for commands|\(Type /help|bypass permissions|^[>❯]\s*$)'; then
+  echo " ✅"
   exit 0
 fi
 
+# Default fallback for windows with an agent: show robot while active
+echo " 🤖"
 exit 0

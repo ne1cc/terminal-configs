@@ -117,9 +117,13 @@ All workstations provisioned with `terminal-configs` enjoy 100% parity across th
 - **Zero-Window Spawning**: When executed from a command-line or subagent session, `wma` initializes the worktree, copies `.env` / baseline configs, and tracks the branch headlessly without spawning unwanted tmux windows or GUI terminal windows.
 - **Interactive Switching**: To switch to the worktree later, simply use `sesh-picker` (`Prefix + T` or `Ctrl-A T`) or `cd .worktrees/<branch-name>`.
 
-### B. Live Agent Robot Indicator Deduplication
-- **Behavior**: When running agentic coding sessions (Claude Code, Antigravity CLI `agy`, Qoder), tmux window tabs display live status badges.
-- **Deduplication**: Monitored via `bin/tmux-agent-window-status`. Window status formats dynamically coordinate with workmux `@workmux_status` hooks so that **exactly one** robot icon (`🤖`) appears per window tab, preventing duplicate visual clutter.
+### B. Live Agent Status Lifecycle & Regular Shell Filtering
+- **Behavior**: When running agentic coding sessions (Claude Code, Antigravity CLI `agy`/`agyy`, Qoder, Codex), tmux window tabs display live status badges:
+  - **` 🤖` (Actively Working)**: The agent is actively generating responses, executing tools, or thinking (detected via process inspection and buffer spinners).
+  - **` 💬` (Waiting for Prompt / Permission)**: The agent or workmux is waiting for permission/input.
+  - **` ✅` (Ready / Waiting for User Input)**: The agent has finished running its turn and is waiting at the prompt for user input.
+  - **Regular Shells (`""` Empty)**: Windows running regular shells (`zsh`, `bash`, `nvim`, `btop`, etc.) without an active AI agent never display the green checkmark or icons.
+- **Deduplication & Safety**: Monitored passively via `bin/tmux-agent-window-status`. Window status formats dynamically coordinate with workmux `@workmux_status` hooks so that **exactly one** status badge appears per window tab without injecting any disruptive tool-call hooks.
 
 ### C. Universal Mouse Link & File Path Opening
 - **Shift-Click (`Shift-MouseDown1`)**: Click any URL in tmux terminal output to open it immediately in the system browser (`open`, `xdg-open`, or `wslview`).
