@@ -3,7 +3,7 @@
   "themeVariables": {
     "darkMode": true,
     "fontFamily": "JetBrainsMono Nerd Font, JetBrains Mono, -apple-system, sans-serif",
-    "fontSize": "18px",
+    "fontSize": "22px",
     "primaryColor": "#24283b",
     "primaryTextColor": "#c0caf5",
     "primaryBorderColor": "#7aa2f7",
@@ -24,19 +24,19 @@
   },
   "flowchart": {
     "curve": "basis",
-    "nodeSpacing": 50,
-    "rankSpacing": 50,
+    "nodeSpacing": 60,
+    "rankSpacing": 60,
     "htmlLabels": true,
     "useMaxWidth": false
   },
   "sequence": {
-    "actorFontSize": 18,
-    "messageFontSize": 16,
-    "noteFontSize": 16,
+    "actorFontSize": 22,
+    "messageFontSize": 18,
+    "noteFontSize": 18,
     "useMaxWidth": false
   },
   "gantt": {
-    "fontSize": 16,
+    "fontSize": 18,
     "useMaxWidth": false
   }
 }
