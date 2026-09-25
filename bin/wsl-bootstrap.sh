@@ -98,7 +98,7 @@ if command -v wslview >/dev/null 2>&1; then
     ok "wslview already installed."
 else
     info "Installing wslu (provides wslview)..."
-    sudo apt install -y wslu 2>/dev/null && ok "wslu installed." || warn "wslu not available in apt."
+    sudo apt install -y wslu 2>/dev/null && ok "wslu installed." || info "wslu not available in apt (using open.exe / cmd.exe fallback)."
 fi
 
 echo -e "\n${GREEN}${BOLD}WSL Bootstrap complete!${NC}"
