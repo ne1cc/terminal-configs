@@ -197,8 +197,8 @@ These **default** keys are replaced by custom bindings above — do not expect s
 | `Prefix + '` | Select window by prompting for index number |
 | `Prefix + .` (stock) / `:move-window -t <n>` | Move / renumber current window to index |
 | `Shift + Left` / `Shift + Right` | Previous / next window (no prefix) |
-| `Ctrl + Shift + h` / `Ctrl + Shift + l` | Previous / next window (no prefix) |
 | `Ctrl + PageUp` / `Ctrl + PageDown` | Previous / next window (no prefix) |
+| `Ctrl + Shift + h` / `Ctrl + Shift + l` | Previous / next window *(macOS)*; Swap window order left/right *(WSL)* |
 | `Ctrl + Shift + Left` / `Ctrl + Shift + Right` | Swap window order left/right (no prefix) |
 
 ### Panes

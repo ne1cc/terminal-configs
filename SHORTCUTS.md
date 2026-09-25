@@ -36,10 +36,10 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### B. Window Navigation & Swapping
 | Keybinding | Scope | Description |
 |---|---|---|
-| `Shift + Left Arrow` / `Ctrl + PageUp` / `Ctrl + Shift + h` | **(No Prefix)** | Switch to previous window |
-| `Shift + Right Arrow` / `Ctrl + PageDown` / `Ctrl + Shift + l` | **(No Prefix)** | Switch to next window |
-| `Ctrl + Shift + Left Arrow` | **(No Prefix)** | Swap / move active window position left in tab bar |
-| `Ctrl + Shift + Right Arrow` | **(No Prefix)** | Swap / move active window position right in tab bar |
+| `Shift + Left Arrow` / `Ctrl + PageUp` / `Ctrl + Shift + h` *(macOS)* | **(No Prefix)** | Switch to previous window |
+| `Shift + Right Arrow` / `Ctrl + PageDown` / `Ctrl + Shift + l` *(macOS)* | **(No Prefix)** | Switch to next window |
+| `Ctrl + Shift + Left Arrow` / `Ctrl + Shift + h` *(WSL)* | **(No Prefix)** | Swap / move active window position left in tab bar |
+| `Ctrl + Shift + Right Arrow` / `Ctrl + Shift + l` *(WSL)* | **(No Prefix)** | Swap / move active window position right in tab bar |
 | `Prefix + \`` / `Prefix + Tab` | Prefix | **Jump to last active window** |
 | `Prefix + >` | Prefix | Move active pane into the next window |
 | `Prefix + <` | Prefix | Move active pane into the previous window |
