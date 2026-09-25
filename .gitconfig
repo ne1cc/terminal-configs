@@ -1,6 +1,6 @@
 [user]
 	email = viciousshrapnel@gmail.com
-	name = LÍX
+	name = LÍX
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -13,7 +13,6 @@
 
 [core]
 	pager = delta
-	hooksPath = /Users/alex/.claude/bin/git-hooks
 
 [init]
 	defaultBranch = main
@@ -42,10 +41,6 @@
 [includeIf "gitdir:~/Github/ne1cc/"]
 	path = ~/Github/ne1cc/.gitconfig
 [includeIf "gitdir:~/Github/ne1cc/.git"]
-	path = ~/Github/ne1cc/.gitconfig
-[includeIf "gitdir:~/Github/n1ecC/"]
-	path = ~/Github/ne1cc/.gitconfig
-[includeIf "gitdir:~/Github/n1ecC/.git"]
 	path = ~/Github/ne1cc/.gitconfig
 [rerere]
 	enabled = true

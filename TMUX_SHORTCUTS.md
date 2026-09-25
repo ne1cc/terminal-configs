@@ -163,7 +163,6 @@ Every pane also **auto-logs** to `~/tmux-logs/` from creation (see hooks in `.tm
 | `Prefix + Alt + p` | Save a static screenshot of current visible pane to `~/tmux-logs/` | Active Pane |
 | `Prefix + Alt + Shift + P` | Save complete pane scrollback history to `~/tmux-logs/` | Active Pane |
 
-> **Note:** `Prefix + Alt + c` is bound to the cheatsheet HUD. Use the command palette (`Prefix + /`) or tmux command prompt for plugin logging utilities if needed.
 
 ---
 

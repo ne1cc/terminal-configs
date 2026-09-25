@@ -1,4 +1,5 @@
 status_tracking: false
+status_format: false
 worktree_dir: .worktrees
 window_prefix: wm-
 files:

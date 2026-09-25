@@ -1,0 +1,42 @@
+{
+  "theme": "dark",
+  "themeVariables": {
+    "darkMode": true,
+    "fontFamily": "JetBrainsMono Nerd Font, JetBrains Mono, -apple-system, sans-serif",
+    "fontSize": "22px",
+    "primaryColor": "#24283b",
+    "primaryTextColor": "#c0caf5",
+    "primaryBorderColor": "#7aa2f7",
+    "lineColor": "#7dcfff",
+    "secondaryColor": "#1f2335",
+    "secondaryBorderColor": "#bb9af7",
+    "secondaryTextColor": "#c0caf5",
+    "tertiaryColor": "#16161e",
+    "tertiaryBorderColor": "#ff9e64",
+    "tertiaryTextColor": "#c0caf5",
+    "background": "#1a1b26",
+    "mainBkg": "#24283b",
+    "nodeBorder": "#7aa2f7",
+    "clusterBkg": "#1f2335",
+    "clusterBorder": "#3b4261",
+    "titleColor": "#7aa2f7",
+    "edgeLabelBackground": "#1a1b26"
+  },
+  "flowchart": {
+    "curve": "basis",
+    "nodeSpacing": 60,
+    "rankSpacing": 60,
+    "htmlLabels": true,
+    "useMaxWidth": false
+  },
+  "sequence": {
+    "actorFontSize": 22,
+    "messageFontSize": 18,
+    "noteFontSize": 18,
+    "useMaxWidth": false
+  },
+  "gantt": {
+    "fontSize": 18,
+    "useMaxWidth": false
+  }
+}

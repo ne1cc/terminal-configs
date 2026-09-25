@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# wma — Headless Workmux worktree launcher
+#
+# Creates a git worktree without switching focus or leaving open tmux windows/terminals.
+# Automatically injects --background and --no-pane-cmds, then closes the background
+# tmux window so the worktree remains headless until opened via `wmo <name>`.
+#
+# Usage:
+#   wma <branch-name> [workmux-add-options...]
+# ==============================================================================
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: wma <branch-name> [options]"
+  echo "Run 'workmux add --help' for available options."
+  exit 1
+fi
+
+cmd_args=("$@")
+
+has_bg=0
+has_no_pane_cmds=0
+for arg in "${cmd_args[@]}"; do
+  if [[ "$arg" == "-b" || "$arg" == "--background" ]]; then
+    has_bg=1
+  fi
+  if [[ "$arg" == "-C" || "$arg" == "--no-pane-cmds" ]]; then
+    has_no_pane_cmds=1
+  fi
+done
+
+add_flags=()
+[[ $has_bg -eq 0 ]] && add_flags+=("--background")
+[[ $has_no_pane_cmds -eq 0 ]] && add_flags+=("--no-pane-cmds")
+
+output=$(workmux add "${add_flags[@]}" "${cmd_args[@]}" 2>&1) || {
+  status=$?
+  echo "$output"
+  exit $status
+}
+
+echo "$output"
+
+# Extract the worktree handle/name from workmux output to close the window
+target_handle=$(echo "$output" | sed -n -E "s/.*Successfully created worktree and tmux window for '([^']+)'.*/\1/p")
+if [[ -z "$target_handle" ]]; then
+  target_handle=$(echo "$output" | sed -n -E 's/.*Worktree:.*\.worktrees\/([^ ]+).*/\1/p')
+fi
+
+if [[ -n "$target_handle" ]]; then
+  workmux close "$target_handle" >/dev/null 2>&1 || true
+  echo "📦 Headless worktree ready: run 'wmo $target_handle' to open in tmux."
+fi

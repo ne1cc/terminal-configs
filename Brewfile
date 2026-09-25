@@ -54,6 +54,8 @@ brew "lazydocker"
 brew "lazygit"
 # Atlas CLI enables you to manage your MongoDB Atlas
 brew "mongodb-atlas-cli"
+# Command-line interface for Mermaid diagram generation
+brew "mermaid-cli"
 # Lightweight PDF and XPS viewer
 brew "mupdf"
 # Lightweight PDF and XPS viewer

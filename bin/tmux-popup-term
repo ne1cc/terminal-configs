@@ -53,4 +53,4 @@ if [ -d "$TARGET_PATH" ]; then
 fi
 
 # 4. Display the popup attaching to the persistent scratch session
-exec tmux display-popup "${POPUP_ARGS[@]}" "tmux attach-session -t $SESSION_NAME"
+exec tmux display-popup "${POPUP_ARGS[@]}" "env -u TMUX tmux attach-session -t $SESSION_NAME"

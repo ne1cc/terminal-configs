@@ -28,7 +28,13 @@ printf '==> Linking Stow-excluded paths from %s\n' "$REPO_DIR"
 
 mkdir -p "$CONFIG_DIR"
 
-link_path "$REPO_DIR/.config/nvim" "$CONFIG_DIR/nvim"
+for config in nvim ghostty alacritty lazygit yazi starship.toml glow fleet sesh workmux; do
+  [[ -e "$REPO_DIR/.config/$config" ]] && link_path "$REPO_DIR/.config/$config" "$CONFIG_DIR/$config"
+done
+
+if [[ "$(uname -s)" == "Darwin" && -d "$REPO_DIR/.config/karabiner" ]]; then
+  link_path "$REPO_DIR/.config/karabiner" "$CONFIG_DIR/karabiner"
+fi
 
 # ~/bin may already be a directory symlink to $REPO_DIR/bin (common on this host).
 # Linking files into that path would replace the real scripts with self-symlinks.

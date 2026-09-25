@@ -9,6 +9,7 @@ A premium, curated repository for my complete terminal environment, shell config
 **Start here:** **[docs/README.md](docs/README.md)** — documentation hub with all workflow guides.
 
 ### Setup & GitHub
+* **[1:1 Environment Provisioning](docs/ENVIRONMENT_PROVISIONING.md)** — Zero-drift high-fidelity provisioning across workstations
 * **[Github Workspace Setup](docs/GITHUB_WORKSPACE_SETUP.md)** — Bootstrap macOS, Linux, WSL
 * **[Github Aliases Guide](docs/GITHUB_ALIASES_GUIDE.md)** — `ghsync`, `ghn`, `ghr`, archive, pins
 

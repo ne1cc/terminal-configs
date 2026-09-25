@@ -250,3 +250,59 @@ map("n", "<leader>mw", toggle_markdown_wrap, vim.tbl_extend("force", opts, { des
 map("n", "<leader>mz", toggle_fit_viewport, vim.tbl_extend("force", opts, { desc = "Fit viewport to full screen width" }))
 map("n", "<leader>mm", cycle_markdown_mode, vim.tbl_extend("force", opts, { desc = "Cycle display mode (Prose/Table/Raw)" }))
 map("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", vim.tbl_extend("force", opts, { desc = "Markdown browser preview" }))
+
+-- Open local image under cursor in macOS Preview / system default viewer
+local function open_image_under_cursor()
+  local line = vim.api.nvim_get_current_line()
+  local url = line:match("%!%[.-%]%((.-)%)")
+  if not url or url == "" then
+    url = line:match("%((.-%.%a%a%a%a?)%)")
+  end
+  if not url or url == "" then
+    vim.notify("No image link found on current line", vim.log.levels.WARN, { title = "Image Viewer" })
+    return
+  end
+
+  local full_path = url
+  if not url:match("^/") and not url:match("^https?://") and not url:match("^~") then
+    local buf_dir = vim.fn.expand("%:p:h")
+    full_path = buf_dir .. "/" .. url
+  elseif url:match("^~") then
+    full_path = vim.fn.expand(url)
+  end
+
+  if url:match("^https?://") or vim.fn.filereadable(full_path) == 1 then
+    vim.ui.open(full_path)
+    vim.notify("Opened " .. vim.fn.fnamemodify(full_path, ":t") .. " in system viewer", vim.log.levels.INFO, { title = "Image Viewer" })
+  else
+    vim.notify("Image file not found: " .. full_path, vim.log.levels.ERROR, { title = "Image Viewer" })
+  end
+end
+
+-- Toggle image.nvim render mode between cursor-only and all-visible
+local function toggle_image_render_mode()
+  local ok_image, image_nvim = pcall(require, "image")
+  if not ok_image then
+    vim.notify("image.nvim is not loaded", vim.log.levels.WARN, { title = "Image Rendering" })
+    return
+  end
+
+  if _G._image_cursor_only == nil then
+    _G._image_cursor_only = true
+  end
+  _G._image_cursor_only = not _G._image_cursor_only
+
+  image_nvim.setup({
+    integrations = {
+      markdown = {
+        only_render_image_at_cursor = _G._image_cursor_only,
+      },
+    },
+  })
+  local mode_str = _G._image_cursor_only and "Cursor Only (Fast)" or "All Images in Viewport"
+  vim.notify("Image rendering mode: " .. mode_str, vim.log.levels.INFO, { title = "Image Rendering" })
+end
+
+map("n", "<leader>io", open_image_under_cursor, vim.tbl_extend("force", opts, { desc = "Open image under cursor in Preview" }))
+map("n", "<leader>it", toggle_image_render_mode, vim.tbl_extend("force", opts, { desc = "Toggle image render mode (cursor/all)" }))
+

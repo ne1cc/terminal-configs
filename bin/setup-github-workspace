@@ -29,7 +29,6 @@ GITHUB_DIRS=(
 
 GITHUB_SCRIPTS=(
   sync-ne1cc
-  sync-n1ecC
   gharchive
   pin-portfolio
   setup-github-profile
@@ -52,12 +51,6 @@ for dir in "${GITHUB_DIRS[@]}"; do
 done
 echo "  directories: ${#GITHUB_DIRS[@]} paths ensured"
 
-# Ensure backwards-compatible symlink for n1ecC -> ne1cc
-if [[ ! -e "$GITHUB_ROOT/n1ecC" ]]; then
-  ln -s "$GITHUB_ROOT/ne1cc" "$GITHUB_ROOT/n1ecC"
-  echo "  symlinked: n1ecC -> ne1cc"
-fi
-
 install_template "$TEMPLATES/README.md" "$GITHUB_ROOT/README.md"
 install_template "$TEMPLATES/config.README.md" "$GITHUB_ROOT/config/README.md"
 install_template "$TEMPLATES/archive.MANIFEST.md" "$GITHUB_ROOT/archive/MANIFEST.md"
@@ -79,5 +72,11 @@ for script in "${GITHUB_SCRIPTS[@]}"; do
     }
   fi
 done
+
+if [[ "${1:-}" == "--sync" ]]; then
+  "$DOTFILES/bin/sync-ne1cc"
+elif [[ "${1:-}" == "--rename" ]]; then
+  "$DOTFILES/bin/sync-ne1cc" --rename
+fi
 
 echo "Done. Run: source ~/.zshrc  then  ghsync-list"

@@ -72,22 +72,10 @@ fi
 # ------------------------------------------------------------------------------
 # 5. Stow dotfiles + Github workspace (setup-github-workspace)
 # ------------------------------------------------------------------------------
-header "Symlinking dotfiles via Stow"
+header "Symlinking dotfiles via install.sh"
 cd "$DOTFILES"
-stow --target="$HOME" --restow .
-ok "All dotfiles linked."
-
-"$DOTFILES/bin/link-stow-extras.sh"
-ok "Stow-excluded paths linked (nvim, bin, taskrc)."
-
-"$DOTFILES/bin/link-claude-code.sh"
-ok "Claude Code global configuration linked."
-
-"$DOTFILES/bin/link-agent-skills.sh"
-ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
-
-"$DOTFILES/bin/setup-github-workspace"
-ok "Github workspace layout and _tools symlinks configured."
+"$DOTFILES/install.sh"
+ok "All dotfiles linked, rerere configured, and TPM plugins installed."
 
 # ------------------------------------------------------------------------------
 # 6. fnm / Node

@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Automatic Outdated Repository Rename Detection (`sync-ne1cc` / `ghsync`)
+- `bin/sync-ne1cc`: Added `detect_and_rename_outdated` to dynamically follow GitHub API redirects for renamed repositories, automatically rename local folders in `~/Github/ne1cc/`, and update origin git remotes.
+- `bin/sync-ne1cc`: Added `--rename` flag, `gh` auth status check, and integrated automatic rename detection into `--sync` and `--pull`.
+- `bin/setup-github-workspace`: Added `--rename` option to run rename sweep during workspace initialization.
+- `setup.sh`, `install.sh`, `bin/mac-bootstrap.sh`: Integrated `--rename` into the setup workflow so local repositories stay in sync with remote names.
+
 ### Changed — GitHub handle rename (n1ecC → ne1cc)
 - Renamed the scaffolded workspace folder `~/Github/n1ecC/` → `~/Github/ne1cc/` across all scripts, configs, docs, agent memory, and templates: `.gitconfig` includeIf blocks, `.zshrc` / `.zprofile` (incl. `ghn`/`ghr`/`ghsync` aliases), `bin/setup-github-workspace`, `bin/gh-mirror-check` default owner, `bin/gharchive` (`--from-n1ecc` → `--from-ne1cc`), `bin/pin-portfolio`, `.config/sesh/sesh.toml`, and `templates/github-workspace/`.
 - Script rename: `bin/sync-n1ecC` → `bin/sync-ne1cc`; env var `N1ECC_DIR` → `NE1CC_DIR`.
@@ -31,7 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added — Antigravity / Gemini Skills & Markdown Rules
 - Added all 100+ Antigravity skills (including newly created `markdown-architect` and full domain suites) to `.gemini/skills/`.
 - Tracked global formatting rules `GEMINI.md` in repository root under `.gemini/GEMINI.md`.
-- Updated [setup.sh](file:///Users/alex/Github/config/terminal-configs/setup.sh), [install.sh](file:///Users/alex/Github/config/terminal-configs/install.sh), and [bin/mac-bootstrap.sh](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
+- Updated [setup.sh](setup.sh), [install.sh](install.sh), and [bin/mac-bootstrap.sh](bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
 
 ### Changed — Neovim Neo-tree Configuration
 - Configured `hijack_netrw_behavior = "open_default"` so opening directories opens the left Neo-tree sidebar instead of netrw/full-window buffer.

@@ -51,7 +51,8 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 
 # Increase file descriptor limits (prevents EMFILE errors in Neovim/Neo-tree, etc.)
-ulimit -n 65536 200000
+ulimit -n 65536 2>/dev/null || true
+ulimit -f unlimited 2>/dev/null || true
 
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
@@ -71,6 +72,21 @@ fi
 
 # Claude Code Agent Teams (Experimental Multi-Agent Orchestrator)
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+# Mermaid CLI / Puppeteer Chrome Engine for high-res diagram rendering
+if [[ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+elif [[ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Chromium.app/Contents/MacOS/Chromium"
+elif command -v google-chrome >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome)"
+elif command -v google-chrome-stable >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome-stable)"
+elif command -v chromium >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium)"
+elif command -v chromium-browser >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium-browser)"
+fi
 
 
 # ==============================================================================
@@ -396,9 +412,16 @@ alias mu="mupdf"
 unalias om 2>/dev/null
 unalias mt 2>/dev/null
 if [[ "$OSTYPE" == darwin* ]]; then
+    export ONEMARKDOWN_DIR="$HOME/Library/Mobile Documents/iCloud~com~coderforart~One-Markdown/Documents"
+    alias cdom='cd "$ONEMARKDOWN_DIR"'
+    alias cdonemarkdown='cd "$ONEMARKDOWN_DIR"'
+
     function om {
         local target="${1:-}"
-        [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
+        if [[ -z "$target" ]]; then
+            cd "$ONEMARKDOWN_DIR" || return 1
+            return 0
+        fi
         open -a "One Markdown" "$target"
     }
     function mt {
@@ -477,6 +500,8 @@ alias gnf='gh-ns-fork'
 alias gnn='gh-ns-new'
 alias gnp='gh-ns-promote'
 alias gns='gh-ns-status'
+alias gwc='git-work-clone'
+alias gwclone='git-work-clone'
 
 # Weekly GitHub mirror drift check (ne1cc ↔ ~/Github/ne1cc). Quiet; only prints problems.
 # Runs at most once per 7 days in interactive shells; skip with: export GH_MIRROR_CHECK=0
@@ -499,13 +524,59 @@ alias mdf='cd "$ICLOUD_MD"'
 # Github workspace (~/Github) — portfolio, explore, sync
 : "${DOTFILES:=$HOME/Github/ne1cc/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
-if [[ -d "$GITHUB_ROOT/ne1cc" ]]; then
-  export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
-  export N1ECC_DIR="$GITHUB_ROOT/ne1cc"
-else
-  export NE1CC_DIR="$GITHUB_ROOT/n1ecC"
-  export N1ECC_DIR="$GITHUB_ROOT/n1ecC"
-fi
+export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
+export WORK_DIR="$GITHUB_ROOT/sun-alexander-dev"
+
+# Auto-route 'git clone' for personal (ne1cc) and work (sun-alexander-dev)
+git() {
+  if [[ "$1" == "clone" ]]; then
+    local -a args=("${@[2,-1]}")
+    local has_work=0
+    local has_personal=0
+    local repo_url=""
+    local dir_specified=0
+    local prev=""
+
+    for arg in "${args[@]}"; do
+      if [[ "$prev" =~ ^-(b|o|u|c|-branch|-origin|-upload-pack|-config|-template|-depth|-reference|-filter|-server-option)$ ]]; then
+        prev=""
+        continue
+      fi
+      if [[ "$arg" == -* ]]; then
+        prev="$arg"
+        continue
+      fi
+      if [[ -z "$repo_url" ]]; then
+        repo_url="$arg"
+        if [[ "$arg" == *github-work:* || "$arg" == *github-work/* ]]; then
+          has_work=1
+        elif [[ "$arg" =~ (github\.com[:/]ne1cc/) ]]; then
+          has_personal=1
+        fi
+      else
+        dir_specified=1
+      fi
+    done
+
+    if [[ "$dir_specified" -eq 0 && -n "$repo_url" ]]; then
+      local clean_url="${repo_url%.git}"
+      local repo_name="${clean_url##*/}"
+      repo_name="${repo_name##*:}"
+      if [[ "$has_work" -eq 1 ]]; then
+        local target_dir="${WORK_DIR:-$HOME/Github/sun-alexander-dev}/$repo_name"
+        echo "⚡ [work-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      elif [[ "$has_personal" -eq 1 ]]; then
+        local target_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}/$repo_name"
+        echo "⚡ [personal-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      fi
+    fi
+  fi
+  command git "$@"
+}
 
 # Smart jump into ne1cc repos:
 #   ghn                 -> interactive fzf picker with git preview, cds directly into selected repo
@@ -515,7 +586,6 @@ fi
 ghn() {
   local target_dir
   local repo_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}"
-  [[ ! -d "$repo_dir" && -d "$HOME/Github/n1ecC" ]] && repo_dir="$HOME/Github/n1ecC"
 
   if [[ "$1" == "--root" || "$1" == "-r" ]]; then
     cd "$repo_dir"
@@ -576,7 +646,6 @@ alias ghcfg='cd "$GITHUB_ROOT/config"'
 alias ghroot='cd "$GITHUB_ROOT"'
 alias ghsync='"$GITHUB_ROOT/_tools/sync-ne1cc"'
 alias sync-ne1cc='"$GITHUB_ROOT/_tools/sync-ne1cc"'
-alias sync-n1ecC='"$GITHUB_ROOT/_tools/sync-ne1cc"'
 alias ghsync-list='"$GITHUB_ROOT/_tools/sync-ne1cc" --list'
 alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-ne1cc" --pull'
 alias ghpin='"$GITHUB_ROOT/_tools/pin-portfolio"'
@@ -584,7 +653,7 @@ alias ghar='"$GITHUB_ROOT/_tools/gharchive"'
 
 # CareerOps Recruiting Workbench quick-jump
 rc() {
-  cd "/Users/alex/Documents/Recruiting" || return 1
+  cd "$HOME/Documents/Recruiting" || return 1
   case "$1" in
     agyy|agy-yolo|yolo)
       shift
@@ -849,7 +918,7 @@ bindkey -M vicmd '\es' sesh-sessions
 # Workmux: Zero-friction git worktrees (headless, no new terminals/windows launched)
 alias wm='workmux'
 wma() {
-  workmux add --headless "$@"
+  command wma "$@"
 }
 alias wml='workmux list'
 alias wmls='workmux list'
@@ -888,11 +957,11 @@ wmux() {
     workmux
   elif [[ "$1" == "add" ]]; then
     shift
-    workmux add --headless "$@"
+    wma "$@"
   elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
     workmux "$@"
   else
-    workmux add --headless "$@"
+    wma "$@"
   fi
 }
 
@@ -1235,9 +1304,32 @@ fkill() {
   fi
 }
 
+fcd() {
+  local dir
+  if [[ $# -eq 0 ]]; then
+    dir=$(fd --type d --strip-cwd-prefix --hidden --follow --exclude .git 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    dir=$(fd --type d --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  fi
+}
+
 fo() {
   local file
-  file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  if [[ $# -eq 0 ]]; then
+    file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    file=$(fd --type f --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}' \
+          --prompt="open> ")
+  fi
   [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
 }
 
