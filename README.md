@@ -97,7 +97,10 @@ bash ~/Github/ne1cc/terminal-configs/bin/mac-bootstrap.sh
 bash ~/Github/ne1cc/terminal-configs/bin/linux-bootstrap.sh
 
 # Windows (WSL2)
-bash ~/Github/ne1cc/terminal-configs/bin/wsl-bootstrap.sh
+bash ~/.dotfiles/bin/wsl-bootstrap.sh
+
+# Windows (Host / VM PowerShell)
+powershell -ExecutionPolicy Bypass -File .\windows\setup.ps1
 ```
 
 To restore packages automatically as part of setup:
