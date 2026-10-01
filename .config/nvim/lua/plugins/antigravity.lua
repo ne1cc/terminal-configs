@@ -14,6 +14,48 @@ local function get_relative_path(file, root)
   return vim.fn.fnamemodify(file, ":t")
 end
 
+-- Shared output spec for explain prompts (file + selection) so they stay in sync.
+local EXPLAIN_FORMAT = [[
+Write a walkthrough so the reader can walk away knowing what the code does and where to go next. Use exactly these sections, in order, as GitHub-Flavored Markdown:
+
+## TL;DR
+2-3 plain sentences: what this code does and why it exists.
+
+## Big Picture
+One Mermaid `flowchart TD` showing how the main pieces connect (functions, modules, or the control flow of the lines).
+
+## Key Terms
+A table with columns: Name | Kind | What it does | Used by. Cover only the functions, variables, types and config values that matter.
+
+## Walkthrough
+Go in order, block by block. Group consecutive lines that do one job under a heading that includes the line range, e.g. `### L12-18: Load config`. Under each, write 1-3 short sentences of plain prose on what it does and why. Give a single line its own note only if it is non-obvious (a regex, a clever expression, a side effect). Where there is branching, async work, or a request/response flow, add a Mermaid `sequenceDiagram` or `stateDiagram-v2` in that block.
+
+## Inputs, Outputs & Side Effects
+A table with columns: Kind | Item | Notes. Kinds: Input, Output, Side effect (files, network, globals), Error behavior.
+
+## Gotchas
+A table with columns: Situation | What happens | Why it matters. Include only real edge cases. Omit this section if there are none.
+
+## Where To Go Next
+An ordered reading path: 2-4 specific files, functions or line ranges to read next and why. Then 2-3 pointers in the form "To change X, start at Y".
+
+Style rules:
+- Plain, direct prose. Explain why, not just what. Do not restate the code. Define any jargon on first use.
+- Mermaid must be valid: wrap every node label in double quotes, avoid parentheses and special characters outside quotes, and keep each diagram to about 12 nodes or fewer.
+- Headings must be plain text. Do not turn headings or code references into links (no file:// or other URLs).
+- Keep tables compact. Skip a section rather than pad it.
+- Do NOT wrap the whole document in a single outer code block.
+]]
+
+-- Prefix each line with its 1-based number (offset-aware) so the model cites accurate ranges.
+local function number_lines(lines, first)
+  local out = {}
+  for i, l in ipairs(lines) do
+    out[i] = string.format("%d: %s", first + i - 1, l)
+  end
+  return table.concat(out, "\n")
+end
+
 -- Executes an Antigravity prompt safely in the background, writing the LLM response
 -- directly to doc_path and opening in One Markdown upon completion.
 local function run_agyy_prompt_to_file(prompt_text, doc_path, task_desc)
@@ -112,7 +154,10 @@ return {
               local rel_path = get_relative_path(file, root)
               local doc_file = root .. "/docs/explanations/" .. rel_path .. ".md"
               local buf_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-              local file_content = table.concat(buf_lines, "\n")
+              local file_content = number_lines(buf_lines, 1)
+              if #buf_lines > 1500 then
+                vim.notify(string.format("⚠️ [Antigravity] %s has %d lines; the explanation will be long and costly", rel_path, #buf_lines), vim.log.levels.WARN)
+              end
               local filetype = vim.bo.filetype ~= "" and vim.bo.filetype or "text"
 
               -- Extract import/include/require/use lines for cross-referencing
@@ -158,7 +203,7 @@ Repository Context (Target Repo: %s):
 %s
 ```
 
-Source File Content:
+Source File Content (each line is prefixed with its line number; do not include the prefixes in quotes of code):
 ```%s
 %s
 ```
@@ -166,16 +211,11 @@ Source File Content:
 Detected imports/dependencies:
 %s
 
-Structure your explanation with:
-1. **Executive Summary & System Role**: Core purpose, problem solved, and responsibilities within this repository architecture.
-2. **Architecture & Design Patterns**: Internal structure, state management, and algorithmic patterns.
-3. **Public APIs & Interfaces**: Key classes, structs, methods, parameters, return types, and contracts.
-4. **Data Flow & Dependencies**: For each detected dependency above, describe what this file gets from it and how data flows between them.
-5. **Notable Edge Cases & Constraints**: Error boundaries, concurrency, and operational trade-offs.
+For this whole file, the Big Picture and Key Terms should show its public surface, internal structure, and how it relates to each detected dependency above (what it takes from each and how data flows). In Where To Go Next, prefer the detected dependencies and the files that likely call this one.
 
-Format in clean GitHub-Flavored Markdown. Do NOT wrap the entire document in a single outer code block.
+%s
 ]], rel_path, vim.fn.fnamemodify(root, ":t"), project_overview ~= "" and project_overview or "(Project root: " .. root .. ")", filetype, file_content,
-                #imports > 0 and table.concat(imports, "\n") or "(none detected)")
+                #imports > 0 and table.concat(imports, "\n") or "(none detected)", EXPLAIN_FORMAT)
 
               -- Use shared helper; after it finishes, append Related Files section
               local doc_dir = vim.fn.fnamemodify(doc_file, ":h")
@@ -470,7 +510,7 @@ Format in clean GitHub-Flavored Markdown.
 
               -- Extract exact buffer lines
               local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
-              local snippet_text = table.concat(lines, "\n")
+              local snippet_text = number_lines(lines, start_line)
 
               -- Isolated folder for snippets and buffer reads
               local snippets_dir = root .. "/docs/snippets"
@@ -478,9 +518,9 @@ Format in clean GitHub-Flavored Markdown.
               local doc_file = string.format("%s/%s_L%d-L%d_%s.md", snippets_dir, filename, start_line, end_line, timestamp)
 
               local prompt = string.format([[
-You are a senior systems engineer. Provide a precise, line-by-line and architectural breakdown of the following code snippet from `%s` (lines %d to %d).
+You are a senior systems engineer and patient teacher. Explain the following code snippet from `%s` (lines %d to %d).
 
-Code Snippet:
+Code Snippet (each line is prefixed with its real line number in the file; do not include the prefixes in quotes of code):
 ```%s
 %s
 ```
@@ -490,13 +530,10 @@ Metadata:
 - Lines: %d to %d
 - Timestamp: %s
 
-Explain:
-1. **Core Intent**: What do these specific lines accomplish?
-2. **Mechanism & Logic Walkthrough**: Step-by-step breakdown of variables, flow control, and functions called.
-3. **Hidden Invariants & Edge Cases**: Potential pitfalls, assumptions about caller context, and performance impact.
+For this snippet, the Big Picture should show the control flow of these lines. Assume the reader has not seen the rest of the file: note what the snippet expects from its caller or surrounding code. In Where To Go Next, point to the surrounding code (callers, callees, definitions) to read next.
 
-Format in clean GitHub-Flavored Markdown.
-]], rel_path, start_line, end_line, filetype, snippet_text, rel_path, start_line, end_line, timestamp)
+%s
+]], rel_path, start_line, end_line, filetype, snippet_text, rel_path, start_line, end_line, timestamp, EXPLAIN_FORMAT)
 
               run_agyy_prompt_to_file(prompt, doc_file, string.format("Explaining %s [L%d-L%d]", rel_path, start_line, end_line))
             end,
