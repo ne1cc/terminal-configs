@@ -42,6 +42,7 @@ An ordered reading path: 2-4 specific files, functions or line ranges to read ne
 Style rules:
 - Plain, direct prose. Explain why, not just what. Do not restate the code. Define any jargon on first use.
 - Mermaid must be valid: wrap every node label in double quotes, avoid parentheses and special characters outside quotes, and keep each diagram to about 12 nodes or fewer.
+- Headings must be plain text. Do not turn headings or code references into links (no file:// or other URLs).
 - Keep tables compact. Skip a section rather than pad it.
 - Do NOT wrap the whole document in a single outer code block.
 ]]
@@ -154,6 +155,9 @@ return {
               local doc_file = root .. "/docs/explanations/" .. rel_path .. ".md"
               local buf_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
               local file_content = number_lines(buf_lines, 1)
+              if #buf_lines > 1500 then
+                vim.notify(string.format("⚠️ [Antigravity] %s has %d lines; the explanation will be long and costly", rel_path, #buf_lines), vim.log.levels.WARN)
+              end
               local filetype = vim.bo.filetype ~= "" and vim.bo.filetype or "text"
 
               -- Extract import/include/require/use lines for cross-referencing
