@@ -411,7 +411,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ae` | Normal | **Explain Current File**: Runs background `agyy` to explain active buffer; extracts imports for cross-references; saves to `docs/explanations/<relpath>.md` with a **Related Files** section; opens in `omd` |
 | `<Leader>ae` | Visual | **Explain Selection**: Runs background `agyy` to explain highlighted lines; saves to `docs/snippets/<file>_L<start>-L<end>_<timestamp>.md` with rich metadata and opens in `omd` |
 | `<Leader>ar` | Normal | **Review File**: Runs background `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<relpath>.md` and opens in `omd` |
-| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`; saves per-file summaries to `docs/architecture/` and AI-synthesised `INDEX.md`; opens in `omd` |
+| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`: scans the repo first (`.repo-map.md` import graph), then saves annotated per-file walkthroughs (a comment on every line for files ≤150 lines, per-block above) to `docs/architecture/` and an AI-synthesised `INDEX.md`; opens in `omd` |
 | `<Leader>av` | Normal | **Explanation Graph**: Runs `explain-viz` (zero AI cost); parses all `docs/explanations/*.md` cross-references; opens interactive D3.js `GRAPH.html` in browser |
 | `<Leader>oh` | Normal | **Open HTML in Browser**: Opens current `.html` buffer in the system browser; falls back to `docs/explanations/GRAPH.html` if buffer isn't HTML |
 | `<Leader>ow` | Normal | **OpenWiki Headless Documentation**: Runs background `openwiki code --update/--init --print` and opens `openwiki/quickstart.md` in `omd` |
