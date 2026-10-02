@@ -43,7 +43,8 @@ Every workstation is provisioned to mirror an identical 1:1 layout with zero con
 |---|---|---|
 | **macOS** (M1/M2/M3/Intel) | `bash bin/mac-bootstrap.sh` | Homebrew, `Brewfile`, Oh My Zsh, P10k, Stow, `link-agent-skills.sh`, `setup-github-workspace` |
 | **Linux** (Ubuntu/Debian) | `bash bin/linux-bootstrap.sh` | `apt`, Linuxbrew, `Brewfile.linux`, Nerd Fonts, OMZ, P10k, Stow, `setup-github-workspace` |
-| **Windows** (WSL2) | `bash bin/wsl-bootstrap.sh` | Linux bootstrap + `/etc/wsl.conf` interop, Windows clipboard (`clip.exe`), Nerd Font sync |
+| **Windows** (WSL2) | `bash bin/wsl-bootstrap.sh` | Linux bootstrap + `/etc/wsl.conf` interop, Windows clipboard (`clip.exe`), Dev Share sync |
+| **Windows** (Host / VM) | `powershell -ExecutionPolicy Bypass -File .\windows\setup.ps1` | Managed `$PROFILE` (`ghn`, `ghroot`, `ghsync`), VirtIO-FS service, Windows Terminal defaults, Git optimizations, Defender exclusions |
 | **Portable Fallback (All)** | `./setup.sh --install-packages` | Idempotent symlinker with automatic collision backups, package bundle, TPM, and Lazy sync |
 
 ---
