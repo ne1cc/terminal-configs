@@ -23,6 +23,9 @@ export DOTFILES="$HOME/Github/ne1cc/terminal-configs"
 export GITHUB_ROOT="$HOME/Github"
 export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
 
+# repo-summarize AI backend (public default is `agy -p`; this setup keeps YOLO mode)
+export REPO_SUMMARIZE_CMD="agyy -p"
+
 # Custom scripts (bin/ in the dotfiles repo, stow'd to ~/bin)
 export PATH="$HOME/Github/_tools:$HOME/bin:$HOME/.local/bin:$PATH"
 

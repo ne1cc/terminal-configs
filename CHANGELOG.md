@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — repo-summarize published as open source (MIT)
+- Extracted `bin/repo-summarize` into the public repo [ne1cc/repo-summarize](https://github.com/ne1cc/repo-summarize) (fresh history, MIT license, README, smoke test).
+- `bin/repo-summarize`: AI backend is now `REPO_SUMMARIZE_CMD` (public default `agy -p`, no permission-skipping flag); output footer links to the public repo.
+- `.zprofile`: exports `REPO_SUMMARIZE_CMD="agyy -p"` so this setup keeps its existing behavior.
+- Docs: fixed stale `docs/explanations/` paths for repo-summarize (now `docs/architecture/`) in `README.md`, `docs/AI_WORKFLOW_GUIDE.md`, `SHORTCUTS.md`; added a featured-tool section to `README.md`.
+- Development history of the tool (2026-09-18 → 2026-10-02): headless v1 → full coverage + AI-synthesised index → bash 3.2 compat → progress tracking/`--status` → scan-first annotated walkthroughs (PRs #25, #28, #36).
+
 ### Added — Automatic Outdated Repository Rename Detection (`sync-ne1cc` / `ghsync`)
 - `bin/sync-ne1cc`: Added `detect_and_rename_outdated` to dynamically follow GitHub API redirects for renamed repositories, automatically rename local folders in `~/Github/ne1cc/`, and update origin git remotes.
 - `bin/sync-ne1cc`: Added `--rename` flag, `gh` auth status check, and integrated automatic rename detection into `--sync` and `--pull`.
