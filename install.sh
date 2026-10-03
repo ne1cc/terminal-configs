@@ -27,7 +27,11 @@ fi
 "$DOTFILES/bin/link-stow-extras.sh"
 "$DOTFILES/bin/link-claude-code.sh"
 "$DOTFILES/bin/link-agent-skills.sh"
-"$DOTFILES/bin/setup-github-workspace"
+"$DOTFILES/bin/setup-github-workspace" --rename
+
+echo "Configuring Git rerere..."
+git config --global rerere.enabled true
+git config --global rerere.autoupdate true
 
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 if [[ ! -d "$TPM_DIR" ]]; then

@@ -1,8 +1,8 @@
 # First terminal surface creates/attaches to the persistent 'main' session:
-initial-command = tmux new-session -A -s main
+initial-command = ~/bin/ghostty-main-session
 
 # Subsequent surfaces (Cmd+N, new windows) launch a brand new tmux session:
-command = /Users/alex/bin/ghostty-new-session
+command = ~/bin/ghostty-new-session
 
 # Send explicit CSI extended key escape sequences to tmux for Ctrl+Tab and Ctrl+Shift+Tab
 keybind = ctrl+tab=text:\x1b[27;5;9~
@@ -29,3 +29,18 @@ background-blur = true
 # Font configuration
 font-size = 15
 
+# Mouse configuration: forward Shift+Click to tmux for universal link opening
+mouse-shift-capture = true
+
+# Performance optimizations: eliminate redundant cursor blink redraws
+cursor-style-blink = false
+
+# Performance: disable complex ligature lookahead in high-throughput editor windows
+font-feature = -calt
+font-feature = -liga
+
+# Performance: bound scrollback buffer memory consumption
+scrollback-limit = 10000
+
+# Performance: maintain synchronized frame pacing with display
+window-vsync = true

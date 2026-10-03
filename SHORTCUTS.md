@@ -36,10 +36,10 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### B. Window Navigation & Swapping
 | Keybinding | Scope | Description |
 |---|---|---|
-| `Shift + Left Arrow` / `Ctrl + PageUp` / `Ctrl + Shift + h` | **(No Prefix)** | Switch to previous window |
-| `Shift + Right Arrow` / `Ctrl + PageDown` / `Ctrl + Shift + l` | **(No Prefix)** | Switch to next window |
-| `Ctrl + Shift + Left Arrow` | **(No Prefix)** | Swap / move active window position left in tab bar |
-| `Ctrl + Shift + Right Arrow` | **(No Prefix)** | Swap / move active window position right in tab bar |
+| `Shift + Left Arrow` / `Ctrl + PageUp` / `Ctrl + Shift + h` *(macOS)* | **(No Prefix)** | Switch to previous window |
+| `Shift + Right Arrow` / `Ctrl + PageDown` / `Ctrl + Shift + l` *(macOS)* | **(No Prefix)** | Switch to next window |
+| `Ctrl + Shift + Left Arrow` / `Ctrl + Shift + h` *(WSL)* | **(No Prefix)** | Swap / move active window position left in tab bar |
+| `Ctrl + Shift + Right Arrow` / `Ctrl + Shift + l` *(WSL)* | **(No Prefix)** | Swap / move active window position right in tab bar |
 | `Prefix + \`` / `Prefix + Tab` | Prefix | **Jump to last active window** |
 | `Prefix + >` | Prefix | Move active pane into the next window |
 | `Prefix + <` | Prefix | Move active pane into the previous window |
@@ -117,7 +117,11 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|---|
 | `Prefix + Alt + n` | Prefix | **Workmux Launch Modal**: Fast interactive popup to create worktree branch |
 | `Prefix + w` | Prefix | **Workmux Dashboard**: Centered 85% TUI popup monitoring all active worktrees & agents |
-| `Prefix + Alt + Shift + W` (`M-W`) | Prefix | **Workmux Live Sidebar**: Toggle real-time agent status sidebar in tmux |
+| `Prefix + Alt + Shift + W` (`M-W`) | Prefix | **Workmux Live Sidebar**: Toggle real-time agent status sidebar in tmux (global) |
+| `Prefix + Alt + Shift + S` (`M-S`) | Prefix | **Workmux Live Sidebar (Session)**: Toggle sidebar for current session only |
+| `Alt + ]` / `Prefix + Alt + ]` | Global / Prefix | **Workmux Agent Next**: Instantly jump to the next active agent |
+| `Alt + [` / `Prefix + Alt + [` | Global / Prefix | **Workmux Agent Prev**: Instantly jump to the previous active agent |
+| `Prefix + Alt + f` | Prefix | **Workmux Sidebar Filter**: Toggle session-only vs global agent list |
 | `Prefix + Ctrl + n` | Prefix | Prompt branch name, create git worktree & open Claude window |
 | `Prefix + Ctrl + a` | Prefix | Fuzzy-pick existing worktree and open Claude window |
 | `Prefix + Ctrl + x` | Prefix | Fuzzy-pick worktree to force-remove (directory + branch) |
@@ -151,6 +155,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `y` | Copy-Mode | Yank selection to system clipboard & exit copy-mode |
 | `Y` | Copy-Mode | Yank entire line to system clipboard & exit copy-mode |
 | `Mouse Drag` | Mouse | Auto-copies selected text to system clipboard with notification toast |
+| `Shift + Left Click` | Mouse | **Open Link / File Under Cursor**: Instantly opens clicked URL, Markdown link, OSC 8 hyperlink, or file path in browser/system handler (Ghostty, Tmux & Alacritty) |
 
 ### J. Session Persistence & Logging
 | Keybinding | Scope | Description |
@@ -177,6 +182,8 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|
 | `agy` | Run Google Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Run Antigravity bypassing tool approval prompts (`--dangerously-skip-permissions`) |
+| `reposum` / `repo-summarize` | Headless batch code summarization tool; writes explanations to `docs/explanations/*.md` and opens `INDEX.md` in One Markdown |
+| `owv` / `openwiki-viz` | Launches interactive OpenWiki dependency graph and architecture visualization |
 | `glog` | Markdown preview of the Antigravity audit ledger (`~/.gemini_history.md`) |
 | `gdiff` | Side-by-side syntax-highlighted diff of Antigravity session history |
 | `agya` | Export, render, and preview the latest Antigravity session audit report |
@@ -208,14 +215,22 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | Command / Alias | Action / Purpose |
 |---|---|
 | `wm` / `wmux` | Base command for `workmux` (or `wmux <branch>` to create worktree directly) |
-| `wma <branch>` | **Workmux Add**: Create worktree branch, tmux window, and copy/symlink configs |
+| `wma <branch>` | **Workmux Add**: Create worktree branch without opening tmux windows/terminals |
+| `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and store prompt file |
+| `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM |
 | `wmo [branch]` | **Workmux Open**: Open/switch to worktree window (fuzzy-picks via `fzf` if branch omitted!) |
 | `wml` / `wmls` | **Workmux List**: List all active worktrees with agent status and branch diffs |
 | `wmm` | **Workmux Merge**: Merge current worktree branch into main and clean up window/directory |
 | `wmr` / `wmrm` | **Workmux Remove**: Clean up worktree directory, tmux window, and branch without merging |
+| `wmrg` | **Workmux Remove Gone**: Auto-remove all worktrees whose upstream branches were merged and deleted on GitHub (`workmux remove --gone`) |
 | `wmc` | **Workmux Close**: Close the tmux window for a worktree while keeping the branch/directory intact |
 | `wmd` | **Workmux Dashboard**: Open the interactive TUI dashboard |
-| `wms` | **Workmux Sidebar**: Toggle the persistent live agent status sidebar in tmux |
+| `wms` | **Workmux Sidebar**: Toggle the persistent live agent status sidebar in tmux (global) |
+| `wmss` | **Workmux Sidebar (Session)**: Toggle sidebar for current session only |
+| `wmsn` / `wmsp` | **Workmux Next/Prev**: Jump to next / previous running agent |
+| `wmsf` | **Workmux Filter**: Toggle sidebar session filter |
+| `wmst` / `wmsl` | **Workmux Position**: Switch sidebar between top horizontal bar and left column |
+| `wmsr` | **Workmux Reap**: Clean up tracked agents older than 12 hours |
 | `wt-new <branch>` | Legacy helper: Create new git worktree with dedicated branch in `.worktrees/<branch>` |
 | `wt-tmux-attach` | Legacy helper: Fuzzy-pick existing worktree and switch tmux window directly to it |
 | `wt-rm` | Legacy helper: Fuzzy-pick worktree to cleanly delete worktree and associated branch |
@@ -287,24 +302,31 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### H. Github workspace (`~/Github`)
 | Command / Alias | Action / Purpose |
 |---|---|
-| `ghn` | `cd ~/Github/n1ecC` — your GitHub repos |
-| `ghr [repo]` | List or `cd` into a specific n1ecC repo |
+| `ghn` | Interactive `fzf` repo selector with git status preview (`cd ~/Github/ne1cc/<repo>`) |
+| `ghn <repo>` | Jump directly to repository under `~/Github/ne1cc/` |
+| `ghn -s [repo]` | Open or attach dedicated tmux session for repository via `tmux-sessionizer` |
+| `ghn --root` | `cd ~/Github/ne1cc` (namespace root) |
+| `ghr [repo]` | List or `cd` into a specific ne1cc repo (alias for `ghn`) |
 | `ghroot` | `cd ~/Github` |
 | `ghex` / `ghws` / `ghcfg` | `cd` explore / workspace / config |
-| `gho` | `cd ~/Github/n1ecC/olist-lakehouse` |
-| `ghab` | `cd ~/Github/n1ecC/ab-testing-dagster` |
-| `ghdhs` | `cd ~/Github/n1ecC/dhs-stunting-pipeline` |
-| `ghtk` | `cd ~/Github/n1ecC/ticker-change` |
-| `ghsync` | Clone missing + pull all n1ecC repos (`sync-n1ecC`) |
+| `ghsync` | Clone missing + pull all ne1cc repos (`sync-ne1cc`) |
 | `ghsync-list` | Show local clone status and dirty repos |
-| `ghsync-pull` | Pull existing n1ecC repos only |
+| `ghsync-pull` | Pull existing ne1cc repos only |
 | `ghar [name]` | Archive project to `~/Github/archive/` |
-| `ghar --from-n1ecc <repo>` | Archive local n1ecC clone (excludes from sync) |
+| `ghar --from-ne1cc <repo>` | Archive local ne1cc clone (excludes from sync) |
 | `ghpin` | Open GitHub profile + portfolio pin instructions |
-| `sync-n1ecC` | Same as `ghsync` (also in `~/bin`) |
+| `sync-ne1cc` | Same as `ghsync` (also in `~/bin`) |
 | `gharchive` | Same as `ghar` (also in `~/bin`) |
 | `pin-portfolio` | Same as `ghpin` (also in `~/bin`) |
 | `setup-github-workspace` | Create full `~/Github` tree (macOS, Linux, WSL) — run by install/bootstrap |
+| `gnc [owner/]<repo>` | Clone repo into `~/Github/<owner>/<repo>` (defaults to `ne1cc` if owner omitted) |
+| `gwc [org/]<repo>` | Clone work repo into `~/Github/sun-alexander-dev/<repo>` via `github-work` SSH host |
+| `gwclone` / `git work-clone`| Shorthand & Git subcommand for work clone (`~/bin/git-work-clone`) |
+| `gnn <name>` | Start local-only project in `~/Github/_local/projects/<name>` |
+| `gnp` | Promote local project → create on GitHub, push, and move to `~/Github/ne1cc/<name>` |
+| `gns` | Show local WIP projects and mirror drift |
+| `gmc` / `gh-mirror` | Check mirror drift between GitHub and local `~/Github/ne1cc/` |
+| `gnf <owner>/<repo>` | Fork repo to your account and clone under your namespace |
 
 ### I. Application Launchers & File Handlers
 | Command / Alias | Action / Purpose |
@@ -312,7 +334,8 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `lg` | Launch Lazygit in current repository |
 | `lgd` | Launch Lazygit in dotfiles repository (`$DOTFILES`) |
 | `mu <file.pdf>` | Open PDF in high-speed MuPDF viewer |
-| `om` / `omd` / `onemarkdown` | Open Markdown file in **One Markdown** |
+| `cdom` / `cdonemarkdown` | Change directory to iCloud Drive **One Markdown** folder (`$ONEMARKDOWN_DIR`) |
+| `om [file.md]` | Open file in **One Markdown** (or `cd` into One Markdown folder if no argument) |
 | `mt` / `marktext` | Open Markdown file in **Mark Text** (new window) |
 | `prev` / `preview` | Open file in Apple **Preview** |
 | `finder` | Open current directory in macOS Finder |
@@ -365,9 +388,12 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>ff` | Normal | Find Files (FzfLua) |
 | `<Leader>fg` | Normal | Live Grep / Ripgrep (FzfLua) |
 | `<Leader>fb` | Normal | List and switch open buffers |
+| `<Leader>fn` | Normal | **Find Notifications / Notification History** (`Snacks.notifier`) |
 | `<Leader>fh` | Normal | Search Neovim help tags |
 | `<Leader>fs` | Normal | Search LSP document symbols |
 | `<Leader>fr` | Normal | Search LSP references |
+| `<Leader>uh` | Normal | **Show Notification History** (`Snacks.notifier.show_history()`) |
+| `<Leader>uH` | Normal | **Dismiss All Active Notifications** (`Snacks.notifier.hide()`) |
 | `Ctrl + q` | Fzf Modal | Select all items & populate quickfix list |
 
 ### C. Git & Lazygit Integration
@@ -379,7 +405,21 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `<Leader>gB` | Normal | Open Fugitive git blame window (`:Git blame`) |
 | `<Leader>gP` | Normal | Push commits via Fugitive (`:Git push`) |
 
-### D. Markdown, Media, Images & PDFs
+### D. Antigravity AI (`agyy`) & OpenWiki Assistant
+| Keybinding | Mode | Action |
+|---|---|---|
+| `<Leader>ae` | Normal | **Explain Current File**: Runs background `agyy` to explain active buffer; extracts imports for cross-references; saves to `docs/explanations/<relpath>.md` with a **Related Files** section; opens in `omd` |
+| `<Leader>ae` | Visual | **Explain Selection**: Runs background `agyy` to explain highlighted lines; saves to `docs/snippets/<file>_L<start>-L<end>_<timestamp>.md` with rich metadata and opens in `omd` |
+| `<Leader>ar` | Normal | **Review File**: Runs background `agyy` to review buffer for bugs & regressions; saves findings to `docs/reviews/<relpath>.md` and opens in `omd` |
+| `<Leader>as` | Normal | **Summarize Whole Repo**: Runs background `repo-summarize`: scans the repo first (`.repo-map.md` import graph), then saves annotated per-file walkthroughs (a comment on every line for files ≤150 lines, per-block above) to `docs/architecture/` and an AI-synthesised `INDEX.md`; opens in `omd` |
+| `<Leader>av` | Normal | **Explanation Graph**: Runs `explain-viz` (zero AI cost); parses all `docs/explanations/*.md` cross-references; opens interactive D3.js `GRAPH.html` in browser |
+| `<Leader>oh` | Normal | **Open HTML in Browser**: Opens current `.html` buffer in the system browser; falls back to `docs/explanations/GRAPH.html` if buffer isn't HTML |
+| `<Leader>ow` | Normal | **OpenWiki Headless Documentation**: Runs background `openwiki code --update/--init --print` and opens `openwiki/quickstart.md` in `omd` |
+| `<Leader>at` | Normal | **Floating Terminal**: Spawns floating interactive Antigravity (`agyy`) session |
+| `<C-q>` | Terminal | **Close Floating Window**: Instantly dismiss active Antigravity terminal overlay |
+| `q` / `<Esc>` | Normal | **Close Floating Window**: Dismiss active Antigravity terminal buffer |
+
+### E. Markdown, Media, Images & PDFs
 | Keybinding | Mode | Action |
 |---|---|---|
 | `<Leader>p` / `<Leader>pi` | Normal | **Paste image from clipboard** directly into Markdown (`img-clip.nvim`) |
@@ -401,14 +441,14 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | `j` / `]i` | Normal (Image buffer) | View next image in folder gallery |
 | `k` / `[i` | Normal (Image buffer) | View previous image in folder gallery |
 
-### E. Neo-tree Sidebar Shortcuts
+### F. Neo-tree Sidebar Shortcuts
 | Keybinding | Context | Action |
 |---|---|---|
 | `<CR>` / `o` | Neo-tree | Open file or expand directory |
 | `P` | Neo-tree | Toggle floating preview of file under cursor |
 | `M` | Neo-tree | Open highlighted PDF directly in **MuPDF** |
 
-### F. Insert / Command Mode Line Editing
+### G. Insert / Command Mode Line Editing
 | Keybinding | Mode | Action |
 |---|---|---|
 | `Alt + K` | Insert / Command | Cut text from cursor to end of line into clipboard (`<C-o>d$`) |
@@ -488,7 +528,7 @@ Launched via `y` (shell wrapper that switches directory on exit) or `yazi`:
 
 ## 7. Karabiner-Elements Window Management
 
-Configured in [`.config/karabiner/karabiner.json`](file:///Users/alex/Github/config/terminal-configs/.config/karabiner/karabiner.json):
+Configured in [`.config/karabiner/karabiner.json`](.config/karabiner/karabiner.json):
 
 | Keybinding | Action |
 |---|---|
@@ -500,35 +540,38 @@ Configured in [`.config/karabiner/karabiner.json`](file:///Users/alex/Github/con
 
 ## 8. Custom CLI Helper Binaries & Scripts
 
-Located in [`bin/`](file:///Users/alex/Github/config/terminal-configs/bin) (symlinked to `~/bin`):
+Located in [`bin/`](bin/) (symlinked to `~/bin`):
 
 | Script | Purpose |
 |---|---|
-| [`fleet`](file:///Users/alex/Github/config/terminal-configs/bin/fleet) | Production Multi-Agent Git Worktree & Tmux Swarm Orchestrator (`claude`, `agy`, `qoder`). |
-| [`tmux-palette`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
-| [`tmux-open-path`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
-| [`tmux-scratchpad`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |
-| [`tmux-ports`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-ports) | Interactive listening ports inspector, process killer, and localhost opener. |
-| [`tmux-cheat`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-cheat) | Interactive developer cheatsheet and documentation HUD (`cheat.sh`). |
-| [`tmux-dotfiles`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-dotfiles) | Fuzzy dotfiles switcher and live config editor with auto-reload. |
-| [`tmux-sessionizer`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
-| [`tmux-agent-matrix`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
-| [`session-handoff`](file:///Users/alex/Github/config/terminal-configs/bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |
-| [`tmux-workspace`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-workspace) | Instant declarative IDE-like workspace layouts (`dev`, `ai`, `triage`). |
-| [`tmux-join-panes`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
-| [`tmux-save-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
-| [`tmux-restore-named`](file:///Users/alex/Github/config/terminal-configs/bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |
-| [`macos-defaults.sh`](file:///Users/alex/Github/config/terminal-configs/bin/macos-defaults.sh) | Applies macOS performance defaults (fast key repeat, Finder tweaks, disable animations). |
-| [`git-install-taskwarrior-hook`](file:///Users/alex/Github/config/terminal-configs/bin/git-install-taskwarrior-hook) | Configures git post-commit hooks to update Taskwarrior items automatically. |
-| [`mac-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
-| [`linux-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
-| [`wsl-bootstrap.sh`](file:///Users/alex/Github/config/terminal-configs/bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
-| [`setup.sh`](file:///Users/alex/Github/n1ecC/terminal-configs/setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
-| [`setup-github-workspace`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
-| [`sync-n1ecC`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/sync-n1ecC) | Clone/pull all github.com/n1ecC repos into `~/Github/n1ecC/`. |
-| [`gharchive`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
-| [`pin-portfolio`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
-| [`setup-github-profile`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
-| [`ghostty-new-session`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
-| [`clear-images`](file:///Users/alex/Github/n1ecC/terminal-configs/bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
+| [`fleet`](bin/fleet) | Production Multi-Agent Git Worktree & Tmux Swarm Orchestrator (`claude`, `agy`, `qoder`). |
+| [`tmux-palette`](bin/tmux-palette) | Interactive Command Palette HUD. Search and trigger any terminal workflow. |
+| [`tmux-open-path`](bin/tmux-open-path) | Extracts file paths & compiler stacktraces from screen and opens in Neovim. |
+| [`tmux-scratchpad`](bin/tmux-scratchpad) | Floating instant scratchpad and notes editor (`~/notes/scratchpad.md`). |
+| [`tmux-ports`](bin/tmux-ports) | Interactive listening ports inspector, process killer, and localhost opener. |
+| [`tmux-cheat`](bin/tmux-cheat) | Interactive developer cheatsheet and documentation HUD (`cheat.sh`). |
+| [`tmux-dotfiles`](bin/tmux-dotfiles) | Fuzzy dotfiles switcher and live config editor with auto-reload. |
+| [`tmux-sessionizer`](bin/tmux-sessionizer) | Interactive project jumper. Scans git repositories and opens or attaches to dedicated tmux session. |
+| [`tmux-agent-matrix`](bin/tmux-agent-matrix) | Spawns parallel AI agents in 2-pane, 3-pane, or 4-pane tiled tmux grid layouts. |
+| [`session-handoff`](bin/session-handoff) | Exports git branch, uncommitted diffs, and session metadata into structured markdown handoff notes. |
+| [`tmux-workspace`](bin/tmux-workspace) | Instant declarative IDE-like workspace layouts (`dev`, `ai`, `triage`). |
+| [`tmux-join-panes`](bin/tmux-join-panes) | Interactive fuzzy multi-select pane joiner with live ANSI terminal buffer preview. |
+| [`tmux-save-named`](bin/tmux-save-named) | Saves full tmux session snapshot under a custom name in `~/.tmux/resurrect/named/`. |
+| [`tmux-restore-named`](bin/tmux-restore-named) | Interactive fuzzy selector to restore any named tmux session snapshot. |
+| [`macos-defaults.sh`](bin/macos-defaults.sh) | Applies macOS performance defaults (fast key repeat, Finder tweaks, disable animations). |
+| [`git-install-taskwarrior-hook`](bin/git-install-taskwarrior-hook) | Configures git post-commit hooks to update Taskwarrior items automatically. |
+| [`mac-bootstrap.sh`](bin/mac-bootstrap.sh) | Complete bootstrap installer for fresh macOS machines. |
+| [`linux-bootstrap.sh`](bin/linux-bootstrap.sh) | Complete bootstrap installer for Linux/Ubuntu workstations. |
+| [`wsl-bootstrap.sh`](bin/wsl-bootstrap.sh) | Complete bootstrap installer for Windows Subsystem for Linux (WSL2). |
+| [`setup.sh`](setup.sh) | Portable, idempotent dotfiles symlink manager with automated collision backups. |
+| [`setup-github-workspace`](bin/setup-github-workspace) | Creates identical `~/Github` tree on macOS, Linux, and WSL; links `_tools` scripts. |
+| [`setup-multi-account-gh`](bin/setup-multi-account-gh) | Automated dual GitHub setup & verification (personal `ne1cc` + work `sun-alexander-dev`). |
+| [`git-work-clone`](bin/git-work-clone) | Clones work repos via `github-work` SSH host into `~/Github/sun-alexander-dev/` (`gwc`, `gwclone`). |
+| [`gh-ns-clone`](bin/gh-ns-clone) | Clones repo into owner mirror; defaults to `ne1cc` if owner omitted (`gnc`). |
+| [`sync-ne1cc`](bin/sync-ne1cc) | Clone/pull all github.com/ne1cc repos into `~/Github/ne1cc/`. |
+| [`gharchive`](bin/gharchive) | Move local projects into `~/Github/archive/` with manifest logging. |
+| [`pin-portfolio`](bin/pin-portfolio) | Open GitHub profile with portfolio pin instructions. |
+| [`setup-github-profile`](bin/setup-github-profile) | Update GitHub profile bio via `gh api` (requires user scope). |
+| [`ghostty-new-session`](bin/ghostty-new-session) | Spawn independent, uniquely-timestamped tmux sessions for new Ghostty surfaces/windows. |
+| [`clear-images`](bin/clear-images) | Purge orphaned terminal image/diagram overlays (Kitty graphics protocol). |
 

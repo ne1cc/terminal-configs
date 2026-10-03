@@ -114,10 +114,22 @@ if [[ "$PLATFORM" == "macOS" && -d "$REPO_DIR/.config/karabiner" ]]; then
   link_path "$REPO_DIR/.config/karabiner" "$CONFIG_DIR/karabiner"
 fi
 
-for script in "$REPO_DIR"/bin/*; do
-  [[ -f "$script" ]] || continue
-  link_path "$script" "$HOME/bin/$(basename "$script")"
-done
+repo_bin="$(cd "$REPO_DIR/bin" && pwd -P)"
+if [[ -L "$HOME/bin" || -d "$HOME/bin" ]]; then
+  home_bin="$(cd "$HOME/bin" 2>/dev/null && pwd -P || echo "")"
+else
+  home_bin=""
+fi
+
+if [[ -n "$home_bin" && "$home_bin" == "$repo_bin" ]]; then
+  printf '  unchanged: %s (already points at repo bin)\n' "$HOME/bin"
+else
+  run mkdir -p "$HOME/bin"
+  for script in "$REPO_DIR"/bin/*; do
+    [[ -f "$script" ]] || continue
+    link_path "$script" "$HOME/bin/$(basename "$script")"
+  done
+fi
 
 if [[ -d "$REPO_DIR/claude-code" ]]; then
   if "$DRY_RUN"; then
@@ -137,9 +149,9 @@ fi
 
 if [[ -x "$REPO_DIR/bin/setup-github-workspace" ]]; then
   if "$DRY_RUN"; then
-    printf '[dry-run] %s/bin/setup-github-workspace\n' "$REPO_DIR"
+    printf '[dry-run] %s/bin/setup-github-workspace --rename\n' "$REPO_DIR"
   else
-    "$REPO_DIR/bin/setup-github-workspace"
+    "$REPO_DIR/bin/setup-github-workspace" --rename
   fi
 fi
 
@@ -160,10 +172,19 @@ if "$INSTALL_PACKAGES"; then
   run brew bundle --file="$BREWFILE"
 fi
 
+if command -v git >/dev/null 2>&1; then
+  run git config --global rerere.enabled true
+  run git config --global rerere.autoupdate true
+fi
+
 if ! "$SKIP_PLUGINS"; then
   if command -v git >/dev/null 2>&1 && [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     run mkdir -p "$HOME/.tmux/plugins"
     run git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+  fi
+
+  if [[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]]; then
+    run "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
   fi
 
   if command -v nvim >/dev/null 2>&1; then

@@ -1,3 +1,71 @@
+# GEMINI.md
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
 ## Superpowers (Mandatory — Start of Every Session)
 
 At the start of every conversation, read and follow the `using-superpowers` skill (`~/.gemini/config/skills/using-superpowers/SKILL.md`). This skill establishes how to discover and invoke all other skills before any action or clarifying question.
@@ -59,16 +127,16 @@ When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or r
 
 ## 8. GitHub Namespace Layout & Shortcuts (mandatory)
 
-Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
+Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
 
 ```text
 ~/Github/
-  n1ecC/                 # ONLY repos that exist on github.com/n1ecC/*
+  ne1cc/                 # ONLY repos that exist on github.com/ne1cc/*
   _local/projects/       # local WIP with no remote yet
   _local/archive/        # old / non-synced trees
   _local/worktrees/      # linked git worktrees
   <other-owner>/         # reference clones (do not add to .mirror-owners)
-  .mirror-owners         # synced owners list (currently: n1ecC)
+  .mirror-owners         # synced owners list (currently: ne1cc)
 ```
 
 ### Shell aliases (prefer these over raw git/gh for repo placement)
@@ -76,9 +144,9 @@ Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
 | Alias | Command | Use when |
 |-------|---------|----------|
 | `gnn <name>` | `gh-ns-new` | Start a **local-only** project in `~/Github/_local/projects/<name>` (`--python` / `--node` optional) |
-| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `n1ecC/<name>` on GitHub, push, **move** into `~/Github/n1ecC/<name>` (`--public`, `--name`, `--owner`) |
+| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `ne1cc/<name>` on GitHub, push, **move** into `~/Github/ne1cc/<name>` (`--public`, `--name`, `--owner`) |
 | `gns` | `gh-ns-status` | Show local WIP + mirror drift |
-| `gmc` | `gh-mirror-check` | Compare `n1ecC` remotes vs `~/Github/n1ecC` (`MISSING` / `ORPHAN`) |
+| `gmc` | `gh-mirror-check` | Compare `ne1cc` remotes vs `~/Github/ne1cc` (`MISSING` / `ORPHAN`) |
 | `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
 | `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
 
@@ -88,14 +156,14 @@ gnn invoice-etl --python
 cd ~/Github/_local/projects/invoice-etl
 # commit work…
 gnp
-cd ~/Github/n1ecC/invoice-etl
+cd ~/Github/ne1cc/invoice-etl
 gmc
 ```
 
 ### Rules agents must follow
-1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/n1ecC/<repo>`.
+1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
 2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
-3. After `gnp`, the canonical path is `~/Github/n1ecC/<repo>`; do not leave promoted repos under `_local`.
+3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
 4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
 6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
@@ -106,4 +174,31 @@ All development happens in workmux-managed git worktrees (`.worktrees/`, one bra
 1. Commit all work on the worktree's branch (Conventional Commits).
 2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
 3. Report the PR URL. Done = PR URL reported. The user merges the PR, then runs `wmr` and `git worktree prune` themselves.
+
+## 10. Specification-Driven Execution & Checkpoint Protocol
+
+To maintain high auditability, keep the human in the loop, and prevent rogue changes:
+
+### Scope Thresholds
+- **Trivial changes** (single-file fixes, typos, dependency bumps, explicit direct instructions):
+  - State the intention briefly in conversation.
+  - Implement surgical changes directly and verify with tests.
+- **Non-trivial changes** (≥2 files, architectural changes, schema/API changes, or ambiguous specs):
+  - Follow the `spec-driven-execution` skill.
+  - Strict two-phase lifecycle: Plan first, get explicit approval, then execute.
+
+### Pre-Execution Plan & Review Gate
+- Inspect the codebase and tests (read-only; **do NOT edit source files yet**).
+- Write an implementation plan:
+  - In Antigravity / UI runtimes: Save as an Antigravity Artifact (`write_to_file` with `ArtifactMetadata.RequestFeedback = true`, `ArtifactType: "plan"`).
+  - In CLI / terminal runtimes: Write to `.scratch/<feature-name>/implementation_plan.md`.
+  - Include: architecture/rationale, exact files to create/modify/delete, step-by-step TDD phases, and verification commands.
+- **STOP and wait for user review/approval** before applying any file modifications.
+
+### Surgical Execution & Audit Walkthrough
+- Execute modifications matching the approved plan surgically.
+- Run unit tests, linters, and verification commands.
+- Capture the post-execution audit trail:
+  - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
+  - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
 

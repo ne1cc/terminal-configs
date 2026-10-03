@@ -4,7 +4,7 @@ A practical guide to the `gh*` shell aliases, sync scripts, and daily workflow f
 
 **Documentation hub:** [README.md](README.md) · **Machine setup:** [GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md)
 
-**Account:** [github.com/n1ecC](https://github.com/n1ecC)  
+**Account:** [github.com/ne1cc](https://github.com/ne1cc)  
 **Canonical repo:** `terminal-configs` (where these scripts and aliases live)
 
 For first-time machine setup (macOS, Linux, WSL), see **[GITHUB_WORKSPACE_SETUP.md](GITHUB_WORKSPACE_SETUP.md)** first. This guide assumes that setup is done and aliases are loaded.
@@ -28,7 +28,7 @@ ghsync-list
 ghsync
 
 # 5. Jump into your repos
-ghn              # cd ~/Github/n1ecC
+ghn              # cd ~/Github/ne1cc
 ghr              # list all local repo folders
 ghr olist-lakehouse
 ```
@@ -66,12 +66,12 @@ Set in `~/.zprofile` (loaded at login):
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GITHUB_ROOT` | `$HOME/Github` | Root of your dev workspace |
-| `N1ECC_DIR` | `$GITHUB_ROOT/n1ecC` | All your GitHub repos (push from here) |
+| `NE1CC_DIR` | `$GITHUB_ROOT/ne1cc` | All your GitHub repos (push from here) |
 
 Override for one-off runs:
 
 ```bash
-N1ECC_DIR=/tmp/test ghsync-list
+NE1CC_DIR=/tmp/test ghsync-list
 ```
 
 ---
@@ -80,9 +80,9 @@ N1ECC_DIR=/tmp/test ghsync-list
 
 ```
 ~/Github/
-??? n1ecC/          # YOUR repos — single source of truth for pushing to GitHub
+??? ne1cc/          # YOUR repos — single source of truth for pushing to GitHub
 ??? config/         # Dotfiles, scripts, machine-specific overrides
-??? explore/        # Third-party clones (read-only; fork to n1ecC/ if you keep changes)
+??? explore/        # Third-party clones (read-only; fork to ne1cc/ if you keep changes)
 ??? workspace/      # Local-only work (sandboxes, coursework, datasets)
 ??? archive/        # Cold storage + MANIFEST.md
 ??? tracking/       # Job search / application tracking
@@ -91,9 +91,9 @@ N1ECC_DIR=/tmp/test ghsync-list
 
 **Conventions:**
 
-1. Only **`n1ecC/`** gets pushed to your GitHub account.
+1. Only **`ne1cc/`** gets pushed to your GitHub account.
 2. **`explore/`** is for learning — clone, read, delete; don't customize in place.
-3. **`workspace/`** stays local until you promote a project to `n1ecC/`.
+3. **`workspace/`** stays local until you promote a project to `ne1cc/`.
 4. Large datasets go in `workspace/datasets/` or repo-local `data/` (gitignored).
 
 ---
@@ -107,7 +107,7 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 | Alias | Action |
 |-------|--------|
 | `ghroot` | `cd ~/Github` |
-| `ghn` | `cd ~/Github/n1ecC` — all your GitHub repos |
+| `ghn` | `cd ~/Github/ne1cc` — all your GitHub repos |
 | `ghex` | `cd ~/Github/explore` |
 | `ghws` | `cd ~/Github/workspace` |
 | `ghcfg` | `cd ~/Github/config` |
@@ -116,25 +116,16 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 
 | Command | Action |
 |---------|--------|
-| `ghr` | List all folders in `~/Github/n1ecC/` |
-| `ghr <repo>` | `cd ~/Github/n1ecC/<repo>` |
-
-### Portfolio quick-jumps
-
-| Alias | Repo |
-|-------|------|
-| `gho` | `olist-lakehouse` |
-| `ghab` | `ab-testing-dagster` |
-| `ghdhs` | `dhs-stunting-pipeline` |
-| `ghtk` | `ticker-change` |
+| `ghr` | List all folders in `~/Github/ne1cc/` |
+| `ghr <repo>` | `cd ~/Github/ne1cc/<repo>` |
 
 ### Sync & maintenance
 
 | Alias | Runs | Purpose |
 |-------|------|---------|
-| `ghsync` | `sync-n1ecC` | Clone missing repos + pull existing |
-| `ghsync-list` | `sync-n1ecC --list` | Show clone status and dirty repos |
-| `ghsync-pull` | `sync-n1ecC --pull` | Pull existing clones only (no new clones) |
+| `ghsync` | `sync-ne1cc` | Clone missing repos + pull existing |
+| `ghsync-list` | `sync-ne1cc --list` | Show clone status and dirty repos |
+| `ghsync-pull` | `sync-ne1cc --pull` | Pull existing clones only (no new clones) |
 | `ghar` | `gharchive` | Move projects to `~/Github/archive/` |
 | `ghpin` | `pin-portfolio` | Open GitHub profile + pin instructions |
 
@@ -142,7 +133,7 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 
 | Script | Same as |
 |--------|---------|
-| `sync-n1ecC` | `ghsync` |
+| `sync-ne1cc` | `ghsync` |
 | `gharchive` | `ghar` |
 | `pin-portfolio` | `ghpin` |
 | `setup-github-workspace` | Creates `~/Github` tree + `_tools` symlinks |
@@ -152,12 +143,12 @@ All aliases are defined in `terminal-configs/.zshrc`. Equivalent bin scripts are
 
 ## Sync: `ghsync`, `ghsync-pull`, `ghsync-list`
 
-The sync engine is **`sync-n1ecC`** (`~/Github/n1ecC/terminal-configs/bin/sync-n1ecC`), symlinked from `~/Github/_tools/sync-n1ecC`.
+The sync engine is **`sync-ne1cc`** (`~/Github/ne1cc/terminal-configs/bin/sync-ne1cc`), symlinked from `~/Github/_tools/sync-ne1cc`.
 
 ### What it syncs
 
 - **Source:** All repos on your GitHub account via `gh api user/repos`
-- **Destination:** `~/Github/n1ecC/<repo-name>/`
+- **Destination:** `~/Github/ne1cc/<repo-name>/`
 - **Excluded from listing:** Forks, and `SystemDashboard` (org repo that shouldn't mirror locally)
 
 ### Three modes
@@ -172,13 +163,13 @@ The sync engine is **`sync-n1ecC`** (`~/Github/n1ecC/terminal-configs/bin/sync-n
 
 **Already cloned:**
 
-1. Sets `origin` to `https://github.com/n1ecC/<repo>.git`
+1. Sets `origin` to `https://github.com/ne1cc/<repo>.git`
 2. `git fetch origin --prune` — download latest commits/branches, remove stale remote refs
 3. `git pull --ff-only origin <current-branch>` — fast-forward only (no merge commit)
 
 **Not cloned yet:**
 
-1. `gh repo clone n1ecC/<repo> ~/Github/n1ecC/<repo>`
+1. `gh repo clone ne1cc/<repo> ~/Github/ne1cc/<repo>`
 2. Skipped if repo is in `~/Github/_tools/archive-exclude.txt`
 
 ### What sync does **not** do
@@ -245,10 +236,10 @@ Move local project folders into `~/Github/archive/` with a dated path and a mani
 ### Usage
 
 ```bash
-ghar my-old-sandbox              # search explore/, workspace/, n1ecC/
+ghar my-old-sandbox              # search explore/, workspace/, ne1cc/
 ghar /full/path/to/dir           # explicit path
 ghar --list                      # show archived projects
-ghar --from-n1ecc old-repo-name  # archive from n1ecC/ (excludes from future sync)
+ghar --from-ne1cc old-repo-name  # archive from ne1cc/ (excludes from future sync)
 ```
 
 ### Behavior
@@ -258,12 +249,12 @@ ghar --from-n1ecc old-repo-name  # archive from n1ecC/ (excludes from future syn
 - Preserves `.git` history in the archived copy
 - Warns if uncommitted changes exist, but still archives
 
-### Archiving from `n1ecC/`
+### Archiving from `ne1cc/`
 
-Repos in `n1ecC/` are protected by default — you must use `--from-n1ecc`:
+Repos in `ne1cc/` are protected by default — you must use `--from-ne1cc`:
 
 ```bash
-ghar --from-n1ecc wingstop-experiment
+ghar --from-ne1cc wingstop-experiment
 ```
 
 This also adds the repo name to `~/Github/_tools/archive-exclude.txt`, so **`ghsync` will not re-clone it**.
@@ -309,15 +300,15 @@ ghsync-list | rg '\*'    # optional — see what still has local edits
 ### New repo on GitHub
 
 ```bash
-# Created repo on github.com/n1ecC/my-new-project
-ghsync                   # clones it into ~/Github/n1ecC/
+# Created repo on github.com/ne1cc/my-new-project
+ghsync                   # clones it into ~/Github/ne1cc/
 ghr my-new-project
 ```
 
 ### Active development
 
 ```bash
-ghab                     # cd ab-testing-dagster
+ghn ticker               # fuzzy jump to ticker-change
 # ... edit ...
 git add -A && git commit -m "fix CI"
 git push origin main
@@ -326,11 +317,11 @@ git push origin main
 ### New project from template
 
 ```bash
-cp -r ~/Github/workspace/sandboxes/de-project-template ~/Github/n1ecC/my-new-project
-cd ~/Github/n1ecC/my-new-project
+cp -r ~/Github/workspace/sandboxes/de-project-template ~/Github/ne1cc/my-new-project
+cd ~/Github/ne1cc/my-new-project
 make install && make check
 # create repo on GitHub, then:
-git remote add origin https://github.com/n1ecC/my-new-project.git
+git remote add origin https://github.com/ne1cc/my-new-project.git
 git push -u origin main
 ```
 
@@ -345,7 +336,7 @@ ghpin                    # verify pins on profile
 ### Retire a local clone (keep GitHub repo)
 
 ```bash
-ghar --from-n1ecc old-experiment
+ghar --from-ne1cc old-experiment
 ghsync-list              # should show [--] not cloned
 ```
 
@@ -360,8 +351,8 @@ ghsync-list              # should show [--] not cloned
 | Pull fails on one repo | Check `git status` in that repo; commit, stash, or resolve divergence |
 | Repo keeps re-cloning after archive | Confirm it's in `_tools/archive-exclude.txt` |
 | Wrong workspace path | Check `echo $GITHUB_ROOT` — should be `~/Github` |
-| Aliases point at old paths | `cd ~/Github/n1ecC/terminal-configs && ./install.sh` |
-| `ghar` can't find project | Use full path, or check explore/workspace/n1ecC spelling |
+| Aliases point at old paths | `cd ~/Github/ne1cc/terminal-configs && ./install.sh` |
+| `ghar` can't find project | Use full path, or check explore/workspace/ne1cc spelling |
 | Bio update fails | `gh auth refresh -h github.com -s user` |
 
 ---
@@ -370,7 +361,7 @@ ghsync-list              # should show [--] not cloned
 
 | Path | Role |
 |------|------|
-| `terminal-configs/bin/sync-n1ecC` | Sync engine (canonical) |
+| `terminal-configs/bin/sync-ne1cc` | Sync engine (canonical) |
 | `terminal-configs/bin/gharchive` | Archive tool |
 | `terminal-configs/bin/pin-portfolio` | Pin instructions |
 | `terminal-configs/bin/setup-github-profile` | Bio updater |
@@ -381,7 +372,7 @@ ghsync-list              # should show [--] not cloned
 After updating `terminal-configs` on another machine:
 
 ```bash
-cd ~/Github/n1ecC/terminal-configs
+cd ~/Github/ne1cc/terminal-configs
 git pull
 ./install.sh
 source ~/.zshrc
@@ -404,7 +395,7 @@ source ~/.zshrc
 ```bash
 # Navigate
 ghroot    ghn    ghex    ghws    ghcfg
-ghr [repo]    gho    ghab    ghdhs    ghtk
+ghn [repo]    ghr [repo]
 
 # Sync
 ghsync-list          # status
@@ -412,7 +403,7 @@ ghsync               # clone missing + pull all
 ghsync-pull          # pull existing only
 
 # Maintain
-ghar [--from-n1ecc] <name>    # archive locally
+ghar [--from-ne1cc] <name>    # archive locally
 ghpin                         # profile pins
 setup-github-profile          # update bio
 

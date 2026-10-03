@@ -1,0 +1,94 @@
+{
+  "includeGitInstructions": true,
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  },
+  "model": "opus",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status waiting"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status working"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux register-agent"
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'git rev-parse --is-inside-work-tree &>/dev/null || exit 0; branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); [[ \"$branch\" == \"main\" || \"$branch\" == \"HEAD\" ]] && exit 0; echo \"🔄 Syncing $branch with origin/main...\"; git fetch origin main 2>&1 && git rebase origin/main 2>&1 && echo \"✅ Worktree is up to date with origin/main\" || { echo \"⚠️  Rebase conflict on $branch — resolve with: git rebase --continue (or --abort)\"; exit 1; }'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status done"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "workmux set-window-status working"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "gitkraken-hooks@gitkraken": true,
+    "mattpocock-skills@mattpocock": true,
+    "superpowers@superpowers-dev": true,
+    "swift-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "gitkraken": {
+      "source": {
+        "source": "directory",
+        "path": "~/.claude/plugins/marketplaces/gitkraken"
+      }
+    },
+    "mattpocock": {
+      "source": {
+        "source": "github",
+        "repo": "mattpocock/skills"
+      }
+    },
+    "superpowers-dev": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers"
+      }
+    }
+  },
+  "claudeMd": "## Git Branching Rules (Conventional Commits)\n\nAll branches MUST use one of these prefixes:\n\n**Development:**\n- `feat/<description>` — New functionality or user-facing enhancements\n- `fix/<description>` — Bug fixes and runtime behavior corrections  \n- `refactor/<description>` — Code restructuring (no behavior change)\n- `perf/<description>` — Performance improvements\n\n**Maintenance:**\n- `chore/<description>` — Dependency bumps, build config, tooling\n- `docs/<description>` — Documentation, guides, comments\n- `test/<description>` — Unit/integration tests and test harnesses\n- `ci/<description>` — CI/CD workflows and automation\n- `style/<description>` — Code formatting and whitespace only\n\n**Release & Experiments:**\n- `release/<description>` — Release prep, tagging, changelog\n- `hotfix/<description>` — Critical production patches from main\n- `exp/<description>` or `spike/<description>` — Throwaway explorations\n\n**Format:** `<type>/<short-kebab-case-description>`\n\n**Examples:**\n✅ `feat/macos-window-controls`\n✅ `fix/timer-ordering-bug`\n✅ `refactor/state-management`\n✅ `chore/bump-flutter-3-22`\n❌ `feature/something` (use `feat/` not `feature/`)\n❌ `bugfix/something` (use `fix/` not `bugfix/`)\n❌ `my-feature-branch` (must have prefix)\n",
+  "theme": "dark-ansi",
+  "agentPushNotifEnabled": true
+}

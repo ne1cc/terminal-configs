@@ -31,9 +31,17 @@ Github/
 tmux-logs/
 tmux_archive_*.log
 
-# Git worktrees managed by workmux
+# Git worktrees & workmux state
 .worktrees/
+.workmux/
 worktrees/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Scratch directories
+.scratch/
 
 # Zsh completion dumps
 .zcompdump*

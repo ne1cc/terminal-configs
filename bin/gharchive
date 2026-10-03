@@ -2,10 +2,10 @@
 # Move a local project folder into ~/Github/archive/ with a dated path + manifest entry.
 #
 # Usage:
-#   gharchive <name>              # search explore/, workspace/, n1ecC/
+#   gharchive <name>              # search explore/, workspace/, ne1cc/
 #   gharchive /full/path/to/dir   # explicit path
 #   gharchive --list              # show archived projects
-#   gharchive --from-n1ecc <name> # archive from n1ecC/ (sync-n1ecC skips unless excluded)
+#   gharchive --from-ne1cc <name> # archive from ne1cc/ (sync-ne1cc skips unless excluded)
 
 set -euo pipefail
 
@@ -42,12 +42,12 @@ find_project() {
     return 0
   fi
 
-  for root in "$GITHUB_ROOT/explore" "$GITHUB_ROOT/workspace" "$GITHUB_ROOT/n1ecC"; do
+  for root in "$GITHUB_ROOT/explore" "$GITHUB_ROOT/workspace" "$GITHUB_ROOT/ne1cc" "$GITHUB_ROOT/n1ecC"; do
     [[ -d "$root/$name" ]] && candidates+=("$root/$name")
   done
 
   if [[ ${#candidates[@]} -eq 0 ]]; then
-    echo "ERROR: Could not find '$name' in explore/, workspace/, or n1ecC/" >&2
+    echo "ERROR: Could not find '$name' in explore/, workspace/, or ne1cc/" >&2
     return 1
   fi
 
@@ -75,7 +75,7 @@ append_exclude() {
   touch "$EXCLUDE_FILE"
   if ! grep -qxF "$name" "$EXCLUDE_FILE" 2>/dev/null; then
     echo "$name" >> "$EXCLUDE_FILE"
-    echo "Added '$name' to archive-exclude.txt (sync-n1ecC will skip re-cloning)."
+    echo "Added '$name' to archive-exclude.txt (sync-ne1cc will skip re-cloning)."
   fi
 }
 
@@ -104,7 +104,7 @@ list_archived() {
 
 do_archive() {
   local src="$1"
-  local from_n1ecc="${2:-false}"
+  local from_ne1cc="${2:-false}"
   local name notes dest dirty
 
   src="$(cd "$src" && pwd)"
@@ -116,14 +116,14 @@ do_archive() {
     exit 0
   fi
 
-  if [[ "$src" == "$GITHUB_ROOT/n1ecC/"* ]]; then
-    if [[ "$from_n1ecc" != "true" ]]; then
-      echo "ERROR: '$name' is in n1ecC/ (your GitHub mirror)." >&2
-      echo "Re-run with --from-n1ecc to archive locally." >&2
+  if [[ "$src" == "$GITHUB_ROOT/ne1cc/"* || "$src" == "$GITHUB_ROOT/n1ecC/"* ]]; then
+    if [[ "$from_ne1cc" != "true" ]]; then
+      echo "ERROR: '$name' is in ne1cc/ (your GitHub mirror)." >&2
+      echo "Re-run with --from-ne1cc to archive locally." >&2
       exit 1
     fi
     append_exclude "$name"
-    notes="archived from n1ecC; excluded from sync-n1ecC"
+    notes="archived from ne1cc; excluded from sync-ne1cc"
   elif [[ "$src" == "$GITHUB_ROOT/explore/"* ]]; then
     notes="archived from explore"
   elif [[ "$src" == "$GITHUB_ROOT/workspace/"* ]]; then
@@ -150,12 +150,12 @@ do_archive() {
   fi
 }
 
-FROM_N1ECC=false
+FROM_NE1CC=false
 case "${1:-}" in
   -h|--help) usage 0 ;;
   --list) list_archived; exit 0 ;;
-  --from-n1ecc)
-    FROM_N1ECC=true
+  --from-ne1cc|--from-n1ecc)
+    FROM_NE1CC=true
     shift
     [[ $# -eq 1 ]] || usage 1
     SRC="$(find_project "$1")"

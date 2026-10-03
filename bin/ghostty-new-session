@@ -1,10 +1,40 @@
 #!/usr/bin/env bash
 # ghostty-new-session:
-# Launched by Ghostty when opening windows (Cmd+N).
-# Creates a brand new, uniquely named tmux session so each new window has its own independent session.
+# Launched by Ghostty when opening windows (Cmd+N) or initial surface.
+# Usage:
+#   ghostty-new-session        # creates a unique timestamped session
+#   ghostty-new-session <name> # creates or attaches to named session (e.g. "main")
 
-tmux_bin="$(command -v tmux 2>/dev/null || echo "/opt/homebrew/bin/tmux")"
+# Ensure package manager binaries are resolvable even in stripped login environments
+export PATH="$HOME/.homebrew/bin:/opt/homebrew/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 
+# Locate tmux binary across platforms (Apple Silicon, Intel Mac, Linux, Linuxbrew)
+tmux_bin=""
+for candidate in \
+    "$(command -v tmux 2>/dev/null)" \
+    "$HOME/.homebrew/bin/tmux" \
+    "/opt/homebrew/bin/tmux" \
+    "/usr/local/bin/tmux" \
+    "/home/linuxbrew/.linuxbrew/bin/tmux" \
+    "/usr/bin/tmux" \
+    "/bin/tmux"; do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+        tmux_bin="$candidate"
+        break
+    fi
+done
+
+if [[ -z "$tmux_bin" ]]; then
+    echo "Error: tmux executable not found in PATH or standard installation directories." >&2
+    exit 1
+fi
+
+# If a specific session name is requested (e.g. "main"), attach or create it
+if [[ -n "$1" ]]; then
+    exec "$tmux_bin" new-session -A -s "$1"
+fi
+
+# Default behavior for new windows: unique timestamped session
 # Using YYYY-MM-DD_HH-MM format because tmux parses colons ':' as window/pane delimiters (session:window.pane)
 base_name="$(date +%Y-%m-%d_%H-%M)"
 session_name="$base_name"

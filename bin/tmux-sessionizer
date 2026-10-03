@@ -9,12 +9,12 @@ if [[ $# -eq 1 ]]; then
 else
     selected=$(
       {
-        find "$GITHUB_ROOT" -mindepth 2 -maxdepth 2 -type d \
-          ! -path "$GITHUB_ROOT/_local/*" \
-          ! -path "$GITHUB_ROOT/_*" \
-          ! -path '*/.*' 2>/dev/null
-        find "$GITHUB_ROOT/_local/projects" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
-      } | LC_ALL=C sort | fzf --prompt='repo > '
+        fd -L --min-depth 2 --max-depth 2 -t d \
+          --exclude '_local' \
+          --exclude '_*' \
+          --exclude '.*' . "$GITHUB_ROOT" 2>/dev/null
+        fd -L --min-depth 1 --max-depth 1 -t d . "$GITHUB_ROOT/_local/projects" 2>/dev/null
+      } | LC_ALL=C sort -u | fzf --prompt='repo > '
     )
 fi
 

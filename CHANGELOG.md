@@ -8,11 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added — Automatic Outdated Repository Rename Detection (`sync-ne1cc` / `ghsync`)
+- `bin/sync-ne1cc`: Added `detect_and_rename_outdated` to dynamically follow GitHub API redirects for renamed repositories, automatically rename local folders in `~/Github/ne1cc/`, and update origin git remotes.
+- `bin/sync-ne1cc`: Added `--rename` flag, `gh` auth status check, and integrated automatic rename detection into `--sync` and `--pull`.
+- `bin/setup-github-workspace`: Added `--rename` option to run rename sweep during workspace initialization.
+- `setup.sh`, `install.sh`, `bin/mac-bootstrap.sh`: Integrated `--rename` into the setup workflow so local repositories stay in sync with remote names.
+
+### Changed — GitHub handle rename (n1ecC → ne1cc)
+- Renamed the scaffolded workspace folder `~/Github/n1ecC/` → `~/Github/ne1cc/` across all scripts, configs, docs, agent memory, and templates: `.gitconfig` includeIf blocks, `.zshrc` / `.zprofile` (incl. `ghn`/`ghr`/`ghsync` aliases), `bin/setup-github-workspace`, `bin/gh-mirror-check` default owner, `bin/gharchive` (`--from-n1ecc` → `--from-ne1cc`), `bin/pin-portfolio`, `.config/sesh/sesh.toml`, and `templates/github-workspace/`.
+- Script rename: `bin/sync-n1ecC` → `bin/sync-ne1cc`; env var `N1ECC_DIR` → `NE1CC_DIR`.
+- After pulling, re-run `bin/setup-github-workspace` to refresh the `~/Github/_tools/sync-ne1cc` symlink.
+
 ### Added / Changed — Tmux Session & Window Management, Ghostty Multi-Session
 - `.tmux.conf`: Re-enabled interactive zoomed tree picker on `Prefix + w` (`choose-tree -Zw`) with pane details collapsed for clean navigation.
 - `.tmux.conf`: Added vim-style fold navigation keys in `tree-mode` (`h` collapse item, `l` expand item, `H` collapse all, `L` expand all).
-- `bin/ghostty-new-session`: Added script to spawn fresh, uniquely-timestamped (`YYYY-MM-DD_HH-MM`) tmux sessions when launching new Ghostty windows (`Cmd+N`).
-- `.config/ghostty/config`: Configured `initial-command = tmux new-session -A -s main` and `command = /Users/alex/bin/ghostty-new-session` so the initial surface attaches to `main` while subsequent windows spawn isolated sessions.
+- `bin/ghostty-new-session`: Enhanced to export package manager paths, search cross-platform tmux locations, and support optional session name arguments (e.g. `main`), fixing macOS Ghostty launch failure when tmux is not in minimal system PATH.
+- `.config/ghostty/config`: Configured `initial-command = ~/bin/ghostty-main-session` and `command = ~/bin/ghostty-new-session` so the initial surface attaches to `main` while subsequent windows spawn isolated sessions without hardcoded paths.
 - `.zshrc`: Updated `ghostty-new()` timestamp naming format.
 - Documentation: Fully audited and updated `SHORTCUTS.md`, `TMUX_SHORTCUTS.md`, `docs/TMUX_WORKFLOW_GUIDE.md`, and `docs/TERMINAL_EMULATORS_GUIDE.md` covering all pane breaking, joining, session moving, and tree navigation shortcuts. Cleaned documentation to UTF-8 encoding.
 
@@ -26,7 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added — Antigravity / Gemini Skills & Markdown Rules
 - Added all 100+ Antigravity skills (including newly created `markdown-architect` and full domain suites) to `.gemini/skills/`.
 - Tracked global formatting rules `GEMINI.md` in repository root under `.gemini/GEMINI.md`.
-- Updated [setup.sh](file:///Users/alex/Github/config/terminal-configs/setup.sh), [install.sh](file:///Users/alex/Github/config/terminal-configs/install.sh), and [bin/mac-bootstrap.sh](file:///Users/alex/Github/config/terminal-configs/bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
+- Updated [setup.sh](setup.sh), [install.sh](install.sh), and [bin/mac-bootstrap.sh](bin/mac-bootstrap.sh) to automatically link `.gemini/skills` and `GEMINI.md` into `~/.gemini/config/` and `$HOME` across all machines.
 
 ### Changed — Neovim Neo-tree Configuration
 - Configured `hijack_netrw_behavior = "open_default"` so opening directories opens the left Neo-tree sidebar instead of netrw/full-window buffer.

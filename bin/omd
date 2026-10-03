@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# omd - Open markdown file with One Markdown (macOS) or glow / xdg-open (Linux)
+set -euo pipefail
+
+TARGET="${1:-}"
+if [[ -z "$TARGET" ]]; then
+  echo "Usage: omd <file.md>" >&2
+  exit 1
+fi
+
+if [[ "$OSTYPE" == darwin* ]]; then
+  if [[ -d "/Applications/One Markdown.app" || -d "$HOME/Applications/One Markdown.app" ]]; then
+    open -a "One Markdown" "$TARGET"
+  else
+    open "$TARGET"
+  fi
+else
+  if command -v glow >/dev/null 2>&1; then
+    glow -p "$TARGET"
+  elif command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$TARGET" &>/dev/null &
+  else
+    cat "$TARGET"
+  fi
+fi

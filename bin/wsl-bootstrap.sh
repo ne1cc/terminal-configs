@@ -8,9 +8,9 @@
 #   - Font installation on the Windows side
 #
 # Usage:
-#   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/n1ecC/terminal-configs
-#   bash ~/Github/n1ecC/terminal-configs/bin/wsl-bootstrap.sh
+#   git clone https://github.com/ne1cc/terminal-configs.git \
+#       ~/Github/ne1cc/terminal-configs
+#   bash ~/Github/ne1cc/terminal-configs/bin/wsl-bootstrap.sh
 # ==============================================================================
 
 set -e
@@ -98,7 +98,43 @@ if command -v wslview >/dev/null 2>&1; then
     ok "wslview already installed."
 else
     info "Installing wslu (provides wslview)..."
-    sudo apt install -y wslu 2>/dev/null && ok "wslu installed." || warn "wslu not available in apt."
+    sudo apt install -y wslu 2>/dev/null && ok "wslu installed." || info "wslu not available in apt (using open.exe / cmd.exe fallback)."
+fi
+
+# ------------------------------------------------------------------------------
+# 6. Windows Shared Dev Drive / GitHub Workspace Integration
+# ------------------------------------------------------------------------------
+header "Windows Shared GitHub Workspace"
+SHARED_GITHUB_CANDIDATES=("/mnt/x/Github" "/mnt/d/Github" "/mnt/z/Github")
+DETECTED_SHARED=""
+
+for candidate in "${SHARED_GITHUB_CANDIDATES[@]}"; do
+    if [[ -d "$candidate" ]]; then
+        DETECTED_SHARED="$candidate"
+        break
+    fi
+done
+
+if [[ -n "$DETECTED_SHARED" ]]; then
+    info "Found Windows shared GitHub workspace at $DETECTED_SHARED."
+    if [[ -L "$HOME/Github" && "$(readlink "$HOME/Github")" == "$DETECTED_SHARED" ]]; then
+        ok "$HOME/Github already points to $DETECTED_SHARED."
+    elif [[ ! -e "$HOME/Github" ]]; then
+        ln -s "$DETECTED_SHARED" "$HOME/Github"
+        ok "Linked $HOME/Github -> $DETECTED_SHARED (zero duplicate repos)."
+    elif [[ -d "$HOME/Github" && ! -L "$HOME/Github" ]]; then
+        info "Existing $HOME/Github directory found. Linking to $DETECTED_SHARED if empty..."
+        if [[ -z "$(ls -A "$HOME/Github" 2>/dev/null)" ]]; then
+            rmdir "$HOME/Github"
+            ln -s "$DETECTED_SHARED" "$HOME/Github"
+            ok "Linked $HOME/Github -> $DETECTED_SHARED."
+        else
+            warn "$HOME/Github contains files. Move them to $DETECTED_SHARED and link manually:"
+            warn "  mv $HOME/Github $HOME/Github.bak && ln -s $DETECTED_SHARED $HOME/Github"
+        fi
+    fi
+else
+    info "No Windows shared Dev Drive detected (/mnt/x/Github, /mnt/d/Github). Using local ~/Github."
 fi
 
 echo -e "\n${GREEN}${BOLD}WSL Bootstrap complete!${NC}"
@@ -107,3 +143,5 @@ echo -e "${CYAN}Next steps:${NC}"
 echo "  1. Restart WSL: wsl --shutdown (from PowerShell)"
 echo "  2. Reopen WSL and run: source ~/.zshrc"
 echo "  3. Install Ghostty/Alacritty on the Windows side"
+echo "  4. On Windows, run: powershell -ExecutionPolicy Bypass -File .\\windows\\setup.ps1"
+

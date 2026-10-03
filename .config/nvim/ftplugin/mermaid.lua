@@ -7,33 +7,26 @@ map("n", "<leader>mp", function()
   vim.cmd("MarkdownPreviewToggle")
 end, vim.tbl_extend("force", opts, { desc = "Mermaid browser preview" }))
 
--- Diagram hover preview (clean floating window at cursor)
+-- Dedicated tab preview (full-width)
 map("n", "<leader>md", function()
-  require("diagram").show_diagram_hover()
-end, vim.tbl_extend("force", opts, { desc = "Show diagram hover preview" }))
+  require("plugins.diagram").show_diagram_tab()
+end, vim.tbl_extend("force", opts, { desc = "Show diagram in dedicated full-width tab" }))
 
--- Toggle in-buffer rendering (opaque background)
+-- Open diagram directly in macOS system viewer (Preview)
+map("n", "<leader>mo", function()
+  require("plugins.diagram").open_system_viewer()
+end, vim.tbl_extend("force", opts, { desc = "Open diagram in system viewer" }))
+
+-- Toggle in-buffer rendering (fills entire terminal page)
 map("n", "<leader>mb", function()
-  local diag = require("diagram")
-  if _G._diagram_in_buffer_rendered then
-    diag.clear()
-    _G._diagram_in_buffer_rendered = false
-    vim.notify("Diagram in-buffer cleared", vim.log.levels.INFO, { title = "Diagram" })
-  else
-    diag.render()
-    _G._diagram_in_buffer_rendered = true
-    vim.notify("Diagram rendered in-buffer", vim.log.levels.INFO, { title = "Diagram" })
-  end
-end, vim.tbl_extend("force", opts, { desc = "Toggle diagram in-buffer" }))
+  require("plugins.diagram").render_full_width()
+end, vim.tbl_extend("force", opts, { desc = "Toggle diagram in-buffer (fills terminal page)" }))
 
 -- Clear image overlays
 map("n", "<leader>ic", function()
-  if pcall(require, "image") then
-    require("image").clear()
-  end
-  if pcall(require, "diagram") then
-    require("diagram").clear()
-  end
+  pcall(function()
+    require("plugins.diagram").clear_custom_images(vim.api.nvim_get_current_buf())
+  end)
   local clear_seq = "\x1b_Ga=d,d=A\x1b\\"
   if vim.env.TMUX then
     clear_seq = "\x1bPtmux;\x1b\x1b_Ga=d,d=A\x1b\x1b\\\x1b\\"

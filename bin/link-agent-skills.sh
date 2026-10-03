@@ -8,13 +8,15 @@
 #   ~/.agents/skills          (cross-runtime alias: Copilot CLI, Gemini)
 #   ~/.qoder/skills           (Qoder CLI)
 #   ~/.codex/skills           (Codex / ChatGPT)
+#   ~/.config/opencode/skills (OpenCode / T3 Code)
 #
 # Cursor-only skills (.cursor/skills-cursor) → ~/.cursor/skills-cursor/
 # Cursor rules (.cursor/rules/*.mdc)         → ~/.cursor/rules/
 #
 # Global instruction files bootstrapped (if absent):
-#   ~/.codex/AGENTS.md        (instructs Codex to invoke using-superpowers at session start)
-#   ~/.qoder/QODER.md         (instructs Qoder to invoke using-superpowers at session start)
+#   ~/.codex/AGENTS.md           (instructs Codex to invoke using-superpowers at session start)
+#   ~/.qoder/QODER.md            (instructs Qoder to invoke using-superpowers at session start)
+#   ~/.config/opencode/AGENTS.md (instructs OpenCode / T3 to invoke using-superpowers at session start)
 
 set -euo pipefail
 
@@ -50,7 +52,7 @@ link_skill_tree() {
 
 printf '==> Linking agent skills from %s\n' "$REPO_DIR"
 
-mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor" "$HOME/.qoder/skills"
+mkdir -p "$HOME/.gemini/config" "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills-cursor" "$HOME/.qoder/skills" "$HOME/.config/opencode/skills"
 
 if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   ln -sfn "$REPO_DIR/.gemini/GEMINI.md" "$HOME/GEMINI.md"
@@ -59,14 +61,24 @@ if [[ -f "$REPO_DIR/.gemini/GEMINI.md" ]]; then
   printf '  linked GEMINI.md (Home, ~/.gemini, and ~/.gemini/config)\n'
 fi
 
+if [[ -f "$REPO_DIR/AGENTS.md" ]]; then
+  mkdir -p "$HOME/.qoder" "$HOME/.agents"
+  ln -sfn "$REPO_DIR/AGENTS.md" "$HOME/.qoder/AGENTS.md"
+  ln -sfn "$REPO_DIR/AGENTS.md" "$HOME/.agents/AGENTS.md"
+  printf '  linked AGENTS.md (~/.qoder and ~/.agents)\n'
+fi
+
 link_skill_tree "$REPO_DIR/.gemini/skills" \
   "$HOME/.gemini/config/skills" \
   "$HOME/.claude/skills" \
   "$HOME/.agents/skills" \
   "$HOME/.qoder/skills" \
-  "$HOME/.codex/skills"
+  "$HOME/.codex/skills" \
+  "$HOME/.config/opencode/skills"
 
-link_skill_tree "$REPO_DIR/.claude/skills" "$HOME/.claude/skills"
+link_skill_tree "$REPO_DIR/.claude/skills" \
+  "$HOME/.claude/skills" \
+  "$HOME/.config/opencode/skills"
 link_skill_tree "$REPO_DIR/.cursor/skills-cursor" "$HOME/.cursor/skills-cursor"
 
 # Link .cursor/rules/*.mdc into ~/.cursor/rules/
@@ -88,78 +100,30 @@ if [[ -f "$REPO_DIR/.gemini/hooks.json" ]]; then
   printf '  linked hooks.json (~/.gemini/config/hooks.json)\n'
 fi
 
-# Ensure workmux does not prompt to install broken Antigravity lifecycle hooks
-mkdir -p "$HOME/.local/state/workmux"
+# Remove legacy declined setting so workmux tracks Antigravity status cleanly
 if [[ -f "$HOME/.local/state/workmux/setup.json" ]]; then
-  if ! grep -q '"agy"' "$HOME/.local/state/workmux/setup.json" 2>/dev/null; then
-    printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
-  fi
-else
-  printf '{\n  "declined": ["agy"],\n  "declined_skills": []\n}\n' > "$HOME/.local/state/workmux/setup.json"
+  rm -f "$HOME/.local/state/workmux/setup.json"
 fi
 
-# ── Codex: bootstrap global AGENTS.md if absent ──────────────────────────────
-CODEX_AGENTS="$HOME/.codex/AGENTS.md"
-if [[ ! -f "$CODEX_AGENTS" ]]; then
+# ── Codex: link global AGENTS.md from repo (or bootstrap) ───────────────────
+if [[ -f "$REPO_DIR/.codex/AGENTS.md" ]]; then
   mkdir -p "$HOME/.codex"
-  cat > "$CODEX_AGENTS" <<'AGENTS_EOF'
-# AGENTS.md — Global Agent Instructions
-
-## Superpowers (Mandatory — Start of Every Session)
-
-At the start of every conversation, read and follow the `using-superpowers` skill:
-
-```
-~/.codex/skills/using-superpowers/SKILL.md
-```
-
-This skill establishes how to discover and invoke all relevant skills **before** any
-response, action, or clarifying question. New feature? Use brainstorming.
-Bug? Use systematic-debugging. Code review? There's a skill for that.
-
-**This is non-negotiable.** Do not skip it. Do not assume you remember it.
-Read it fresh every session.
-
-## Platform: Codex
-
-Read `~/.codex/skills/using-superpowers/references/codex-tools.md` for
-Codex-specific tool mappings.
-AGENTS_EOF
-  printf '  bootstrapped: %s\n' "$CODEX_AGENTS"
-else
-  printf '  unchanged: %s\n' "$CODEX_AGENTS"
+  ln -sfn "$REPO_DIR/.codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
+  printf '  linked: %s -> %s\n' "$HOME/.codex/AGENTS.md" "$REPO_DIR/.codex/AGENTS.md"
 fi
 
-# ── Qoder: bootstrap global QODER.md if absent ───────────────────────────────
-QODER_MD="$HOME/.qoder/QODER.md"
-if [[ ! -f "$QODER_MD" ]]; then
+# ── Qoder: link global QODER.md from repo (or bootstrap) ────────────────────
+if [[ -f "$REPO_DIR/.qoder/QODER.md" ]]; then
   mkdir -p "$HOME/.qoder"
-  cat > "$QODER_MD" <<'QODER_EOF'
-# QODER.md — Global Qoder Agent Instructions
+  ln -sfn "$REPO_DIR/.qoder/QODER.md" "$HOME/.qoder/QODER.md"
+  printf '  linked: %s -> %s\n' "$HOME/.qoder/QODER.md" "$REPO_DIR/.qoder/QODER.md"
+fi
 
-## Superpowers (Mandatory — Start of Every Session)
-
-At the start of every conversation, read and follow the `using-superpowers` skill:
-
-```
-~/.qoder/skills/using-superpowers/SKILL.md
-```
-
-This skill establishes how to discover and invoke all relevant skills **before** any
-response, action, or clarifying question. New feature? Use brainstorming.
-Bug? Use systematic-debugging. Code review? There's a skill for that.
-
-**This is non-negotiable.** Do not skip it. Do not assume you remember it.
-Read it fresh every session.
-
-## Platform: Qoder
-
-Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for
-Qoder-specific tool mappings, if that file exists.
-QODER_EOF
-  printf '  bootstrapped: %s\n' "$QODER_MD"
-else
-  printf '  unchanged: %s\n' "$QODER_MD"
+# ── OpenCode / T3: link global AGENTS.md from repo ─────────────────────────
+if [[ -f "$REPO_DIR/.opencode/AGENTS.md" ]]; then
+  mkdir -p "$HOME/.config/opencode"
+  ln -sfn "$REPO_DIR/.opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+  printf '  linked: %s -> %s\n' "$HOME/.config/opencode/AGENTS.md" "$REPO_DIR/.opencode/AGENTS.md"
 fi
 
 # ── Claude Code: seed ~/.claude/settings.json with required permissions ───────

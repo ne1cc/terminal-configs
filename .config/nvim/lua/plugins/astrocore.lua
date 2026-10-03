@@ -32,7 +32,10 @@ return {
         ["<C-Up>"] = { "<C-w>k", desc = "Focus Window Above" },
         ["<C-Down>"] = { "<C-w>j", desc = "Focus Window Below" },
         ["<C-Left>"] = { "<C-w>h", desc = "Focus Window Left" },
-        ["<C-Right>"] = { "<C-w>l", desc = "Focus Window Right" },
+        -- Notification management
+        ["<leader>uh"] = { function() Snacks.notifier.show_history() end, desc = "Notification History" },
+        ["<leader>uH"] = { function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
+        ["<leader>fn"] = { function() Snacks.notifier.show_history() end, desc = "Find Notifications" },
       },
     },
 

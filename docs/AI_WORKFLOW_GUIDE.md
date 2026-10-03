@@ -122,12 +122,21 @@ Full details: [claude-code/commands/README.md](../claude-code/commands/README.md
 
 ## Antigravity (Gemini CLI)
 
+### Neovim Integration (`agyy`)
+Inside Neovim, Antigravity runs non-intrusively in the background without terminal popup interruptions:
+- `<Leader>ae` (Normal): Deeply explains active file architecture & logic in background (`docs/explanations/<relpath>.md`), opens in One Markdown.
+- `<Leader>ae` (Visual): Explains visually selected buffer lines into an isolated snippets folder (`docs/snippets/<file>_L<start>-L<end>_<timestamp>.md`) with rich metadata, opens in One Markdown.
+- `<Leader>ar` (Normal): Deep code review for bugs & performance regressions in background (`docs/reviews/<relpath>.md`), opens in One Markdown.
+- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`) generating complete mirrored explanations, Mermaid system diagram, and `INDEX.md`.
+- `<Leader>at` (Normal): Floating interactive `agyy` chat terminal (`<C-q>` or `q` / `<Esc>` to dismiss).
+
 ### Commands
 
-| Alias | Action |
-|-------|--------|
+| Alias / Command | Action |
+|-----------------|--------|
 | `agy` | Run Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Skip tool approval prompts |
+| `reposum` / `repo-summarize` | Headless batch code summarization tool (`docs/explanations/INDEX.md` + One Markdown) |
 
 ### Audit ledger
 
@@ -311,12 +320,43 @@ Prefix + Ctrl + t    # pick 3-agent matrix
 
 ---
 
+---
+
+## OpenWiki & Headless Repository Insights
+
+OpenWiki produces structured architectural documentation (`openwiki/quickstart.md`, component guides, and interactive dependency graphs) without interrupting your editor workflow.
+
+### 1. Headless Generation in Neovim
+- Inside any project buffer, press **`<Leader>ow`** (Normal mode).
+- Runs `openwiki code --update --print` (or `--init`) in the background via Neovim's detached job engine.
+- Zero terminal popups. When finished, Neovim displays a notification toast and immediately opens `openwiki/quickstart.md` in One Markdown (`omd`).
+
+### 2. Whole-Repo Summarization
+- Inside Neovim, press **`<Leader>as`** or run `reposum` / `repo-summarize --open` from your shell.
+- Analyzes repository structure, generating `docs/explanations/*.md` and opening `docs/explanations/INDEX.md` in One Markdown.
+
+### 3. Interactive Architecture Visualization
+- From terminal or tmux, run:
+  ```bash
+  owv
+  # or: openwiki-viz
+  ```
+- Starts OpenWiki's interactive dependency browser and opens it in your default browser.
+
+### 4. Neovim MCP Integration (`mcphub.nvim`)
+- Configured in `.config/nvim/lua/plugins/mcphub.lua`.
+- Connects local and global MCP servers (including OpenWiki MCP) to Neovim.
+- AI chat integrations (CodeCompanion / Avante) are staged with explicit human approval guardrails (`requires_approval = true`).
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
 | `claude` not found | Install Claude Code CLI; check `$PATH` |
 | `agy` not found | Install Antigravity CLI |
+| `openwiki` not found | Run `npm install -g openwiki` (Node >= 22.22.0) |
 | Slash commands missing | Run `./install.sh` to symlink `~/.claude/commands/` |
 | Lazygit AI key fails | Ensure `claude`, `agy`, `codex` on `$PATH` |
 | Handoff empty git section | Must run inside git repo |
@@ -330,7 +370,9 @@ Prefix + Ctrl + t    # pick 3-agent matrix
 Claude:       claude  cplan  creview  cgc  cbug  cinit
 Slash:        /plan  /cook  /continue  /release  /tech-dd
 Antigravity:  agy  agyy  glog  gdiff  agya  agyih
+OpenWiki:     <Leader>ow  owv / openwiki-viz  reposum  <Leader>as
 Handoff:      handoff  Prefix+Shift+H
 tmux AI:      Prefix+a  Prefix+Alt+y  Prefix+Ctrl+t
-Lazygit:      lg ? Ctrl+A  C  X  Q  N  O
+Lazygit:      lg → Ctrl+A  C  X  Q  N  O
 ```
+

@@ -3,9 +3,9 @@
 # linux-bootstrap.sh — zero-to-hero provisioning for Ubuntu/Debian
 #
 # Usage (on a fresh machine):
-#   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/n1ecC/terminal-configs
-#   bash ~/Github/n1ecC/terminal-configs/bin/linux-bootstrap.sh
+#   git clone https://github.com/ne1cc/terminal-configs.git \
+#       ~/Github/ne1cc/terminal-configs
+#   bash ~/Github/ne1cc/terminal-configs/bin/linux-bootstrap.sh
 # ==============================================================================
 
 set -e

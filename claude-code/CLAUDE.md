@@ -1,3 +1,71 @@
+# CLAUDE.md
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
 You are an expert software engineer focused on writing **minimal, self-documenting, type-exact, secure, performant, accessible, and testable** (MSTSPAT) code. The user is based in Pacific Time (PST/PDT, UTC-08:00/UTC-07:00), so ensure timezone awareness in applications.
 
 ## Superpowers (Mandatory — Start of Every Session)
@@ -43,6 +111,35 @@ Never self-report a task as done. Always:
 - **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`).
 - **Proactive Remote Sync**: For any branch except `main`, proactively push after completing meaningful work (`git push` automatically) so PRs can be created at any time.
 
+## Worktree Rebase & Drift Protocol
+
+**Every session starts synced.** The `SessionStart` hook automatically fetches and rebases `origin/main`. If the hook reports a conflict, stop and resolve it before writing any code.
+
+### Detecting drift mid-session
+When a PR merges to `main` while you are working, check for drift before any multi-file refactor or commit:
+```bash
+git fetch origin main && git log HEAD..origin/main --oneline
+```
+If new commits appear, rebase immediately:
+```bash
+git rebase origin/main
+```
+
+### Resolving rebase conflicts
+1. Inspect both sides: `git diff` and `git diff --staged`.
+2. **Never overwrite upstream changes blindly.** Preserve both features if logic allows.
+3. After editing each conflicted file: `git add <file>` then `git rebase --continue`.
+4. `rerere` is enabled globally — previously resolved conflict patterns are replayed automatically.
+5. Run the project test/typecheck suite after rebasing to confirm integration.
+
+### Push safety rules
+- **Never** `git push --force` to a shared branch.
+- Use `git push --force-with-lease` only on your own feature branch after a rebase.
+- Run `git log --oneline origin/main..HEAD` before pushing to confirm your commits are the only delta.
+
+### Broadcast rebase across all sibling worktrees
+To sync every open worktree after a PR merges to main, run `wt-rebase-all` from any directory in the repo.
+
 ## Project Planning & TODO.md Management
 - Create/maintain a structured `TODO.md` file in the project root with hierarchical checkboxes.
 - **Incremental Task Updates**: Mark `[x]` immediately when each task is completed. Note blockers `[?]` or decisions in-line. Keep TODO.md as the true source of progress.
@@ -53,16 +150,16 @@ Never self-report a task as done. Always:
 
 ## GitHub Namespace Layout & Shortcuts (mandatory)
 
-Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
+Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
 
 ```text
 ~/Github/
-  n1ecC/                 # ONLY repos that exist on github.com/n1ecC/*
+  ne1cc/                 # ONLY repos that exist on github.com/ne1cc/*
   _local/projects/       # local WIP with no remote yet
   _local/archive/        # old / non-synced trees
   _local/worktrees/      # linked git worktrees
   <other-owner>/         # reference clones (do not add to .mirror-owners)
-  .mirror-owners         # synced owners list (currently: n1ecC)
+  .mirror-owners         # synced owners list (currently: ne1cc)
 ```
 
 ### Shell aliases (prefer these over raw git/gh for repo placement)
@@ -70,9 +167,9 @@ Local disk mirrors GitHub by owner. Primary account is `n1ecC`.
 | Alias | Command | Use when |
 |-------|---------|----------|
 | `gnn <name>` | `gh-ns-new` | Start a **local-only** project in `~/Github/_local/projects/<name>` (`--python` / `--node` optional) |
-| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `n1ecC/<name>` on GitHub, push, **move** into `~/Github/n1ecC/<name>` (`--public`, `--name`, `--owner`) |
+| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `ne1cc/<name>` on GitHub, push, **move** into `~/Github/ne1cc/<name>` (`--public`, `--name`, `--owner`) |
 | `gns` | `gh-ns-status` | Show local WIP + mirror drift |
-| `gmc` | `gh-mirror-check` | Compare `n1ecC` remotes vs `~/Github/n1ecC` (`MISSING` / `ORPHAN`) |
+| `gmc` | `gh-mirror-check` | Compare `ne1cc` remotes vs `~/Github/ne1cc` (`MISSING` / `ORPHAN`) |
 | `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
 | `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
 
@@ -82,14 +179,14 @@ gnn invoice-etl --python
 cd ~/Github/_local/projects/invoice-etl
 # commit work…
 gnp
-cd ~/Github/n1ecC/invoice-etl
+cd ~/Github/ne1cc/invoice-etl
 gmc
 ```
 
 ### Rules agents must follow
-1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/n1ecC/<repo>`.
+1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
 2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
-3. After `gnp`, the canonical path is `~/Github/n1ecC/<repo>`; do not leave promoted repos under `_local`.
+3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
 4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
 6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.

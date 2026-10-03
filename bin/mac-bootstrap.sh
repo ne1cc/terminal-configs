@@ -3,9 +3,9 @@
 # mac-bootstrap.sh — zero-to-hero provisioning for a new Apple Silicon Mac
 #
 # Usage (on a fresh machine):
-#   git clone https://github.com/n1ecC/terminal-configs.git \
-#       ~/Github/n1ecC/terminal-configs
-#   bash ~/Github/n1ecC/terminal-configs/bin/mac-bootstrap.sh
+#   git clone https://github.com/ne1cc/terminal-configs.git \
+#       ~/Github/ne1cc/terminal-configs
+#   bash ~/Github/ne1cc/terminal-configs/bin/mac-bootstrap.sh
 # ==============================================================================
 
 set -e
@@ -72,22 +72,10 @@ fi
 # ------------------------------------------------------------------------------
 # 5. Stow dotfiles + Github workspace (setup-github-workspace)
 # ------------------------------------------------------------------------------
-header "Symlinking dotfiles via Stow"
+header "Symlinking dotfiles via install.sh"
 cd "$DOTFILES"
-stow --target="$HOME" --restow .
-ok "All dotfiles linked."
-
-"$DOTFILES/bin/link-stow-extras.sh"
-ok "Stow-excluded paths linked (nvim, bin, taskrc)."
-
-"$DOTFILES/bin/link-claude-code.sh"
-ok "Claude Code global configuration linked."
-
-"$DOTFILES/bin/link-agent-skills.sh"
-ok "Agent skills linked for Gemini, Claude Code, Codex, and Cursor."
-
-"$DOTFILES/bin/setup-github-workspace"
-ok "Github workspace layout and _tools symlinks configured."
+"$DOTFILES/install.sh"
+ok "All dotfiles linked, rerere configured, and TPM plugins installed."
 
 # ------------------------------------------------------------------------------
 # 6. fnm / Node

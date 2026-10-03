@@ -69,6 +69,10 @@ fi
 export EDITOR="nvim"
 export VISUAL="nvim"
 
+# Increase file descriptor limits (prevents EMFILE errors in Neovim/Neo-tree, etc.)
+ulimit -n 65536 2>/dev/null || true
+ulimit -f unlimited 2>/dev/null || true
+
 # Alacritty: export TERM so inner tools (nvim, tmux) know the outer terminal
 export TERM="${TERM:-xterm-256color}"
 
@@ -87,6 +91,21 @@ fi
 
 # Claude Code Agent Teams (Experimental Multi-Agent Orchestrator)
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+# Mermaid CLI / Puppeteer Chrome Engine for high-res diagram rendering
+if [[ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+elif [[ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]]; then
+    export PUPPETEER_EXECUTABLE_PATH="/Applications/Chromium.app/Contents/MacOS/Chromium"
+elif command -v google-chrome >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome)"
+elif command -v google-chrome-stable >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome-stable)"
+elif command -v chromium >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium)"
+elif command -v chromium-browser >/dev/null 2>&1; then
+    export PUPPETEER_EXECUTABLE_PATH="$(command -v chromium-browser)"
+fi
 
 
 # ==============================================================================
@@ -387,6 +406,9 @@ snap() {
 alias agy-yolo='agy --dangerously-skip-permissions'
 alias agyy='agy --dangerously-skip-permissions'
 alias yolo='agy --dangerously-skip-permissions'
+alias reposum='repo-summarize'
+alias owv='openwiki-viz'
+alias exv='explain-viz --open'
 alias glog='glow -p ~/.gemini_history.md'
 alias gdiff='cat ~/.gemini_history.md | delta --side-by-side --syntax-theme="Nord"'
 
@@ -409,9 +431,16 @@ alias mu="mupdf"
 unalias om 2>/dev/null
 unalias mt 2>/dev/null
 if [[ "$OSTYPE" == darwin* ]]; then
+    export ONEMARKDOWN_DIR="$HOME/Library/Mobile Documents/iCloud~com~coderforart~One-Markdown/Documents"
+    alias cdom='cd "$ONEMARKDOWN_DIR"'
+    alias cdonemarkdown='cd "$ONEMARKDOWN_DIR"'
+
     function om {
         local target="${1:-}"
-        [[ -n "$target" ]] || { echo "Usage: om <file.md>"; return 1; }
+        if [[ -z "$target" ]]; then
+            cd "$ONEMARKDOWN_DIR" || return 1
+            return 0
+        fi
         open -a "One Markdown" "$target"
     }
     function mt {
@@ -490,8 +519,10 @@ alias gnf='gh-ns-fork'
 alias gnn='gh-ns-new'
 alias gnp='gh-ns-promote'
 alias gns='gh-ns-status'
+alias gwc='git-work-clone'
+alias gwclone='git-work-clone'
 
-# Weekly GitHub mirror drift check (n1ecC ↔ ~/Github/n1ecC). Quiet; only prints problems.
+# Weekly GitHub mirror drift check (ne1cc ↔ ~/Github/ne1cc). Quiet; only prints problems.
 # Runs at most once per 7 days in interactive shells; skip with: export GH_MIRROR_CHECK=0
 if [[ -o interactive && "${GH_MIRROR_CHECK:-1}" != 0 ]] && command -v gh-mirror-check >/dev/null 2>&1; then
   (gh-mirror-check --quiet --if-stale 7 || true) &!
@@ -510,41 +541,138 @@ alias icloud='cd "$ICLOUD_DRIVE"'
 alias mdf='cd "$ICLOUD_MD"'
 
 # Github workspace (~/Github) — portfolio, explore, sync
-: "${DOTFILES:=$HOME/Github/n1ecC/terminal-configs}"
+: "${DOTFILES:=$HOME/Github/ne1cc/terminal-configs}"
 : "${GITHUB_ROOT:=$HOME/Github}"
-: "${N1ECC_DIR:=$GITHUB_ROOT/n1ecC}"
-alias ghn='cd "$N1ECC_DIR"'
+export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
+export WORK_DIR="$GITHUB_ROOT/sun-alexander-dev"
+
+# Auto-route 'git clone' for personal (ne1cc) and work (sun-alexander-dev)
+git() {
+  if [[ "$1" == "clone" ]]; then
+    local -a args=("${@[2,-1]}")
+    local has_work=0
+    local has_personal=0
+    local repo_url=""
+    local dir_specified=0
+    local prev=""
+
+    for arg in "${args[@]}"; do
+      if [[ "$prev" =~ ^-(b|o|u|c|-branch|-origin|-upload-pack|-config|-template|-depth|-reference|-filter|-server-option)$ ]]; then
+        prev=""
+        continue
+      fi
+      if [[ "$arg" == -* ]]; then
+        prev="$arg"
+        continue
+      fi
+      if [[ -z "$repo_url" ]]; then
+        repo_url="$arg"
+        if [[ "$arg" == *github-work:* || "$arg" == *github-work/* ]]; then
+          has_work=1
+        elif [[ "$arg" =~ (github\.com[:/]ne1cc/) ]]; then
+          has_personal=1
+        fi
+      else
+        dir_specified=1
+      fi
+    done
+
+    if [[ "$dir_specified" -eq 0 && -n "$repo_url" ]]; then
+      local clean_url="${repo_url%.git}"
+      local repo_name="${clean_url##*/}"
+      repo_name="${repo_name##*:}"
+      if [[ "$has_work" -eq 1 ]]; then
+        local target_dir="${WORK_DIR:-$HOME/Github/sun-alexander-dev}/$repo_name"
+        echo "⚡ [work-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      elif [[ "$has_personal" -eq 1 ]]; then
+        local target_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}/$repo_name"
+        echo "⚡ [personal-clone] Automatically routing $repo_url → $target_dir"
+        command git clone "${args[@]}" "$target_dir"
+        return $?
+      fi
+    fi
+  fi
+  command git "$@"
+}
+
+# Smart jump into ne1cc repos:
+#   ghn                 -> interactive fzf picker with git preview, cds directly into selected repo
+#   ghn <repo-name>     -> cds directly to ~/Github/ne1cc/<repo-name> (or closest match)
+#   ghn -s [repo-name]  -> opens/attaches dedicated tmux session via tmux-sessionizer
+#   ghn --root          -> cd ~/Github/ne1cc
+ghn() {
+  local target_dir
+  local repo_dir="${NE1CC_DIR:-$HOME/Github/ne1cc}"
+
+  if [[ "$1" == "--root" || "$1" == "-r" ]]; then
+    cd "$repo_dir"
+    return 0
+  fi
+
+  if [[ "$1" == "-s" ]]; then
+    shift
+    if [[ $# -eq 0 ]]; then
+      tmux-sessionizer
+    else
+      local match
+      match=$(fd --min-depth 1 --max-depth 1 -t d "$1" "$repo_dir" 2>/dev/null | head -n 1)
+      if [[ -n "$match" ]]; then
+        tmux-sessionizer "$match"
+      else
+        tmux-sessionizer "$repo_dir/$1"
+      fi
+    fi
+    return 0
+  fi
+
+  if [[ $# -eq 0 ]]; then
+    if [[ -t 0 && -t 1 ]] && command -v fzf >/dev/null 2>&1; then
+      target_dir=$(
+        fd -L --min-depth 1 --max-depth 1 -t d . "$repo_dir" 2>/dev/null |
+          sed 's|/*$||; s|.*/||' |
+          fzf --prompt="ne1cc repo > " \
+              --preview="git -C '$repo_dir/{}' status -sb 2>/dev/null || ls -la '$repo_dir/{}'" \
+              --preview-window="right:50%:wrap"
+      )
+      [[ -z "$target_dir" ]] && return 0
+      cd "$repo_dir/$target_dir"
+      return 0
+    else
+      cd "$repo_dir"
+      return 0
+    fi
+  fi
+
+  if [[ -d "$repo_dir/$1" ]]; then
+    cd "$repo_dir/$1"
+  else
+    local fuzzy_match
+    fuzzy_match=$(fd --min-depth 1 --max-depth 1 -t d "$1" "$repo_dir" 2>/dev/null | head -n 1)
+    if [[ -n "$fuzzy_match" && -d "$fuzzy_match" ]]; then
+      cd "$fuzzy_match"
+    else
+      echo "No matching repository for '$1' under $repo_dir" >&2
+      return 1
+    fi
+  fi
+}
+alias ghr=ghn
 alias ghex='cd "$GITHUB_ROOT/explore"'
 alias ghws='cd "$GITHUB_ROOT/workspace"'
 alias ghcfg='cd "$GITHUB_ROOT/config"'
 alias ghroot='cd "$GITHUB_ROOT"'
-alias ghsync='"$GITHUB_ROOT/_tools/sync-n1ecC"'
-alias ghsync-list='"$GITHUB_ROOT/_tools/sync-n1ecC" --list'
-alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-n1ecC" --pull'
+alias ghsync='"$GITHUB_ROOT/_tools/sync-ne1cc"'
+alias sync-ne1cc='"$GITHUB_ROOT/_tools/sync-ne1cc"'
+alias ghsync-list='"$GITHUB_ROOT/_tools/sync-ne1cc" --list'
+alias ghsync-pull='"$GITHUB_ROOT/_tools/sync-ne1cc" --pull'
 alias ghpin='"$GITHUB_ROOT/_tools/pin-portfolio"'
 alias ghar='"$GITHUB_ROOT/_tools/gharchive"'
 
-# Portfolio repo quick-jumps
-alias gho='cd "$N1ECC_DIR/olist-lakehouse"'
-alias ghab='cd "$N1ECC_DIR/ab-testing-dagster"'
-alias ghdhs='cd "$N1ECC_DIR/dhs-stunting-pipeline"'
-alias ghtk='cd "$N1ECC_DIR/ticker-change"'
-
-# cd into any n1ecC repo: ghr [repo-name]
-ghr() {
-  if [[ $# -eq 0 ]]; then
-    ls -1 "$N1ECC_DIR"
-    return 0
-  fi
-  cd "$N1ECC_DIR/$1" || {
-    echo "Unknown repo: $1 (try: ghr with no args to list)"
-    return 1
-  }
-}
-
 # CareerOps Recruiting Workbench quick-jump
 rc() {
-  cd "/Users/alex/Documents/Recruiting" || return 1
+  cd "$HOME/Documents/Recruiting" || return 1
   case "$1" in
     agyy|agy-yolo|yolo)
       shift
@@ -579,6 +707,19 @@ alias dlogs='docker logs -f --tail=100'
 alias ta='tmux attach -t main || tmux new-session -s main'
 alias tl='tmux list-sessions'
 alias tk='tmux kill-session -t'
+alias tp='$HOME/bin/tmux-popup-term'
+
+# Quickly jump to the caller pane's directory inside the tmux popup terminal
+cdhere() {
+    local target_dir
+    target_dir="$(cat "${TMPDIR:-/tmp}/tmux-${UID:-$(id -u)}/last_dir" 2>/dev/null || true)"
+    if [[ -n "$target_dir" && -d "$target_dir" ]]; then
+        cd "$target_dir" && echo "📂 Jumped to: $target_dir"
+    else
+        echo "No caller directory recorded."
+    fi
+}
+alias unsync='unsync'
 
 # Launch a brand new Ghostty window attached to a fresh tmux session
 ghostty-new() {
@@ -691,14 +832,83 @@ wt-tmux-attach() {
   tmux new-window -c "$dir" -n "$name" "zsh -ic 'claude --name $name; exec zsh'"
 }
 
-# wt-rm [branch] — remove a worktree (fzf picker if no arg)
+# wt-rm [branch] — remove a worktree (delegates to wmr picker & pruner)
 wt-rm() {
-  local branch=${1:-$(git worktree list 2>/dev/null | tail -n +2 \
-    | fzf --height=50% --reverse --prompt="remove> " | awk '{print $NF}' | tr -d '[]')}
-  [[ -z "$branch" ]] && return 0
-  local dir; dir=$(git worktree list | awk -v b="[$branch]" '$NF==b {print $1}')
-  git worktree remove --force "$dir" && git branch -d "$branch"
+  wmr "$@"
 }
+
+# ==============================================================================
+# WORKTREE REBASE & SYNC (pairs with wmr, wma, wmo)
+# ==============================================================================
+
+# wtr [name] — rebase current worktree (or named worktree) onto origin/main
+wtr() {
+  local target="${1:-.}"
+  local dir
+  dir=$(git -C "$target" rev-parse --show-toplevel 2>/dev/null) || {
+    echo "❌ Not in a git repository or valid worktree"
+    return 1
+  }
+  local branch
+  branch=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [[ "$branch" == "main" || "$branch" == "HEAD" ]]; then
+    echo "ℹ️  On $branch — no rebase needed"
+    return 0
+  fi
+
+  echo "🔄 [wtr] Fetching origin/main and rebasing $branch..."
+  git -C "$dir" fetch origin main --quiet 2>&1
+  # --autostash safely shelves uncommitted edits, rebases, then reapplies them
+  if git -C "$dir" rebase --autostash origin/main; then
+    echo "✅ [wtr] $branch is up to date with origin/main"
+  else
+    echo "⚠️  [wtr] Conflict on $branch (rerere active)"
+    echo "   Resolve: git diff → git add <file> → git rebase --continue"
+    return 1
+  fi
+}
+
+# wts — sync all active worktrees across the repo onto origin/main
+# Run this right after a PR merges to main to keep all sibling worktrees fresh.
+wts() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "❌ Not inside a git repository"
+    return 1
+  }
+
+  echo "🔄 [wts] Fetching origin/main..."
+  git -C "$root" fetch origin main --quiet 2>&1 || {
+    echo "❌ Failed to fetch origin/main"
+    return 1
+  }
+
+  echo "🔄 [wts] Rebasing idle worktrees..."
+  git -C "$root" worktree list --porcelain \
+    | grep '^worktree ' \
+    | cut -d' ' -f2- \
+    | while read -r wt; do
+        local branch; branch=$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null)
+        [[ "$branch" == "main" || "$branch" == "HEAD" ]] && continue
+        local name; name=$(basename "$wt")
+
+        # Safety: if agent has uncommitted changes in this worktree, skip to avoid colliding
+        if [[ -n $(git -C "$wt" status --porcelain 2>/dev/null) ]]; then
+          echo "  ⏸️  $name ($branch) → skipped (agent has uncommitted edits)"
+          continue
+        fi
+
+        if git -C "$wt" rebase origin/main >/dev/null 2>&1; then
+          echo "  ✅ $name ($branch) → synced"
+        else
+          echo "  ⚠️  $name ($branch) → conflict! (cd $wt && git rebase --continue)"
+        fi
+      done
+  echo "🏁 [wts] All worktrees checked."
+}
+alias wt-sync='wts'
+alias wt-rebase-all='wts'
+alias wmrb='workmux rebase'
 
 # ==============================================================================
 # WORKMUX & SESH WORKFLOW INTEGRATIONS
@@ -724,9 +934,11 @@ bindkey -M emacs '\es' sesh-sessions
 bindkey -M viins '\es' sesh-sessions
 bindkey -M vicmd '\es' sesh-sessions
 
-# Workmux: Zero-friction git worktrees + tmux windows
+# Workmux: Zero-friction git worktrees (headless, no new terminals/windows launched)
 alias wm='workmux'
-alias wma='workmux add'
+wma() {
+  command wma "$@"
+}
 alias wml='workmux list'
 alias wmls='workmux list'
 alias wmo='workmux open'
@@ -734,17 +946,41 @@ alias wmc='workmux close'
 alias wmm='workmux merge'
 alias wmr='workmux remove'
 alias wmrm='workmux remove'
+alias wmrg='workmux remove --gone'
+
+# wmp — prune dead tmux windows whose worktree directories no longer exist
+wmp() {
+  local target dir
+  tmux list-windows -a -F '#{session_name}:#{window_id} #{pane_current_path}' 2>/dev/null | while read -r target dir; do
+    if [[ -n "$dir" && ! -d "$dir" ]]; then
+      echo "🧹 Pruning orphaned window $target (directory gone: $dir)"
+      tmux kill-window -t "$target" 2>/dev/null || true
+    fi
+  done
+  return 0
+}
+alias wm-prune='wmp'
 alias wmd='workmux dashboard'
 alias wms='workmux sidebar'
+alias wmss='workmux sidebar --session'
+alias wmsn='workmux sidebar next'
+alias wmsp='workmux sidebar prev'
+alias wmsf='workmux sidebar filter'
+alias wmst='workmux sidebar on --position top'
+alias wmsl='workmux sidebar on --position left'
+alias wmsr='workmux reap-agents --hours 12'
 
 # wmux: Smart wrapper that forwards subcommands or creates worktrees directly
 wmux() {
   if [ $# -eq 0 ]; then
     workmux
-  elif [[ "$1" =~ ^(add|open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
+  elif [[ "$1" == "add" ]]; then
+    shift
+    wma "$@"
+  elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
     workmux "$@"
   else
-    workmux add "$@"
+    wma "$@"
   fi
 }
 
@@ -1087,9 +1323,32 @@ fkill() {
   fi
 }
 
+fcd() {
+  local dir
+  if [[ $# -eq 0 ]]; then
+    dir=$(fd --type d --strip-cwd-prefix --hidden --follow --exclude .git 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    dir=$(fd --type d --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'eza --tree --level=2 --color=always --icons {} 2>/dev/null || ls -la {}' \
+          --prompt="cd> ") && cd "$dir"
+  fi
+}
+
 fo() {
   local file
-  file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  if [[ $# -eq 0 ]]; then
+    file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}')
+  else
+    local target="$1"
+    target="${target/#\~/$HOME}"
+    file=$(fd --type f --hidden --follow --exclude .git . "$target" 2>/dev/null | \
+      fzf --preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || cat {}' \
+          --prompt="open> ")
+  fi
   [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
 }
 
@@ -1215,3 +1474,64 @@ wmo() {
     [ -n "$b" ] && workmux open "$b"
   fi
 }
+
+unalias wmr 2>/dev/null || true
+unalias wmrm 2>/dev/null || true
+wmr() {
+  if [ $# -gt 0 ]; then
+    workmux remove "$@" && git worktree prune
+    return
+  fi
+
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: Not inside a git repository." >&2
+    return 1
+  fi
+
+  local main_info main_branch main_path
+  main_info=$(git worktree list | head -n 1)
+  main_path=$(echo "$main_info" | awk '{print $1}')
+  main_branch=$(echo "$main_info" | sed -E 's/.*\[(.*)\].*/\1/')
+
+  local wt_list
+  wt_list=$(workmux list 2>/dev/null | awk -v mb="$main_branch" 'NR==1 || ($1 != mb && $1 != "")')
+
+  local count
+  count=$(echo "$wt_list" | tail -n +2 | wc -l | tr -d ' ')
+  if [ "$count" -eq 0 ]; then
+    echo "No removable worktrees found."
+    return 0
+  fi
+
+  local fzf_out
+  fzf_out=$(echo "$wt_list" | fzf -m \
+    --header-lines=1 \
+    --prompt="Select worktree(s) to remove > " \
+    --header="TAB: multi-select | ENTER: confirm removal | ESC: cancel" \
+    --reverse)
+
+  [ -z "$fzf_out" ] && return 0
+
+  local -a selected
+  selected=("${(@f)$(echo "$fzf_out" | awk '{print $1}')}")
+  [ ${#selected[@]} -eq 0 ] && return 0
+
+  # If currently inside one of the target worktrees, navigate back to repo root
+  local cur_dir wt_path wt_real
+  cur_dir=$(pwd -P)
+  for b in "${selected[@]}"; do
+    wt_path=$(workmux path "$b" 2>/dev/null || true)
+    if [ -n "$wt_path" ] && [ -d "$wt_path" ]; then
+      wt_real=$(cd "$wt_path" 2>/dev/null && pwd -P || echo "$wt_path")
+      if [[ "$cur_dir" == "$wt_real"* ]]; then
+        cd "$main_path"
+        break
+      fi
+    fi
+  done
+
+  echo "Removing worktree(s): ${selected[*]}"
+  workmux remove "${selected[@]}" && git worktree prune
+}
+alias wmrm=wmr
+

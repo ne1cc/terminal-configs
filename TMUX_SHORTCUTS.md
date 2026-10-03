@@ -115,6 +115,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `f` | Extract URLs from pane → fzf picker → open in browser | Copy Mode |
 | `i` | Exit copy-mode (return to normal mode) | Copy Mode |
 | `Mouse Drag Release` | Select text and auto-copy to system clipboard + status toast | Copy Mode |
+| `Shift + Left Click` | Open URL, Markdown link, OSC 8 hyperlink, or file path under cursor | Normal / Copy Mode |
 | `Escape` | Cancel selection / exit copy-mode | Copy Mode |
 
 ### Git Worktree & AI Workflows
@@ -129,6 +130,7 @@ These bindings have been custom-configured or overridden for ergonomics, Tokyo N
 | `Prefix + Alt + y` | **Open/re-attach to persistent Antigravity YOLO popup session (`agyy`)** | Active Session |
 | `Prefix + O` (`Shift + o`) | **Screen File & Stacktrace Jumper** (extract file paths on screen & jump in Neovim) | Active Window |
 | `Prefix + Alt + i` | **Instant Floating Scratchpad** (quick notes in `~/notes/scratchpad.md`) | Active Window |
+| `Prefix + t` / `Prefix + \`` / `Alt + \`` / `Alt + t` | **Instant Persistent Terminal Popup** (scratchpad shell, `cdhere` to sync dir) | Active Window |
 | `Prefix + A` | **Open side-by-side Claude pane** (35% width vertical split) | Active Session |
 | `Prefix + Ctrl + c` | New window named "Claude" running Claude in current directory | Active Session |
 | `Prefix + Ctrl + t` | **Agent Matrix Launcher** (interactive fzf modal for 2/3/4-pane AI grids) | Active Session |
@@ -161,7 +163,6 @@ Every pane also **auto-logs** to `~/tmux-logs/` from creation (see hooks in `.tm
 | `Prefix + Alt + p` | Save a static screenshot of current visible pane to `~/tmux-logs/` | Active Pane |
 | `Prefix + Alt + Shift + P` | Save complete pane scrollback history to `~/tmux-logs/` | Active Pane |
 
-> **Note:** `Prefix + Alt + c` is bound to the cheatsheet HUD. Use the command palette (`Prefix + /`) or tmux command prompt for plugin logging utilities if needed.
 
 ---
 
@@ -196,8 +197,8 @@ These **default** keys are replaced by custom bindings above — do not expect s
 | `Prefix + '` | Select window by prompting for index number |
 | `Prefix + .` (stock) / `:move-window -t <n>` | Move / renumber current window to index |
 | `Shift + Left` / `Shift + Right` | Previous / next window (no prefix) |
-| `Ctrl + Shift + h` / `Ctrl + Shift + l` | Previous / next window (no prefix) |
 | `Ctrl + PageUp` / `Ctrl + PageDown` | Previous / next window (no prefix) |
+| `Ctrl + Shift + h` / `Ctrl + Shift + l` | Previous / next window *(macOS)*; Swap window order left/right *(WSL)* |
 | `Ctrl + Shift + Left` / `Ctrl + Shift + Right` | Swap window order left/right (no prefix) |
 
 ### Panes
