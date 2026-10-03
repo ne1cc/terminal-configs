@@ -1,30 +1,34 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# repo-summarize — Headless repository file summarizer powered by Antigravity (agyy)
+# repo-summarize — Headless repository file summarizer for any print-mode AI CLI
 #
 # Three passes:
 #   0. Scan (no AI): build docs/architecture/.repo-map.md — layout, entry points
 #      and a heuristic import graph (who imports whom).
 #   1. Per file: stream the source plus its repo context (callers, callees,
-#      siblings) through Antigravity (agyy -p) and write an annotated walkthrough
+#      siblings) through an AI CLI (default: agy -p) and write an annotated walkthrough
 #      to docs/architecture/<filename>.md — a comment on every line for short
 #      files, per-block explanations for long ones.
 #   2. Synthesise INDEX.md from the repo map and the per-file summaries.
 #
-# Output is SEPARATE from single-file <Leader>ae explanations (docs/explanations/).
-#
 # Usage:
 #   repo-summarize                      # summarize current git repository
 #   repo-summarize /path/to/repo        # target specific repository
-#   repo-summarize --open               # open INDEX.md in One Markdown upon finish
+#   repo-summarize --open               # open INDEX.md in a viewer upon finish
 #   repo-summarize --dry-run            # scan + show discovered files, no AI calls
 #   repo-summarize --max-files N        # process up to N files (default: all)
 #   repo-summarize --force              # overwrite existing summaries
 #   repo-summarize --filter <substr>    # only process files matching substr
 #   repo-summarize --status             # show progress of current / background run
+#
+# Environment:
+#   REPO_SUMMARIZE_CMD   AI command, prompt appended as last arg (default: agy -p)
 # ==============================================================================
 
 set -euo pipefail
+
+# AI backend: any CLI that takes the prompt as its last argument and prints the reply.
+read -r -a AI_CMD <<< "${REPO_SUMMARIZE_CMD:-agy -p}"
 
 OPEN_IN_OMD=false
 DRY_RUN=false
@@ -118,7 +122,7 @@ if "$CHECK_STATUS"; then
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 📚 Antigravity Headless Repo Summarizer (agyy)"
+echo " 📚 Headless Repo Summarizer (${AI_CMD[*]})"
 echo " Target : $TARGET_DIR"
 echo " Docs   : docs/architecture/"
 echo " Limit  : ${MAX_FILES:-no cap}"
@@ -313,7 +317,7 @@ EDGES_FILE="$DOCS_DIR/.repo-edges.tsv"
 ERR_LOG="$DOCS_DIR/.repo-summarize.log"
 DOC_MARKER="repo-summarize:v2"
 ANNOTATE_LINE_LIMIT=150     # <= this many lines: comment every line; above: per-block
-PROMPT_BYTE_LIMIT=110000    # agyy -p takes the prompt as ONE argv entry (Linux caps it at ~128KB)
+PROMPT_BYTE_LIMIT=110000    # the AI CLI takes the prompt as ONE argv entry (Linux caps it at ~128KB)
 
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/repo-summarize.XXXXXX")"
 trap 'rm -rf "$WORK_DIR"' EXIT
@@ -464,8 +468,8 @@ if "$DRY_RUN"; then
   exit 0
 fi
 
-if ! command -v agyy >/dev/null 2>&1; then
-  echo "Error: 'agyy' (or 'agy') command not found in PATH." >&2
+if ! command -v "${AI_CMD[0]}" >/dev/null 2>&1; then
+  echo "Error: '${AI_CMD[0]}' not found in PATH. Install it or set REPO_SUMMARIZE_CMD (e.g. 'claude -p')." >&2
   exit 1
 fi
 
@@ -707,10 +711,10 @@ for rel in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
     continue
   fi
 
-  if RESPONSE="$(agyy -p "$(cat "$tmp_prompt")" 2>>"$ERR_LOG")" && [[ "$RESPONSE" =~ [^[:space:]] ]]; then
+  if RESPONSE="$("${AI_CMD[@]}" "$(cat "$tmp_prompt")" 2>>"$ERR_LOG")" && [[ "$RESPONSE" =~ [^[:space:]] ]]; then
     :
   else
-    fail_file "$rel" "agyy exited non-zero or returned empty output"
+    fail_file "$rel" "${AI_CMD[0]} exited non-zero or returned empty output"
     continue
   fi
 
@@ -722,7 +726,7 @@ for rel in "${FILES_TO_PROCESS[@]+"${FILES_TO_PROCESS[@]}"}"; do
 > **Source File**: [\`$rel\`](${up}../../$rel)
 > **Repository**: \`$REPO_NAME\`
 > **Style**: $mode-by-$mode annotation ($n_lines lines)
-> **Generated**: $(date +"%Y-%m-%d %H:%M:%S") via \`repo-summarize\` + \`agyy\`
+> **Generated**: $(date +"%Y-%m-%d %H:%M:%S") via \`repo-summarize\` + \`${AI_CMD[0]}\`
 
 ---
 
@@ -788,7 +792,7 @@ $ALL_SUMMARIES
 Write in clean GitHub-Flavored Markdown. Make this the definitive architectural reference for a new engineer joining the project.
 EOF
 
-if ! INDEX_RESPONSE="$(agyy -p "$(cat "$tmp_index_prompt")" 2>>"$ERR_LOG")" || [[ ! "$INDEX_RESPONSE" =~ [^[:space:]] ]]; then
+if ! INDEX_RESPONSE="$("${AI_CMD[@]}" "$(cat "$tmp_index_prompt")" 2>>"$ERR_LOG")" || [[ ! "$INDEX_RESPONSE" =~ [^[:space:]] ]]; then
   write_progress "index_failed" "INDEX.md"
   echo "✗ INDEX synthesis failed — existing INDEX.md left untouched. See ${ERR_LOG#"$TARGET_DIR"/}" >&2
   exit 1
@@ -797,7 +801,7 @@ fi
 cat <<EOF > "$INDEX_FILE"
 # $REPO_NAME — Architectural Overview
 
-> Generated on $(date +"%Y-%m-%d %H:%M:%S") by \`repo-summarize\` + [Antigravity \`agyy\`](https://github.com/ne1cc/terminal-configs)
+> Generated on $(date +"%Y-%m-%d %H:%M:%S") by [\`repo-summarize\`](https://github.com/ne1cc/repo-summarize) + \`${AI_CMD[0]}\`
 > Per-file summaries are in \`docs/architecture/<path>.md\`
 
 ---

@@ -4,6 +4,12 @@ A premium, curated repository for my complete terminal environment, shell config
 
 ---
 
+## Featured Tool: repo-summarize (open source)
+
+**[ne1cc/repo-summarize](https://github.com/ne1cc/repo-summarize)** — one command turns any codebase into annotated architecture docs. It builds a zero-AI repo map (layout, entry points, import graph), explains every file in the context of its callers and callees (a comment on every line for short files, per-block for long ones), then synthesises an architectural `INDEX.md`. Single-file Bash, MIT licensed, works with any print-mode AI CLI via `REPO_SUMMARIZE_CMD`. Wired into Neovim as `<Leader>as` and into the shell as `reposum`.
+
+---
+
 ## Master Guides and Documentation
 
 **Start here:** **[docs/README.md](docs/README.md)** — documentation hub with all workflow guides.
@@ -128,7 +134,7 @@ To restore packages automatically as part of setup:
 * Customized AstroNvim structure with Tokyo Night theme.
 * Inline image rendering (`3rd/image.nvim` + `img-clip.nvim`), PDF viewing (`MuPDF`), and FzfLua picker.
 * Antigravity (`agyy`) integrations for background file explanations, code reviews, visual selections, and repository summaries. Results open in One Markdown under `docs/explanations/`, `docs/reviews/`, or `docs/snippets/`.
-* `<Leader>as` runs the headless `repo-summarize` workflow and writes a mirrored explanation index at `docs/explanations/INDEX.md`.
+* `<Leader>as` runs the headless [`repo-summarize`](https://github.com/ne1cc/repo-summarize) workflow: a repo map first, then annotated per-file walkthroughs and an AI-synthesised `INDEX.md` in `docs/architecture/`.
 
 ### Claude Code Workflows (Configuration as Code)
 * Integrates a version-controlled global [CLAUDE.md](claude-code/CLAUDE.md) symlinked automatically to `~/.claude/CLAUDE.md`.

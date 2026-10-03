@@ -127,7 +127,7 @@ Inside Neovim, Antigravity runs non-intrusively in the background without termin
 - `<Leader>ae` (Normal): Deeply explains active file architecture & logic in background (`docs/explanations/<relpath>.md`), opens in One Markdown.
 - `<Leader>ae` (Visual): Explains visually selected buffer lines into an isolated snippets folder (`docs/snippets/<file>_L<start>-L<end>_<timestamp>.md`) with rich metadata, opens in One Markdown.
 - `<Leader>ar` (Normal): Deep code review for bugs & performance regressions in background (`docs/reviews/<relpath>.md`), opens in One Markdown.
-- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`) generating complete mirrored explanations, Mermaid system diagram, and `INDEX.md`.
+- `<Leader>as` (Normal): Headless batch repository summarization (`repo-summarize --open`): scans the repo first, then writes annotated per-file walkthroughs and an AI-synthesised `INDEX.md` (with Mermaid module map) to `docs/architecture/`.
 - `<Leader>at` (Normal): Floating interactive `agyy` chat terminal (`<C-q>` or `q` / `<Esc>` to dismiss).
 
 ### Commands
@@ -136,7 +136,7 @@ Inside Neovim, Antigravity runs non-intrusively in the background without termin
 |-----------------|--------|
 | `agy` | Run Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Skip tool approval prompts |
-| `reposum` / `repo-summarize` | Headless batch code summarization tool (`docs/explanations/INDEX.md` + One Markdown) |
+| `reposum` / `repo-summarize` | Headless batch code summarization tool (`docs/architecture/INDEX.md` + One Markdown); open source at [ne1cc/repo-summarize](https://github.com/ne1cc/repo-summarize) |
 
 ### Audit ledger
 
@@ -333,7 +333,8 @@ OpenWiki produces structured architectural documentation (`openwiki/quickstart.m
 
 ### 2. Whole-Repo Summarization
 - Inside Neovim, press **`<Leader>as`** or run `reposum` / `repo-summarize --open` from your shell.
-- Analyzes repository structure, generating `docs/explanations/*.md` and opening `docs/explanations/INDEX.md` in One Markdown.
+- Builds a zero-AI repo map (`docs/architecture/.repo-map.md`), writes annotated per-file walkthroughs to `docs/architecture/*.md`, and opens the synthesised `docs/architecture/INDEX.md` in One Markdown.
+- Backend is set by `REPO_SUMMARIZE_CMD` (exported in `.zprofile` as `agyy -p`); the public default is `agy -p`.
 
 ### 3. Interactive Architecture Visualization
 - From terminal or tmux, run:

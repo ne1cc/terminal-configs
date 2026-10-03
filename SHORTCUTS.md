@@ -182,7 +182,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 |---|---|
 | `agy` | Run Google Antigravity CLI |
 | `agy-yolo` / `agyy` / `yolo` | Run Antigravity bypassing tool approval prompts (`--dangerously-skip-permissions`) |
-| `reposum` / `repo-summarize` | Headless batch code summarization tool; writes explanations to `docs/explanations/*.md` and opens `INDEX.md` in One Markdown |
+| `reposum` / `repo-summarize` | Headless batch code summarization tool; writes annotated walkthroughs to `docs/architecture/*.md` and opens `INDEX.md` in One Markdown; open source: [ne1cc/repo-summarize](https://github.com/ne1cc/repo-summarize) |
 | `owv` / `openwiki-viz` | Launches interactive OpenWiki dependency graph and architecture visualization |
 | `glog` | Markdown preview of the Antigravity audit ledger (`~/.gemini_history.md`) |
 | `gdiff` | Side-by-side syntax-highlighted diff of Antigravity session history |
