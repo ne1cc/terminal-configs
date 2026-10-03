@@ -63,7 +63,13 @@ if [[ -n "$STALE_DAYS" ]]; then
   mkdir -p "$CACHE_DIR"
   if [[ -f "$STAMP_FILE" ]]; then
     now=$(date +%s)
-    mtime=$(stat -f %m "$STAMP_FILE" 2>/dev/null || stat -c %Y "$STAMP_FILE" 2>/dev/null || echo 0)
+    if stat -c %Y "$STAMP_FILE" >/dev/null 2>&1; then
+      mtime=$(stat -c %Y "$STAMP_FILE")
+    elif stat -f %m "$STAMP_FILE" >/dev/null 2>&1; then
+      mtime=$(stat -f %m "$STAMP_FILE")
+    else
+      mtime=0
+    fi
     age_days=$(( (now - mtime) / 86400 ))
     if (( age_days < STALE_DAYS )); then
       exit 0

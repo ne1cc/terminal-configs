@@ -34,6 +34,7 @@ tmux_archive_*.log
 # Git worktrees & workmux state
 .worktrees/
 .workmux/
+worktrees/
 
 # Python cache
 __pycache__/
@@ -42,5 +43,6 @@ __pycache__/
 # Scratch directories
 .scratch/
 
-
+# Zsh completion dumps
+.zcompdump*
 
