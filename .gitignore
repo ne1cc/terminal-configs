@@ -30,3 +30,8 @@ Github/
 # Tmux pane logs (auto-logging + manual captures + prefix+P archives)
 tmux-logs/
 tmux_archive_*.log
+
+# Git worktrees managed by workmux
+.worktrees/
+worktrees/
+
