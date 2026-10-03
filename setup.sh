@@ -102,7 +102,7 @@ if [[ -f "$REPO_DIR/.taskrc.template" ]]; then
   fi
 fi
 
-for dotfile in .zshrc .zprofile .p10k.zsh .tmux.conf .gitconfig .taskrc .inputrc .bashrc .bash_profile; do
+for dotfile in .zshrc .zshenv .zprofile .p10k.zsh .tmux.conf .gitconfig .taskrc .inputrc .bashrc .bash_profile; do
   [[ -f "$REPO_DIR/$dotfile" ]] && link_path "$REPO_DIR/$dotfile" "$HOME/$dotfile"
 done
 

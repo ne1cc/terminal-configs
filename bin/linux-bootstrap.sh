@@ -127,6 +127,7 @@ cd "$DOTFILES"
 
 STOW_TARGETS=(
     "$HOME/.zshrc"
+    "$HOME/.zshenv"
     "$HOME/.zprofile"
     "$HOME/.gitconfig"
     "$HOME/.p10k.zsh"

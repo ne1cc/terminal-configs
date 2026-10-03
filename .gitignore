@@ -35,3 +35,6 @@ tmux_archive_*.log
 .worktrees/
 worktrees/
 
+# Zsh completion dumps
+.zcompdump*
+
