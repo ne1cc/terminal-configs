@@ -11,12 +11,7 @@ return {
       render_modes = { "n", "c", "t" },
       file_types = { "markdown", "vimwiki" },
       anti_conceal = {
-        enabled = true,
-        ignore = {
-          code_background = true,
-          sign = true,
-          table_border = true,
-        },
+        enabled = false,
       },
       win_options = {
         conceallevel = { default = 0, rendered = 2 },
