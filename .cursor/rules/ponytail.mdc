@@ -1,0 +1,9 @@
+---
+description: Use Ponytail full mode by default for coding tasks.
+globs:
+alwaysApply: true
+---
+
+## Ponytail by default
+
+For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.agents/skills/ponytail/SKILL.md` (or `~/.cursor/skills-cursor/ponytail/SKILL.md`) before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.
