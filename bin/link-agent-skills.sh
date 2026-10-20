@@ -9,14 +9,16 @@
 #   ~/.qoder/skills           (Qoder CLI)
 #   ~/.codex/skills           (Codex / ChatGPT)
 #   ~/.config/opencode/skills (OpenCode / T3 Code)
+#   ~/.cursor/skills-cursor   (Cursor IDE)
 #
 # Cursor-only skills (.cursor/skills-cursor) → ~/.cursor/skills-cursor/
 # Cursor rules (.cursor/rules/*.mdc)         → ~/.cursor/rules/
+# OpenCode commands (.opencode/command/*.md)  → ~/.config/opencode/command/
 #
 # Global instruction files bootstrapped (if absent):
-#   ~/.codex/AGENTS.md           (instructs Codex to invoke using-superpowers at session start)
-#   ~/.qoder/QODER.md            (instructs Qoder to invoke using-superpowers at session start)
-#   ~/.config/opencode/AGENTS.md (instructs OpenCode / T3 to invoke using-superpowers at session start)
+#   ~/.codex/AGENTS.md           (instructs Codex to invoke using-superpowers & ponytail)
+#   ~/.qoder/QODER.md            (instructs Qoder to invoke using-superpowers & ponytail)
+#   ~/.config/opencode/AGENTS.md (instructs OpenCode / T3 to invoke using-superpowers & ponytail)
 
 set -euo pipefail
 
@@ -74,7 +76,8 @@ link_skill_tree "$REPO_DIR/.gemini/skills" \
   "$HOME/.agents/skills" \
   "$HOME/.qoder/skills" \
   "$HOME/.codex/skills" \
-  "$HOME/.config/opencode/skills"
+  "$HOME/.config/opencode/skills" \
+  "$HOME/.cursor/skills-cursor"
 
 link_skill_tree "$REPO_DIR/.claude/skills" \
   "$HOME/.claude/skills" \
@@ -93,6 +96,20 @@ if [[ -d "$REPO_DIR/.cursor/rules" ]]; then
     ln -sfn "$rule" "$dest"
   done
   printf '  linked cursor rules from %s\n' "$REPO_DIR/.cursor/rules"
+fi
+
+# Link .opencode/command/*.md into ~/.config/opencode/command/
+if [[ -d "$REPO_DIR/.opencode/command" ]]; then
+  mkdir -p "$HOME/.config/opencode/command"
+  for cmd in "$REPO_DIR/.opencode/command"/*.md; do
+    [[ -f "$cmd" ]] || continue
+    dest="$HOME/.config/opencode/command/$(basename "$cmd")"
+    if [[ -L "$dest" && "$(readlink "$dest")" == "$cmd" ]]; then
+      continue
+    fi
+    ln -sfn "$cmd" "$dest"
+  done
+  printf '  linked opencode commands from %s\n' "$REPO_DIR/.opencode/command"
 fi
 
 if [[ -f "$REPO_DIR/.gemini/hooks.json" ]]; then
@@ -149,6 +166,11 @@ if added:
 else:
     print("  unchanged: ~/.claude/settings.json permissions already set")
 PY_EOF
+fi
+
+# ── Ponytail: configure and install plugins across all coding agents ────────
+if [[ -x "$REPO_DIR/bin/install-ponytail.sh" ]]; then
+  "$REPO_DIR/bin/install-ponytail.sh"
 fi
 
 printf 'Done linking agent skills.\n'

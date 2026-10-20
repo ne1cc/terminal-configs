@@ -85,3 +85,7 @@ Read it fresh every session.
 
 Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for
 Qoder-specific tool mappings, if that file exists.
+
+## Ponytail by default
+
+For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.qoder/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.

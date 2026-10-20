@@ -190,3 +190,7 @@ gmc
 4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
 6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
+
+## Ponytail by default
+
+For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.claude/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.

@@ -155,6 +155,14 @@ if [[ -x "$REPO_DIR/bin/setup-github-workspace" ]]; then
   fi
 fi
 
+if [[ -x "$REPO_DIR/bin/install-ponytail.sh" ]]; then
+  if "$DRY_RUN"; then
+    "$REPO_DIR/bin/install-ponytail.sh" --dry-run
+  else
+    "$REPO_DIR/bin/install-ponytail.sh"
+  fi
+fi
+
 # Ghostty now uses ~/.config/ghostty/config on every supported platform. Remove
 # the obsolete macOS location only when it is our previously-managed symlink;
 # loading both files applies keybindings twice and produces duplicate errors.
@@ -193,6 +201,10 @@ if ! "$SKIP_PLUGINS"; then
 
   if command -v claude >/dev/null 2>&1 && [[ -d "$HOME/.claude/skills/delegate-agy" ]]; then
     printf '  Claude Code delegate-agy plugin is present at ~/.claude/skills/delegate-agy\n'
+  fi
+
+  if [[ -d "$HOME/.agents/skills/ponytail" ]]; then
+    printf '  Ponytail agent skills are active across coding agents\n'
   fi
 fi
 

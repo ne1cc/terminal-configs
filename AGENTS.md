@@ -60,3 +60,7 @@ To maintain high auditability, keep the human in the loop, and prevent rogue cha
 - Capture the post-execution audit trail:
   - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
   - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
+
+## Ponytail by default
+
+For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.agents/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.
