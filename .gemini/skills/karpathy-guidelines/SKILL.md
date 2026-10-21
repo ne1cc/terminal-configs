@@ -66,6 +66,21 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. High-Signal Code Commenting & Walkthroughs
+
+**No syntax restatement. High architectural signal. Document contracts, invariants, and the non-obvious why.**
+
+When writing non-trivial code (multi-step routines, async workflows, security/auth, state machines, or branching logic):
+1. **Boundary Docblock**:
+   - 1-sentence intent.
+   - Bulleted return & throw contract (`Returns <type> on success`, `Returns fallback on missing/stale`, `Throws/Rejects on ...`).
+   - Known limits, helper assumptions, or `shortcut: <limit>, <when to upgrade>`.
+2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
+   - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
+   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+3. **Walkthroughs in Responses (Chat, PRs, Docs)**:
+   - Summarize code using: Executive Intent & Contract → Numbered Block-by-Block Breakdown (with monospace `Condition → Action` truth tables and async sequence traces) → Compact Unicode Flow Tree (`├─` / `└─`) → Important Limits & Failure Modes.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
