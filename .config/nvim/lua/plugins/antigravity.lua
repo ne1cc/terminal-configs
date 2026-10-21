@@ -42,6 +42,7 @@ An ordered reading path: 2-4 specific files, functions or line ranges to read ne
 Style rules:
 - Plain, direct prose. Explain why, not just what. Do not restate the code. Define any jargon on first use.
 - Put every diagram in its own ```mermaid fenced block. Never draw ASCII or box-drawing art.
+- Never use a Mermaid keyword (end, off, alt, opt, loop, par, graph) as a node or participant ID.
 - Mermaid must be valid: wrap every node label in double quotes, avoid parentheses and special characters outside quotes, and keep each diagram to about 12 nodes or fewer.
 - Headings must be plain text. Do not turn headings or code references into links (no file:// or other URLs).
 - Keep tables compact. Skip a section rather than pad it.
@@ -312,7 +313,7 @@ Structure your review with:
 3. **Performance Regressions & Inefficiencies**: Algorithmic complexity, unnecessary allocations, blocking I/O.
 4. **Actionable Recommendations & Diffs**: Concrete fixes with minimal, surgical code snippets.
 
-Format in clean GitHub-Flavored Markdown. Draw any diagram as Mermaid in its own ```mermaid fenced block, never ASCII or box-drawing art, and quote node labels.
+Format in clean GitHub-Flavored Markdown. Draw any diagram as Mermaid in its own ```mermaid fenced block, never ASCII or box-drawing art, and quote node labels. Never use a Mermaid keyword (end, off, alt, opt, loop, par, graph) as a node or participant ID.
 ]], rel_path, filetype, file_content)
 
               run_agyy_prompt_to_file(prompt, doc_file, "Reviewing " .. rel_path)
