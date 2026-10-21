@@ -1,4 +1,80 @@
-# Global Agent Instructions
+# AGENTS.md — Global Agent Instructions
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## Superpowers (Mandatory — Start of Every Session)
+
+At the start of every conversation, read and follow the `using-superpowers` skill:
+```
+~/.agents/skills/using-superpowers/SKILL.md
+```
+This skill establishes how to discover and invoke all relevant skills **before** any response, action, or clarifying question. New feature? Use brainstorming. Bug? Use systematic-debugging. Code review? There's a skill for that.
+
+**This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.
 
 ## Worktree & PR Lifecycle (mandatory)
 
@@ -62,6 +138,83 @@ To maintain high auditability, keep the human in the loop, and prevent rogue cha
   - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
   - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
 
+# Markdown, Math & Diagram Formatting Rules
+
+When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
+
+## 1. No Raw LaTeX Math Tags
+- NEVER use raw LaTeX math delimiters or environments (`$$ ... $$`, `$...$`, `\text{...}`, `\frac{...}{...}`, `\le`, `\ge`, `\Delta`, `\sum`, `\rightarrow`).
+- Many Markdown viewers (such as One Markdown, VS Code Markdown Preview, GitHub Markdown) do not enable LaTeX MathJax by default, causing raw tags to render as broken, unreadable code.
+
+## 2. Monospace Calculation & Formula Blocks
+- For all multi-step calculations, equations, summation proofs, and ratios, ALWAYS use clean fenced monospace code blocks:
+  ```
+  Total % Change = ∑ (Percentage Change_k)
+                 = (Actual Change_1 / Allowable Change_1) + ...
+                 = 50% + 75% = 125% > 100%
+  ```
+
+## 3. Native Unicode Typography
+- Use standard native Unicode symbols for mathematical and logical expressions:
+  - Inequality: `≤`, `≥`, `≠`, `≈`
+  - Operations: `∑`, `×`, `÷`, `√N`, `±`
+  - Greek / Derivatives: `Δ`, `μ`, `σ`, `λ`, `∈`
+  - Arrows & Logic: `→`, `⇒`, `↔`, `⇔`
+
+## 4. Currency vs. Math Collision Prevention
+- Dollar signs (`$`) must NEVER be used as LaTeX math delimiters.
+- When referencing currency, format values inside backtick code spans: `$10.00/hr`, `-$8.00`, `$5.00/yd`.
+
+## 5. Inline Variables & Expressions
+- Wrap variable names, parameters, and short inline formulas in backtick code spans: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
+
+## 6. Fenced Mermaid Diagrams
+- Only use supported diagram types: `flowchart TD` / `flowchart LR` / `graph TD` / `graph LR`, `sequenceDiagram`, `stateDiagram-v2`, `classDiagram`, `erDiagram`.
+- To prevent syntax errors:
+  - Always quote node labels containing punctuation, parentheses, or brackets: `id["Label (Extra Info)"]`.
+  - NEVER use reserved keywords (`end`, `graph`, `subgraph`, `flowchart`) as unquoted node IDs.
+
+## 7. Fast File & Code Search (Use `rg` Instead of `find`)
+- NEVER use traditional UNIX `find` or slow shell directory recursion when searching for files, archives, or code.
+- ALWAYS use `rg` (Ripgrep) or `fd` for all file and directory discovery:
+  - Finding files by pattern/name: `rg --files -g "*pattern*"` (or `fd "pattern"`)
+  - Finding all files including hidden/ignored: `rg --files --hidden --no-ignore -g "*pattern*"` (or `fd -H -I "pattern"`)
+  - Searching file contents: `rg "query"` or `rg -i "query"`
+  - Listing matching file paths only: `rg -l "query"`
+- Ripgrep respects `.gitignore` by default and uses multi-threaded traversal, preventing background command hangs and slow searches.
+
+## 8. GitHub Namespace Layout & Shortcuts (mandatory)
+
+Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
+
+```text
+~/Github/
+  ne1cc/                 # ONLY repos that exist on github.com/ne1cc/*
+  _local/projects/       # local WIP with no remote yet
+  _local/archive/        # old / non-synced trees
+  _local/worktrees/      # linked git worktrees
+  <other-owner>/         # reference clones (do not add to .mirror-owners)
+  .mirror-owners         # synced owners list (currently: ne1cc)
+```
+
+### Shell aliases (prefer these over raw git/gh for repo placement)
+
+| Alias | Command | Use when |
+|-------|---------|----------|
+| `gnn <name>` | `gh-ns-new` | Start a **local-only** project in `~/Github/_local/projects/<name>` (`--python` / `--node` optional) |
+| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `ne1cc/<name>` on GitHub, push, **move** into `~/Github/ne1cc/<name>` (`--public`, `--name`, `--owner`) |
+| `gns` | `gh-ns-status` | Show local WIP + mirror drift |
+| `gmc` | `gh-mirror-check` | Compare `ne1cc` remotes vs `~/Github/ne1cc` (`MISSING` / `ORPHAN`) |
+| `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
+| `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
+
+### Rules agents must follow
+1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
+2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
+3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
+4. Do not add third-party orgs to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
+5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
+
 ## High-Signal Code Commenting & Walkthrough Standard
 
 When writing, documenting, or explaining non-trivial code (multi-step routines, async workflows, security/auth, state machines, or branching logic), structure comments and summaries to maximize architectural signal and eliminate syntax restatement.
@@ -75,7 +228,7 @@ Do not restate syntax (`// calls foo()`). Structure comments in two concise tier
    - **Limits**: Non-obvious invariants, helper assumptions, concurrency bounds, or `shortcut: <limit>, <when to upgrade>`.
 2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
    - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
-   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+   - State the **why** the code cannot show: race-condition guards, conditional write invariants, or status-code rationale.
 
 ```js
 /**

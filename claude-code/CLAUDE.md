@@ -66,89 +66,124 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
-You are an expert software engineer focused on writing **minimal, self-documenting, type-exact, secure, performant, accessible, and testable** (MSTSPAT) code. The user is based in Pacific Time (PST/PDT, UTC-08:00/UTC-07:00), so ensure timezone awareness in applications.
-
 ## Superpowers (Mandatory — Start of Every Session)
 
-At the start of every conversation, read and follow the `using-superpowers` skill (`~/.claude/skills/using-superpowers/SKILL.md`). This skill establishes how to discover and invoke all other skills before any action or clarifying question.
+At the start of every conversation, read and follow the `using-superpowers` skill:
+```
+~/.claude/skills/using-superpowers/SKILL.md
+```
+This skill establishes how to discover and invoke all relevant skills **before** any response, action, or clarifying question. New feature? Use brainstorming. Bug? Use systematic-debugging. Code review? There's a skill for that.
 
 **This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.
 
-## Planning Process (Mandatory <thinking> tags)
-Before any significant implementation, use `<thinking>` tags to:
-1. Identify the core requirements and constraints.
-2. Consider 3 different implementation approaches.
-3. Choose the simplest approach that meets current and future needs.
-4. Verify clarity, security, performance, accessibility, and testability.
+## Worktree & PR Lifecycle (mandatory)
 
-## Session Discipline & Context Health
-- **Scoped Sessions**: Each session should have a **single, bounded scope** (one feature, one bug, one refactor). If the task grows, stop and open a new named session: `claude --name <descriptive-branch-name>`. Do not let context drift.
-- **Context Management**: Run `/context` if responses drift or session feels sluggish. Run `/compact` to prune debugging noise while retaining code changes and architectural decisions.
-- **Handoff Document**: When a discrete task is finished, generate a session handoff to `.claude/memory/sessions/YYYY-MM-DD-<feature-name>.md` containing:
-  - Files modified (with line ranges for significant changes)
-  - Structural side effects and data-structure changes
-  - Architectural decisions made and alternatives rejected
-  - Exact verification commands used and their output
-  - Open questions or follow-up tasks
+All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
+1. Commit all work on the worktree's branch (Conventional Commits).
+2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
+3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL. Skip for one-commit chore/fix PRs where the PR body already tells the whole story.
+4. Report the PR URL (and retrospective comment URL). Done = PR URL reported.
+5. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
 
-## Evidence Loop & Verification (Before marking any task complete)
-Never self-report a task as done. Always:
-1. Run the compiler / linter for the affected code.
-2. Run the relevant test suite (or write a targeted test if none exists).
-3. Output the zero-exit-status result verbatim into the conversation.
-4. If tests fail, re-evaluate the architecture — do not patch symptoms.
+## Worktree Git Sync & Rebase Protocol
 
-## Technology Stacks
-- **TypeScript/Next.js**: `bun` package manager (use `bunx` not `npx`). Next.js 15+ with App Router, `./src` structure. Server Components by default, Client Components only for interactivity. `shadcn@latest` for UI. Drizzle ORM + PostgreSQL (`src/lib/db/`). Zustand for state (`src/lib/store/`). Vercel AI SDK (default: `gpt-5`).
-- **Python**: `uv` package manager with `.venv` directories. FastAPI with Pydantic v2. Python 3.12+, type hints, async patterns. LangChain v0.3+.
+You are operating inside an isolated Git worktree. **Concurrent development is always happening on other branches.** Assume `main` has advanced since your worktree was created.
 
-## Git Workflow & Conventions
-- **Git Worktrees**: Use git worktrees + named sessions for parallel tasks:
-  - `wt-new <branch>` (create worktree, open tmux window, launch claude)
-  - `wt-tmux-attach` (attach to existing worktree)
-  - `wt-rm [branch]` (cleanup worktree + branch)
-- **Worktree & PR Lifecycle (mandatory)**: Sessions run in workmux-managed worktrees (`.worktrees/`, one branch and one tmux window per worktree; `wmux` manages them). At the end of development: commit all work on the worktree's branch, push with `git push -u origin <branch>`, open a PR (`gh pr create` — title under 70 chars, summary body, test plan), and report the PR URL. Done = PR URL reported. After PR merge (or upon user request to merge): merge the PR, fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
-- **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`).
-- **Proactive Remote Sync**: For any branch except `main`, proactively push after completing meaningful work (`git push` automatically) so PRs can be created at any time.
-
-## Worktree Rebase & Drift Protocol
-
-**Every session starts synced.** The `SessionStart` hook automatically fetches and rebases `origin/main`. If the hook reports a conflict, stop and resolve it before writing any code.
-
-### Detecting drift mid-session
-When a PR merges to `main` while you are working, check for drift before any multi-file refactor or commit:
+### At session start and before any commit
+Check whether `origin/main` has new commits:
 ```bash
 git fetch origin main && git log HEAD..origin/main --oneline
 ```
-If new commits appear, rebase immediately:
+If output is non-empty, rebase immediately:
 ```bash
 git rebase origin/main
 ```
 
-### Resolving rebase conflicts
-1. Inspect both sides: `git diff` and `git diff --staged`.
-2. **Never overwrite upstream changes blindly.** Preserve both features if logic allows.
-3. After editing each conflicted file: `git add <file>` then `git rebase --continue`.
-4. `rerere` is enabled globally — previously resolved conflict patterns are replayed automatically.
-5. Run the project test/typecheck suite after rebasing to confirm integration.
+### Conflict resolution rules
+1. Never overwrite upstream changes blindly. Inspect both sides with `git diff`.
+2. Preserve both features if logic permits; only remove code you authored if it is superseded.
+3. After resolving each conflicted file: `git add <file>` then `git rebase --continue`.
+4. `rerere` is enabled globally — repeat conflict patterns are replayed automatically.
+5. Run the project test/typecheck suite after rebasing before resuming task work.
 
-### Push safety rules
-- **Never** `git push --force` to a shared branch.
+### Push safety
+- Never `git push --force` to a shared branch.
 - Use `git push --force-with-lease` only on your own feature branch after a rebase.
-- Run `git log --oneline origin/main..HEAD` before pushing to confirm your commits are the only delta.
+- Verify your delta: `git log --oneline origin/main..HEAD` before any push.
 
-### Broadcast rebase across all sibling worktrees
-To sync every open worktree after a PR merges to main, run `wt-rebase-all` from any directory in the repo.
+## Specification-Driven Execution & Checkpoint Protocol
 
-## Project Planning & TODO.md Management
-- Create/maintain a structured `TODO.md` file in the project root with hierarchical checkboxes.
-- **Incremental Task Updates**: Mark `[x]` immediately when each task is completed. Note blockers `[?]` or decisions in-line. Keep TODO.md as the true source of progress.
+To maintain high auditability, keep the human in the loop, and prevent rogue changes:
 
-## Claude Code Configuration
-- **Security**: Deny access to `.env*`, `secrets/**`, and dangerous bash commands. Confirm `git push*` and `package.json` changes.
-- **MCP Integration**: Configure external tools (database, GitHub, etc.) via JSON config.
+### 1. Scope Thresholds
+- **Trivial changes** (single-file fixes, typos, dependency bumps, explicit direct instructions):
+  - State the intention briefly in conversation.
+  - Implement surgical changes directly and verify with tests.
+- **Non-trivial changes** (≥2 files, architectural changes, schema/API changes, or ambiguous specs):
+  - Follow the `spec-driven-execution` skill.
+  - Strict two-phase lifecycle: Plan first, get explicit approval, then execute.
 
-## GitHub Namespace Layout & Shortcuts (mandatory)
+### 2. Phase 1 — Pre-Execution Plan & Review Gate
+- Inspect the codebase and tests (read-only; **do NOT edit source files yet**).
+- Write an implementation plan:
+  - In Antigravity / UI runtimes: Save as an Antigravity Artifact (`write_to_file` with `ArtifactMetadata.RequestFeedback = true`, `ArtifactType: "plan"`).
+  - In CLI / terminal runtimes: Write to `.scratch/<feature-name>/implementation_plan.md`.
+  - Include: architecture/rationale, exact files to create/modify/delete, step-by-step TDD phases, and verification commands.
+- **STOP and wait for user review/approval** before applying any file modifications.
+
+### 3. Phase 2 — Surgical Execution & Audit Walkthrough
+- Execute modifications matching the approved plan surgically.
+- Run unit tests, linters, and verification commands.
+- Capture the post-execution audit trail:
+  - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
+  - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
+
+# Markdown, Math & Diagram Formatting Rules
+
+When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
+
+## 1. No Raw LaTeX Math Tags
+- NEVER use raw LaTeX math delimiters or environments (`$$ ... $$`, `$...$`, `\text{...}`, `\frac{...}{...}`, `\le`, `\ge`, `\Delta`, `\sum`, `\rightarrow`).
+- Many Markdown viewers (such as One Markdown, VS Code Markdown Preview, GitHub Markdown) do not enable LaTeX MathJax by default, causing raw tags to render as broken, unreadable code.
+
+## 2. Monospace Calculation & Formula Blocks
+- For all multi-step calculations, equations, summation proofs, and ratios, ALWAYS use clean fenced monospace code blocks:
+  ```
+  Total % Change = ∑ (Percentage Change_k)
+                 = (Actual Change_1 / Allowable Change_1) + ...
+                 = 50% + 75% = 125% > 100%
+  ```
+
+## 3. Native Unicode Typography
+- Use standard native Unicode symbols for mathematical and logical expressions:
+  - Inequality: `≤`, `≥`, `≠`, `≈`
+  - Operations: `∑`, `×`, `÷`, `√N`, `±`
+  - Greek / Derivatives: `Δ`, `μ`, `σ`, `λ`, `∈`
+  - Arrows & Logic: `→`, `⇒`, `↔`, `⇔`
+
+## 4. Currency vs. Math Collision Prevention
+- Dollar signs (`$`) must NEVER be used as LaTeX math delimiters.
+- When referencing currency, format values inside backtick code spans: `$10.00/hr`, `-$8.00`, `$5.00/yd`.
+
+## 5. Inline Variables & Expressions
+- Wrap variable names, parameters, and short inline formulas in backtick code spans: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
+
+## 6. Fenced Mermaid Diagrams
+- Only use supported diagram types: `flowchart TD` / `flowchart LR` / `graph TD` / `graph LR`, `sequenceDiagram`, `stateDiagram-v2`, `classDiagram`, `erDiagram`.
+- To prevent syntax errors:
+  - Always quote node labels containing punctuation, parentheses, or brackets: `id["Label (Extra Info)"]`.
+  - NEVER use reserved keywords (`end`, `graph`, `subgraph`, `flowchart`) as unquoted node IDs.
+
+## 7. Fast File & Code Search (Use `rg` Instead of `find`)
+- NEVER use traditional UNIX `find` or slow shell directory recursion when searching for files, archives, or code.
+- ALWAYS use `rg` (Ripgrep) or `fd` for all file and directory discovery:
+  - Finding files by pattern/name: `rg --files -g "*pattern*"` (or `fd "pattern"`)
+  - Finding all files including hidden/ignored: `rg --files --hidden --no-ignore -g "*pattern*"` (or `fd -H -I "pattern"`)
+  - Searching file contents: `rg "query"` or `rg -i "query"`
+  - Listing matching file paths only: `rg -l "query"`
+- Ripgrep respects `.gitignore` by default and uses multi-threaded traversal, preventing background command hangs and slow searches.
+
+## 8. GitHub Namespace Layout & Shortcuts (mandatory)
 
 Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
 
@@ -173,23 +208,12 @@ Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
 | `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
 | `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
 
-### Happy path
-```bash
-gnn invoice-etl --python
-cd ~/Github/_local/projects/invoice-etl
-# commit work…
-gnp
-cd ~/Github/ne1cc/invoice-etl
-gmc
-```
-
 ### Rules agents must follow
 1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
 2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
 3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
-4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
+4. Do not add third-party orgs to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
-6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
 
 ## High-Signal Code Commenting & Walkthrough Standard
 
@@ -204,7 +228,7 @@ Do not restate syntax (`// calls foo()`). Structure comments in two concise tier
    - **Limits**: Non-obvious invariants, helper assumptions, concurrency bounds, or `shortcut: <limit>, <when to upgrade>`.
 2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
    - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
-   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+   - State the **why** the code cannot show: race-condition guards, conditional write invariants, or status-code rationale.
 
 ```js
 /**

@@ -98,4 +98,12 @@ End with:
 Nothing found: `What this change does:`, then `Looks good. Ship.` and one line
 on what you checked.
 
+## Cross-Provider Review in T3 Code (On-Demand)
+
+When running inside T3 Code where the `t3-orchestration` MCP tool `delegate_task` is available:
+- **On-Demand Only**: Only invoke cross-provider review when the user explicitly asks for cross-model verification (e.g., "have another model review this" or `/ponytail-review --cross`). Never invoke automatically for routine reviews or commits.
+- **Dispatch Pattern**: Use `delegate_task` to assign the review to an independent provider family (e.g., if currently in `antigravity`, delegate to `codex` or `claudeAgent`). Pass the diff and the 4 review requirements (Must fix, Should fix, Nice to have, Lean).
+- **Graceful Fallback**: If `delegate_task` is unavailable (e.g., running in standard CLI terminal), run the review in the current agent session.
+
+
 Lists findings, changes no code.

@@ -68,13 +68,77 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Superpowers (Mandatory — Start of Every Session)
 
-At the start of every conversation, read and follow the `using-superpowers` skill (`~/.gemini/config/skills/using-superpowers/SKILL.md`). This skill establishes how to discover and invoke all other skills before any action or clarifying question.
+At the start of every conversation, read and follow the `using-superpowers` skill:
+```
+~/.gemini/config/skills/using-superpowers/SKILL.md
+```
+This skill establishes how to discover and invoke all relevant skills **before** any response, action, or clarifying question. New feature? Use brainstorming. Bug? Use systematic-debugging. Code review? There's a skill for that.
 
 **This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.
 
----
+## Worktree & PR Lifecycle (mandatory)
 
-# Markdown & Equation Formatting Rules for Antigravity
+All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
+1. Commit all work on the worktree's branch (Conventional Commits).
+2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
+3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL. Skip for one-commit chore/fix PRs where the PR body already tells the whole story.
+4. Report the PR URL (and retrospective comment URL). Done = PR URL reported.
+5. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
+
+## Worktree Git Sync & Rebase Protocol
+
+You are operating inside an isolated Git worktree. **Concurrent development is always happening on other branches.** Assume `main` has advanced since your worktree was created.
+
+### At session start and before any commit
+Check whether `origin/main` has new commits:
+```bash
+git fetch origin main && git log HEAD..origin/main --oneline
+```
+If output is non-empty, rebase immediately:
+```bash
+git rebase origin/main
+```
+
+### Conflict resolution rules
+1. Never overwrite upstream changes blindly. Inspect both sides with `git diff`.
+2. Preserve both features if logic permits; only remove code you authored if it is superseded.
+3. After resolving each conflicted file: `git add <file>` then `git rebase --continue`.
+4. `rerere` is enabled globally — repeat conflict patterns are replayed automatically.
+5. Run the project test/typecheck suite after rebasing before resuming task work.
+
+### Push safety
+- Never `git push --force` to a shared branch.
+- Use `git push --force-with-lease` only on your own feature branch after a rebase.
+- Verify your delta: `git log --oneline origin/main..HEAD` before any push.
+
+## Specification-Driven Execution & Checkpoint Protocol
+
+To maintain high auditability, keep the human in the loop, and prevent rogue changes:
+
+### 1. Scope Thresholds
+- **Trivial changes** (single-file fixes, typos, dependency bumps, explicit direct instructions):
+  - State the intention briefly in conversation.
+  - Implement surgical changes directly and verify with tests.
+- **Non-trivial changes** (≥2 files, architectural changes, schema/API changes, or ambiguous specs):
+  - Follow the `spec-driven-execution` skill.
+  - Strict two-phase lifecycle: Plan first, get explicit approval, then execute.
+
+### 2. Phase 1 — Pre-Execution Plan & Review Gate
+- Inspect the codebase and tests (read-only; **do NOT edit source files yet**).
+- Write an implementation plan:
+  - In Antigravity / UI runtimes: Save as an Antigravity Artifact (`write_to_file` with `ArtifactMetadata.RequestFeedback = true`, `ArtifactType: "plan"`).
+  - In CLI / terminal runtimes: Write to `.scratch/<feature-name>/implementation_plan.md`.
+  - Include: architecture/rationale, exact files to create/modify/delete, step-by-step TDD phases, and verification commands.
+- **STOP and wait for user review/approval** before applying any file modifications.
+
+### 3. Phase 2 — Surgical Execution & Audit Walkthrough
+- Execute modifications matching the approved plan surgically.
+- Run unit tests, linters, and verification commands.
+- Capture the post-execution audit trail:
+  - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
+  - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
+
+# Markdown, Math & Diagram Formatting Rules
 
 When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
 
@@ -89,12 +153,6 @@ When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or r
                  = (Actual Change_1 / Allowable Change_1) + ...
                  = 50% + 75% = 125% > 100%
   ```
-- Use code blocks for financial calculations:
-  ```
-  ΔProfit = (-8 hrs × $10.00/hr) + (+30 yds × $5.00/yd)
-          = -$80 + $150
-          = +$70.00
-  ```
 
 ## 3. Native Unicode Typography
 - Use standard native Unicode symbols for mathematical and logical expressions:
@@ -105,16 +163,16 @@ When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or r
 
 ## 4. Currency vs. Math Collision Prevention
 - Dollar signs (`$`) must NEVER be used as LaTeX math delimiters.
-- When referencing currency, format values inside backtick code spans:
-  - Correct: `$10.00/hr`, `-$8.00`, `$5.00/yd`
-  - Incorrect: `$10.00/hr$` or `$$10.00$$`
+- When referencing currency, format values inside backtick code spans: `$10.00/hr`, `-$8.00`, `$5.00/yd`.
 
 ## 5. Inline Variables & Expressions
-- Wrap variable names, parameters, and short inline formulas in backtick code spans:
-  - Examples: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
+- Wrap variable names, parameters, and short inline formulas in backtick code spans: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
 
-## 6. Session Resumption & Handoffs
-- When asked to "resume", "continue", or "pick up where we left off", always check `.gemini/sessions/` or `~/.gemini/sessions/` for the latest dated session handoff document to instantly restore context, working branch, uncommitted diffs, and the open tasks roadmap.
+## 6. Fenced Mermaid Diagrams
+- Only use supported diagram types: `flowchart TD` / `flowchart LR` / `graph TD` / `graph LR`, `sequenceDiagram`, `stateDiagram-v2`, `classDiagram`, `erDiagram`.
+- To prevent syntax errors:
+  - Always quote node labels containing punctuation, parentheses, or brackets: `id["Label (Extra Info)"]`.
+  - NEVER use reserved keywords (`end`, `graph`, `subgraph`, `flowchart`) as unquoted node IDs.
 
 ## 7. Fast File & Code Search (Use `rg` Instead of `find`)
 - NEVER use traditional UNIX `find` or slow shell directory recursion when searching for files, archives, or code.
@@ -150,61 +208,14 @@ Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
 | `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
 | `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
 
-### Happy path
-```bash
-gnn invoice-etl --python
-cd ~/Github/_local/projects/invoice-etl
-# commit work…
-gnp
-cd ~/Github/ne1cc/invoice-etl
-gmc
-```
-
 ### Rules agents must follow
 1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
 2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
 3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
-4. Do not add third-party orgs (e.g. `facebook`) to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
+4. Do not add third-party orgs to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
 5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
-6. Prefer `gmc` / `gns` to verify layout instead of ad-hoc `find` when diagnosing missing clones.
 
-## 9. Worktree & PR Lifecycle (mandatory)
-
-All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
-1. Commit all work on the worktree's branch (Conventional Commits).
-2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
-3. Report the PR URL. Done = PR URL reported.
-4. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
-
-## 10. Specification-Driven Execution & Checkpoint Protocol
-
-To maintain high auditability, keep the human in the loop, and prevent rogue changes:
-
-### Scope Thresholds
-- **Trivial changes** (single-file fixes, typos, dependency bumps, explicit direct instructions):
-  - State the intention briefly in conversation.
-  - Implement surgical changes directly and verify with tests.
-- **Non-trivial changes** (≥2 files, architectural changes, schema/API changes, or ambiguous specs):
-  - Follow the `spec-driven-execution` skill.
-  - Strict two-phase lifecycle: Plan first, get explicit approval, then execute.
-
-### Pre-Execution Plan & Review Gate
-- Inspect the codebase and tests (read-only; **do NOT edit source files yet**).
-- Write an implementation plan:
-  - In Antigravity / UI runtimes: Save as an Antigravity Artifact (`write_to_file` with `ArtifactMetadata.RequestFeedback = true`, `ArtifactType: "plan"`).
-  - In CLI / terminal runtimes: Write to `.scratch/<feature-name>/implementation_plan.md`.
-  - Include: architecture/rationale, exact files to create/modify/delete, step-by-step TDD phases, and verification commands.
-- **STOP and wait for user review/approval** before applying any file modifications.
-
-### Surgical Execution & Audit Walkthrough
-- Execute modifications matching the approved plan surgically.
-- Run unit tests, linters, and verification commands.
-- Capture the post-execution audit trail:
-  - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
-  - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
-
-
-## 11. High-Signal Code Commenting & Walkthrough Standard
+## High-Signal Code Commenting & Walkthrough Standard
 
 When writing, documenting, or explaining non-trivial code (multi-step routines, async workflows, security/auth, state machines, or branching logic), structure comments and summaries to maximize architectural signal and eliminate syntax restatement.
 
@@ -217,7 +228,7 @@ Do not restate syntax (`// calls foo()`). Structure comments in two concise tier
    - **Limits**: Non-obvious invariants, helper assumptions, concurrency bounds, or `shortcut: <limit>, <when to upgrade>`.
 2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
    - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
-   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+   - State the **why** the code cannot show: race-condition guards, conditional write invariants, or status-code rationale.
 
 ```js
 /**
@@ -269,7 +280,6 @@ When summarizing or explaining code to humans:
 3. **Control-Flow Tree**: Compact Unicode tree (`├─` / `└─`) showing the decision gates and exit points.
 4. **Important Limits**: Bulleted list of helper assumptions, concurrency gaps, and uncaught error boundaries.
 
-
 ## Clickable Absolute File Links (Mandatory Across All Outputs)
 
 When referencing, creating, modifying, inspecting, or summarizing files, configs, scripts, or code symbols in any response, plan, walkthrough, or retrospective:
@@ -279,7 +289,6 @@ When referencing, creating, modifying, inspecting, or summarizing files, configs
   - Code symbols / line ranges: `[`symbolName`](file:///absolute/path/to/filename.ext#L10-L25)`
 - **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
 - Always use forward slashes (`/`).
-
 
 ## Ponytail by default
 
