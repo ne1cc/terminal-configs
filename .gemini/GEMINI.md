@@ -170,10 +170,11 @@ gmc
 
 ## 9. Worktree & PR Lifecycle (mandatory)
 
-All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development, before the user removes the worktree (`wmr`) and prunes:
+All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
 1. Commit all work on the worktree's branch (Conventional Commits).
 2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
-3. Report the PR URL. Done = PR URL reported. The user merges the PR, then runs `wmr` and `git worktree prune` themselves.
+3. Report the PR URL. Done = PR URL reported.
+4. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
 
 ## 10. Specification-Driven Execution & Checkpoint Protocol
 
@@ -267,6 +268,17 @@ When summarizing or explaining code to humans:
 2. **Numbered Block-by-Block Walkthrough (`## 1. ...`)**: Isolate each block, explain data shapes, provide a monospace `Condition → Action` truth table, and detail the async/state transition sequence.
 3. **Control-Flow Tree**: Compact Unicode tree (`├─` / `└─`) showing the decision gates and exit points.
 4. **Important Limits**: Bulleted list of helper assumptions, concurrency gaps, and uncaught error boundaries.
+
+
+## Clickable Absolute File Links (Mandatory Across All Outputs)
+
+When referencing, creating, modifying, inspecting, or summarizing files, configs, scripts, or code symbols in any response, plan, walkthrough, or retrospective:
+
+- **ALWAYS use GitHub-style Markdown links with the absolute `file://` URI scheme**:
+  - Specific files: `[filename.ext](file:///absolute/path/to/filename.ext)`
+  - Code symbols / line ranges: `[`symbolName`](file:///absolute/path/to/filename.ext#L10-L25)`
+- **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
+- Always use forward slashes (`/`).
 
 
 ## Ponytail by default

@@ -107,7 +107,7 @@ Never self-report a task as done. Always:
   - `wt-new <branch>` (create worktree, open tmux window, launch claude)
   - `wt-tmux-attach` (attach to existing worktree)
   - `wt-rm [branch]` (cleanup worktree + branch)
-- **Worktree & PR Lifecycle (mandatory)**: Sessions run in workmux-managed worktrees (`.worktrees/`, one branch and one tmux window per worktree; `wmux` manages them). At the end of development, before the user removes the worktree (`wmr`) and prunes: commit all work on the worktree's branch, push with `git push -u origin <branch>`, then open a PR (`gh pr create` — title under 70 chars, summary body, test plan) and report the PR URL. Done = PR URL reported. The user merges, then runs `wmr` and `git worktree prune` themselves.
+- **Worktree & PR Lifecycle (mandatory)**: Sessions run in workmux-managed worktrees (`.worktrees/`, one branch and one tmux window per worktree; `wmux` manages them). At the end of development: commit all work on the worktree's branch, push with `git push -u origin <branch>`, open a PR (`gh pr create` — title under 70 chars, summary body, test plan), and report the PR URL. Done = PR URL reported. After PR merge (or upon user request to merge): merge the PR, fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
 - **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`).
 - **Proactive Remote Sync**: For any branch except `main`, proactively push after completing meaningful work (`git push` automatically) so PRs can be created at any time.
 
@@ -255,6 +255,16 @@ When summarizing or explaining code to humans:
 2. **Numbered Block-by-Block Walkthrough (`## 1. ...`)**: Isolate each block, explain data shapes, provide a monospace `Condition → Action` truth table, and detail the async/state transition sequence.
 3. **Control-Flow Tree**: Compact Unicode tree (`├─` / `└─`) showing the decision gates and exit points.
 4. **Important Limits**: Bulleted list of helper assumptions, concurrency gaps, and uncaught error boundaries.
+
+## Clickable Absolute File Links (Mandatory Across All Outputs)
+
+When referencing, creating, modifying, inspecting, or summarizing files, configs, scripts, or code symbols in any response, plan, walkthrough, or retrospective:
+
+- **ALWAYS use GitHub-style Markdown links with the absolute `file://` URI scheme**:
+  - Specific files: `[filename.ext](file:///absolute/path/to/filename.ext)`
+  - Code symbols / line ranges: `[`symbolName`](file:///absolute/path/to/filename.ext#L10-L25)`
+- **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
+- Always use forward slashes (`/`).
 
 ## Ponytail by default
 

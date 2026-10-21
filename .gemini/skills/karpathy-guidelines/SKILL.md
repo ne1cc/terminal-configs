@@ -81,6 +81,17 @@ When writing non-trivial code (multi-step routines, async workflows, security/au
 3. **Walkthroughs in Responses (Chat, PRs, Docs)**:
    - Summarize code using: Executive Intent & Contract → Numbered Block-by-Block Breakdown (with monospace `Condition → Action` truth tables and async sequence traces) → Compact Unicode Flow Tree (`├─` / `└─`) → Important Limits & Failure Modes.
 
+## 6. Clickable Absolute File Links
+
+**No bare relative paths. Mandatory absolute `file://` links for all cited files and code symbols.**
+
+When referencing, creating, modifying, inspecting, or summarizing files, configs, scripts, or code symbols in any response, plan, walkthrough, or retrospective:
+- **ALWAYS use GitHub-style Markdown links with the absolute `file://` URI scheme**:
+  - Specific files: `[filename.ext](file:///absolute/path/to/filename.ext)`
+  - Code symbols / line ranges: `[`symbolName`](file:///absolute/path/to/filename.ext#L10-L25)`
+- **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
+- Always use forward slashes (`/`).
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
