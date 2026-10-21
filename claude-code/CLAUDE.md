@@ -290,6 +290,15 @@ When referencing, creating, modifying, inspecting, or summarizing files, configs
 - **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
 - Always use forward slashes (`/`).
 
+## Post-Implementation & PR Visualization (`mermaid-lens`)
+
+- Upon completing a feature implementation, architectural refactor, PR description/review, or system design explanation, silently evaluate the changes against `~/.claude/skills/mermaid-lens/SKILL.md`.
+- **Override Flags**:
+  - `#diagram` in prompt → Bypass complexity gate and force an inline ` ```mermaid ` diagram in chat (no disk write).
+  - `--save-mmd` (or `--save-mmd=path/to/file.mmd`) in prompt → Bypass complexity gate, render inline in chat, and write the diagram to `docs/diagrams/<feature>.mmd` (or the specified `.mmd`/`.md` path).
+  - `#no-diagram` in prompt → Hard-suppress diagram generation for the turn.
+- When no flags are passed, only render an inline diagram (≤12 nodes, ≤3 subgraphs, double-quoted labels, `[NEW]`/`[MODIFIED]` delta tags) if the changes cross the semantic complexity gate (cross-boundary I/O, state machines, complex DAGs, or 3+ entity schemas); otherwise omit completely with zero commentary.
+
 ## Ponytail by default
 
 For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.claude/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.
