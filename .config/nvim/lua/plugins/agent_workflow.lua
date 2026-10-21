@@ -1,3 +1,87 @@
+-- Helper to extract and sort target file paths from neo-tree selection or cursor
+local function get_nodes_to_open(state, selected_nodes)
+  local nodes = {}
+  -- 1. Check tagged nodes (set via `v` or `<Tab>`)
+  if state.selected and vim.tbl_count(state.selected) > 0 then
+    for id in pairs(state.selected) do
+      local node = state.tree:get_node(id)
+      if node and node.type == "file" then
+        table.insert(nodes, node.path)
+      end
+    end
+  -- 2. Check visual selection nodes (e.g. range selected in `V` mode)
+  elseif selected_nodes and #selected_nodes > 0 then
+    for _, node in ipairs(selected_nodes) do
+      if node and node.type == "file" then
+        table.insert(nodes, node.path)
+      end
+    end
+  -- 3. Fallback: single node under cursor
+  else
+    local node = state.tree:get_node()
+    if node and node.type == "file" then
+      table.insert(nodes, node.path)
+    end
+  end
+
+  local unique_paths = {}
+  local seen = {}
+  for _, path in ipairs(nodes) do
+    if not seen[path] then
+      seen[path] = true
+      table.insert(unique_paths, path)
+    end
+  end
+
+  table.sort(unique_paths)
+  return unique_paths
+end
+
+local function open_all_selected_nodes(state, selected_nodes)
+  local paths = get_nodes_to_open(state, selected_nodes)
+  if #paths == 0 then
+    vim.notify("Neo-tree: No files selected to open", vim.log.levels.WARN)
+    return
+  end
+
+  -- 1. Load all chosen paths into Neovim buffers
+  for _, path in ipairs(paths) do
+    vim.cmd("badd " .. vim.fn.fnameescape(path))
+  end
+
+  -- 2. Open first file in the editor window (safely avoids replacing neo-tree)
+  local nt_utils = require("neo-tree.utils")
+  nt_utils.open_file(state, paths[1], "edit")
+
+  -- 3. Clear tagged selections if set
+  if state.selected and vim.tbl_count(state.selected) > 0 then
+    state.selected = {}
+    require("neo-tree.ui.renderer").redraw(state)
+  end
+
+  vim.notify(string.format("Loaded %d file(s) into buffers", #paths), vim.log.levels.INFO)
+end
+
+local function quickfix_selected_nodes(state, selected_nodes)
+  local paths = get_nodes_to_open(state, selected_nodes)
+  if #paths == 0 then
+    vim.notify("Neo-tree: No files selected for quickfix", vim.log.levels.WARN)
+    return
+  end
+
+  local qf_items = {}
+  for _, path in ipairs(paths) do
+    table.insert(qf_items, { filename = path, lnum = 1, col = 1 })
+  end
+  vim.fn.setqflist(qf_items, "r")
+  vim.cmd("copen")
+
+  if state.selected and vim.tbl_count(state.selected) > 0 then
+    state.selected = {}
+    require("neo-tree.ui.renderer").redraw(state)
+  end
+end
+
 return {
   -- 1. DIFFVIEW: Side-by-side git diffs for reviewing agent overhauls
   {
@@ -109,6 +193,9 @@ return {
             config = { use_float = true, use_snacks_image = true, use_image_nvim = true },
           },
           ["l"] = "focus_preview",
+          ["v"] = "select",
+          ["O"] = "open_all_selected",
+          ["<C-q>"] = "quickfix_selected",
         },
       },
       filesystem = {
@@ -125,6 +212,9 @@ return {
             ["l"] = "focus_preview",
             ["E"] = "expand_all_nodes",
             ["M"] = "open_mupdf",
+            ["v"] = "select",
+            ["O"] = "open_all_selected",
+            ["<C-q>"] = "quickfix_selected",
           },
         },
       },
@@ -135,6 +225,18 @@ return {
           if filepath and node.type == "file" then
             vim.fn.jobstart({ "mupdf", filepath }, { detach = true })
           end
+        end,
+        open_all_selected = function(state)
+          open_all_selected_nodes(state)
+        end,
+        open_all_selected_visual = function(state, selected_nodes)
+          open_all_selected_nodes(state, selected_nodes)
+        end,
+        quickfix_selected = function(state)
+          quickfix_selected_nodes(state)
+        end,
+        quickfix_selected_visual = function(state, selected_nodes)
+          quickfix_selected_nodes(state, selected_nodes)
         end,
       },
     },
