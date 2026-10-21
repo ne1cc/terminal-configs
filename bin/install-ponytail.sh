@@ -59,12 +59,23 @@ PONYTAIL_SKILLS=(
 DEST_DIRS=(
   "$HOME/.gemini/config/skills"
   "$HOME/.claude/skills"
+  "$HOME/.claude-secondary/skills"
   "$HOME/.agents/skills"
   "$HOME/.qoder/skills"
   "$HOME/.codex/skills"
   "$HOME/.config/opencode/skills"
+  "$HOME/.opencode/skills"
+  "$HOME/.t3/skills"
   "$HOME/.cursor/skills-cursor"
 )
+
+# Also link into all T3 Antigravity provider instances if present
+if [[ -d "$HOME/.t3/userdata/providers/antigravity" ]]; then
+  for pdir in "$HOME/.t3/userdata/providers/antigravity"/*; do
+    [[ -d "$pdir" ]] || continue
+    DEST_DIRS+=("$pdir/config/skills")
+  done
+fi
 
 for dest_root in "${DEST_DIRS[@]}"; do
   run mkdir -p "$dest_root"
@@ -72,6 +83,13 @@ for dest_root in "${DEST_DIRS[@]}"; do
     src="$REPO_DIR/.gemini/skills/$sname"
     [[ -d "$src" ]] || continue
     dest="$dest_root/$sname"
+    if [[ -e "$dest" && -e "$src" ]]; then
+      src_real="$(cd -P "$src" 2>/dev/null && pwd || true)"
+      dest_real="$(cd -P "$dest" 2>/dev/null && pwd || true)"
+      if [[ -n "$src_real" && "$src_real" == "$dest_real" ]]; then
+        continue
+      fi
+    fi
     if [[ -L "$dest" && "$(readlink "$dest")" == "$src" ]]; then
       continue
     fi
