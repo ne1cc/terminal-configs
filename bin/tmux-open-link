@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
 """
 tmux-open-link: Universal terminal link and file opener for Shift+Click in Tmux.
-Resolves explicit OSC 8 hyperlinks, inline HTTP/HTTPS URLs, Markdown links,
-and local file paths from the clicked terminal row and cursor column.
+
+Intent: Resolves clicked URLs, file URIs, Markdown links, and terminal paths,
+        dispatching Markdown files to omd, code/text files to VS Code at the
+        target line, and web/media URLs to the default system opener.
+
+Contract:
+- Extracts target under cursor from explicit OSC 8 hyperlinks, Markdown links,
+  URI schemes, or local file regex with line numbers.
+- Resolves relative paths against the active tmux pane's current working directory.
+- Dispatches:
+    * Markdown (.md, .markdown) -> omd
+    * Code/text files (.py, .ts, configs, etc.) -> code -g <path>:<line> (fallback: system open)
+    * Media & web URLs -> system open / browser
+- Displays a status toast in tmux via notify_tmux().
+- Exits 0 on resolution/dispatch; exits 1 on fatal error.
+
+Limits: Relies on `code` CLI for line jumping; falls back to system open if absent.
 """
 
 import sys
@@ -10,31 +25,31 @@ import os
 import re
 import subprocess
 import shutil
+import urllib.parse
 from pathlib import Path
 
 
-def get_system_opener(target: str):
-    """Determine the correct system opener command for the target URL or path."""
-    if sys.platform == "darwin":
-        return ["open", target]
-    
-    # Check for WSL (Windows Subsystem for Linux)
-    if "microsoft" in Path("/proc/version").read_text(errors="ignore").lower() if Path("/proc/version").exists() else False:
-        if shutil.which("wslview"):
-            return ["wslview", target]
-        if shutil.which("open.exe"):
-            return ["open.exe", target]
-        return ["cmd.exe", "/c", "start", '""', target]
-    
-    # Standard Linux
-    if shutil.which("xdg-open"):
-        return ["xdg-open", target]
-    
-    # Fallback
-    return ["open", target]
+def get_pane_cwd() -> str | None:
+    """Query tmux for the active pane's current working directory."""
+    if "TMUX" not in os.environ:
+        return os.getcwd()
+    try:
+        res = subprocess.run(
+            ["tmux", "display-message", "-p", "#{pane_current_path}"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=1,
+        )
+        cwd = res.stdout.strip()
+        if cwd and os.path.isdir(cwd):
+            return cwd
+    except Exception:
+        pass
+    return os.getcwd()
 
 
-def notify_tmux(message: str):
+def notify_tmux(message: str) -> None:
     """Display a status notification toast in tmux."""
     if "TMUX" in os.environ:
         subprocess.run(
@@ -46,11 +61,118 @@ def notify_tmux(message: str):
 
 
 def clean_url(url: str) -> str:
-    """Strip common trailing punctuation from terminal text matching."""
+    """Strip trailing terminal punctuation from link matches."""
     return url.rstrip(".,;:!?)>\"'`")
 
 
-def resolve_target(hyperlink: str, line: str, col: int) -> str | None:
+def find_omd_command() -> list[str]:
+    """Locate the omd launcher script or system fallback."""
+    if shutil.which("omd"):
+        return ["omd"]
+    home_bin = os.path.expanduser("~/bin/omd")
+    if os.path.exists(home_bin) and os.access(home_bin, os.X_OK):
+        return [home_bin]
+    if sys.platform == "darwin" and os.path.exists("/Applications/One Markdown.app"):
+        return ["open", "-a", "One Markdown"]
+    return ["open"]
+
+
+def find_code_command() -> str | None:
+    """Locate the VS Code CLI executable."""
+    if shutil.which("code"):
+        return "code"
+    candidates = [
+        "/usr/local/bin/code",
+        "/opt/homebrew/bin/code",
+        "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+    ]
+    for c in candidates:
+        if os.path.exists(c) and os.access(c, os.X_OK):
+            return c
+    return None
+
+
+def get_system_opener(target: str) -> list[str]:
+    """Determine the platform-appropriate system opener command."""
+    if sys.platform == "darwin":
+        return ["open", target]
+
+    # Check for WSL (Windows Subsystem for Linux)
+    is_wsl = False
+    proc_version = Path("/proc/version")
+    if proc_version.exists():
+        is_wsl = "microsoft" in proc_version.read_text(errors="ignore").lower()
+    if is_wsl:
+        if shutil.which("wslview"):
+            return ["wslview", target]
+        if shutil.which("open.exe"):
+            return ["open.exe", target]
+        return ["cmd.exe", "/c", "start", '""', target]
+
+    if shutil.which("xdg-open"):
+        return ["xdg-open", target]
+
+    return ["open", target]
+
+
+def parse_target(raw: str, cwd: str | None = None) -> tuple[str, str, int | None]:
+    """
+    Parse a raw link or file string into (target_type, cleaned_target, line_number).
+    target_type: 'web' | 'markdown' | 'code' | 'media' | 'system'
+    """
+    raw = raw.strip()
+
+    # 1. Web links (http://, https://, ftp://)
+    if raw.startswith(("http://", "https://", "ftp://")):
+        return ("web", raw, None)
+
+    # 2. VCS / Remote protocol links (git://, ssh://)
+    if raw.startswith(("git://", "ssh://")):
+        return ("system", raw, None)
+
+    line_num: int | None = None
+    path_str = raw
+
+    # 3. Local file URI (file:///path/to/file#L10 or file://localhost/...)
+    if path_str.startswith("file://"):
+        parsed = urllib.parse.urlparse(path_str)
+        path_str = urllib.parse.unquote(parsed.path)
+        if parsed.fragment:
+            m = re.match(r"^L?(\d+)", parsed.fragment)
+            if m:
+                line_num = int(m.group(1))
+    else:
+        # 4. Standard file path with optional :line or :line:col suffix
+        m = re.search(r":(\d+)(?::\d+)?$", path_str)
+        if m:
+            line_num = int(m.group(1))
+            path_str = path_str[:m.start()]
+
+    # 5. Resolve path against cwd if relative
+    expanded = os.path.expanduser(path_str)
+    if not os.path.isabs(expanded) and cwd:
+        candidate = os.path.join(cwd, expanded)
+        if os.path.exists(candidate):
+            expanded = os.path.abspath(candidate)
+
+    ext = os.path.splitext(expanded)[1].lower()
+
+    # 6. Markdown files
+    if ext in {".md", ".markdown", ".mdown"}:
+        return ("markdown", expanded, line_num)
+
+    # 7. Media & document formats
+    if ext in {
+        ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".ico",
+        ".pdf", ".mp4", ".mov", ".zip", ".tar", ".gz", ".html", ".htm"
+    }:
+        return ("media", expanded, line_num)
+
+    # 8. All other files (source code, configs, scripts, extensionless text files)
+    return ("code", expanded, line_num)
+
+
+def resolve_target(hyperlink: str, line: str, col: int, cwd: str | None = None) -> str | None:
     """Resolve the URL or file path under cursor column col."""
     # 1. Explicit OSC 8 hyperlink from tmux #{mouse_hyperlink}
     if hyperlink and hyperlink.strip():
@@ -79,28 +201,30 @@ def resolve_target(hyperlink: str, line: str, col: int) -> str | None:
         if start <= col <= end:
             return cleaned
 
-    # 4. Local file path regex (/path, ~/path, ./path, ../path, word/path.ext)
+    # 4. Local file path regex (/path, ~/path, ./path, ../path, word/path)
     file_pattern = re.compile(
-        r'(?:^|[\s"\'`\(<\[])(/[^:\s<>"\'`\)]+|~/[^:\s<>"\'`\)]+|\.{1,2}/[^:\s<>"\'`\)]+|[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\.[a-zA-Z0-9_]+)(?::(\d+))?'
+        r'(?:^|[\s"\'`\(<\[])(/[^:\s<>"\'`\)]+|~/[^:\s<>"\'`\)]+|\.{1,2}/[^:\s<>"\'`\)]+|[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)(?::(\d+)(?::\d+)?)?'
     )
     file_matches = []
     for m in file_pattern.finditer(line):
         path_str = m.group(1)
         line_num = m.group(2)
         start = m.start(1)
-        end = m.end(1)
+        end = m.end(2) if line_num else m.end(1)
+        full_match = f"{path_str}:{line_num}" if line_num else path_str
         expanded = os.path.expanduser(path_str)
-        if os.path.exists(expanded):
-            file_matches.append((start, end, expanded, line_num))
+        path_exists = os.path.exists(expanded) or (
+            cwd is not None and os.path.exists(os.path.join(cwd, path_str))
+        )
+        if path_exists:
+            file_matches.append((start, end, full_match))
             if start <= col <= end:
-                return expanded
+                return full_match
 
-    # 5. Proximity fallback: If mouse was clicked on the row with URLs
+    # 5. Proximity fallback: If mouse clicked on a line with URLs
     if url_matches:
-        # If there is only one URL on the line, assume user intended to open it
         if len(url_matches) == 1:
             return url_matches[0][2]
-        # Otherwise choose the closest URL to the click column
         closest = min(url_matches, key=lambda item: abs(item[0] - col))
         return closest[2]
 
@@ -114,7 +238,17 @@ def resolve_target(hyperlink: str, line: str, col: int) -> str | None:
     return None
 
 
-def main():
+def format_display_path(path: str, max_len: int = 55) -> str:
+    """Shorten path for clean tmux notification display."""
+    home = os.path.expanduser("~")
+    if path.startswith(home):
+        path = "~" + path[len(home):]
+    if len(path) <= max_len:
+        return path
+    return "..." + path[-(max_len - 3):]
+
+
+def main() -> None:
     hyperlink = sys.argv[1] if len(sys.argv) > 1 else ""
     line = sys.argv[2] if len(sys.argv) > 2 else ""
     try:
@@ -122,16 +256,46 @@ def main():
     except ValueError:
         col = 0
 
-    target = resolve_target(hyperlink, line, col)
+    pane_cwd = get_pane_cwd()
+    target = resolve_target(hyperlink, line, col, cwd=pane_cwd)
 
     if not target:
         notify_tmux("⚠️  No link or file path found under cursor")
         sys.exit(0)
 
-    # Format notification display text (truncate if overly long)
-    disp = target if len(target) <= 60 else target[:57] + "..."
+    target_type, clean_path, line_num = parse_target(target, cwd=pane_cwd)
+    disp = format_display_path(clean_path)
 
-    cmd = get_system_opener(target)
+    # 1. Dispatch Markdown -> omd
+    if target_type == "markdown":
+        omd_cmd = find_omd_command()
+        cmd = omd_cmd + [clean_path]
+        toast = f"📖 Opened in omd: {disp}"
+
+    # 2. Dispatch Code / Text -> VS Code (fallback: system open)
+    elif target_type == "code":
+        code_bin = find_code_command()
+        if code_bin:
+            if line_num:
+                cmd = [code_bin, "-g", f"{clean_path}:{line_num}"]
+                toast = f"💻 Opened in VS Code: {disp}:{line_num}"
+            else:
+                cmd = [code_bin, clean_path]
+                toast = f"💻 Opened in VS Code: {disp}"
+        else:
+            cmd = get_system_opener(clean_path)
+            toast = f"🔗 Opened: {disp}"
+
+    # 3. Dispatch Media -> System opener
+    elif target_type == "media":
+        cmd = get_system_opener(clean_path)
+        toast = f"🖼️  Opened: {disp}"
+
+    # 4. Dispatch Web / System URLs -> System browser / handler
+    else:
+        cmd = get_system_opener(clean_path)
+        toast = f"🔗 Opened: {disp}"
+
     try:
         subprocess.Popen(
             cmd,
@@ -139,7 +303,7 @@ def main():
             stderr=subprocess.DEVNULL,
             start_new_session=True,
         )
-        notify_tmux(f"🔗 Opened: {disp}")
+        notify_tmux(toast)
     except Exception as err:
         notify_tmux(f"❌ Failed to open {disp}: {err}")
         sys.exit(1)
