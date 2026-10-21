@@ -151,6 +151,16 @@ When summarizing or explaining code to humans:
 3. **Control-Flow Tree**: Compact Unicode tree (`├─` / `└─`) showing the decision gates and exit points.
 4. **Important Limits**: Bulleted list of helper assumptions, concurrency gaps, and uncaught error boundaries.
 
+## Clickable Absolute File Links (Mandatory Across All Outputs)
+
+When referencing, creating, modifying, inspecting, or summarizing files, configs, scripts, or code symbols in any response, plan, walkthrough, or retrospective:
+
+- **ALWAYS use GitHub-style Markdown links with the absolute `file://` URI scheme**:
+  - Specific files: `[filename.ext](file:///absolute/path/to/filename.ext)`
+  - Code symbols / line ranges: `[`symbolName`](file:///absolute/path/to/filename.ext#L10-L25)`
+- **NEVER emit bare unlinked filenames or relative paths** (`./src/app.ts`, `app.ts`) when referencing files on disk. Every cited file must be a directly clickable link that opens immediately via click / shift-click in terminal emulators (Ghostty/tmux) and GUI interfaces.
+- Always use forward slashes (`/`).
+
 ## Ponytail by default
 
 For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.qoder/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.
