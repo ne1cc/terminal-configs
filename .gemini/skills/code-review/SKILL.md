@@ -85,3 +85,11 @@ A change can pass one axis and fail the other:
 - Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
 
 Reporting them separately stops one axis from masking the other.
+
+## Cross-Provider Sub-Agents in T3 Code (On-Demand)
+
+When running inside T3 Code where the `t3-orchestration` MCP tool `delegate_task` is available:
+- **On-Demand Only**: Only invoke cross-provider delegation when the user explicitly requests cross-model review.
+- **Dispatch Pattern**: You can delegate the `Standards` review and `Spec` review to distinct provider families (e.g., dispatch one axis to `claudeAgent` and the other to `codex`) via `delegate_task`.
+- **Graceful Fallback**: When `delegate_task` is unavailable, use standard parallel subagent dispatch.
+
