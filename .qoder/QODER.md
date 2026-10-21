@@ -69,22 +69,155 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## Superpowers (Mandatory — Start of Every Session)
 
 At the start of every conversation, read and follow the `using-superpowers` skill:
-
 ```
 ~/.qoder/skills/using-superpowers/SKILL.md
 ```
+This skill establishes how to discover and invoke all relevant skills **before** any response, action, or clarifying question. New feature? Use brainstorming. Bug? Use systematic-debugging. Code review? There's a skill for that.
 
-This skill establishes how to discover and invoke all relevant skills **before** any
-response, action, or clarifying question. New feature? Use brainstorming.
-Bug? Use systematic-debugging. Code review? There's a skill for that.
-
-**This is non-negotiable.** Do not skip it. Do not assume you remember it.
-Read it fresh every session.
+**This is non-negotiable.** Do not skip it. Do not assume you remember it. Read it fresh every session.
 
 ## Platform: Qoder
 
-Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for
-Qoder-specific tool mappings, if that file exists.
+Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for Qoder-specific tool mappings, if that file exists.
+
+## Worktree & PR Lifecycle (mandatory)
+
+All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
+1. Commit all work on the worktree's branch (Conventional Commits).
+2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
+3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL. Skip for one-commit chore/fix PRs where the PR body already tells the whole story.
+4. Report the PR URL (and retrospective comment URL). Done = PR URL reported.
+5. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
+
+## Worktree Git Sync & Rebase Protocol
+
+You are operating inside an isolated Git worktree. **Concurrent development is always happening on other branches.** Assume `main` has advanced since your worktree was created.
+
+### At session start and before any commit
+Check whether `origin/main` has new commits:
+```bash
+git fetch origin main && git log HEAD..origin/main --oneline
+```
+If output is non-empty, rebase immediately:
+```bash
+git rebase origin/main
+```
+
+### Conflict resolution rules
+1. Never overwrite upstream changes blindly. Inspect both sides with `git diff`.
+2. Preserve both features if logic permits; only remove code you authored if it is superseded.
+3. After resolving each conflicted file: `git add <file>` then `git rebase --continue`.
+4. `rerere` is enabled globally — repeat conflict patterns are replayed automatically.
+5. Run the project test/typecheck suite after rebasing before resuming task work.
+
+### Push safety
+- Never `git push --force` to a shared branch.
+- Use `git push --force-with-lease` only on your own feature branch after a rebase.
+- Verify your delta: `git log --oneline origin/main..HEAD` before any push.
+
+## Specification-Driven Execution & Checkpoint Protocol
+
+To maintain high auditability, keep the human in the loop, and prevent rogue changes:
+
+### 1. Scope Thresholds
+- **Trivial changes** (single-file fixes, typos, dependency bumps, explicit direct instructions):
+  - State the intention briefly in conversation.
+  - Implement surgical changes directly and verify with tests.
+- **Non-trivial changes** (≥2 files, architectural changes, schema/API changes, or ambiguous specs):
+  - Follow the `spec-driven-execution` skill.
+  - Strict two-phase lifecycle: Plan first, get explicit approval, then execute.
+
+### 2. Phase 1 — Pre-Execution Plan & Review Gate
+- Inspect the codebase and tests (read-only; **do NOT edit source files yet**).
+- Write an implementation plan:
+  - In Antigravity / UI runtimes: Save as an Antigravity Artifact (`write_to_file` with `ArtifactMetadata.RequestFeedback = true`, `ArtifactType: "plan"`).
+  - In CLI / terminal runtimes: Write to `.scratch/<feature-name>/implementation_plan.md`.
+  - Include: architecture/rationale, exact files to create/modify/delete, step-by-step TDD phases, and verification commands.
+- **STOP and wait for user review/approval** before applying any file modifications.
+
+### 3. Phase 2 — Surgical Execution & Audit Walkthrough
+- Execute modifications matching the approved plan surgically.
+- Run unit tests, linters, and verification commands.
+- Capture the post-execution audit trail:
+  - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
+  - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
+
+# Markdown, Math & Diagram Formatting Rules
+
+When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
+
+## 1. No Raw LaTeX Math Tags
+- NEVER use raw LaTeX math delimiters or environments (`$$ ... $$`, `$...$`, `\text{...}`, `\frac{...}{...}`, `\le`, `\ge`, `\Delta`, `\sum`, `\rightarrow`).
+- Many Markdown viewers (such as One Markdown, VS Code Markdown Preview, GitHub Markdown) do not enable LaTeX MathJax by default, causing raw tags to render as broken, unreadable code.
+
+## 2. Monospace Calculation & Formula Blocks
+- For all multi-step calculations, equations, summation proofs, and ratios, ALWAYS use clean fenced monospace code blocks:
+  ```
+  Total % Change = ∑ (Percentage Change_k)
+                 = (Actual Change_1 / Allowable Change_1) + ...
+                 = 50% + 75% = 125% > 100%
+  ```
+
+## 3. Native Unicode Typography
+- Use standard native Unicode symbols for mathematical and logical expressions:
+  - Inequality: `≤`, `≥`, `≠`, `≈`
+  - Operations: `∑`, `×`, `÷`, `√N`, `±`
+  - Greek / Derivatives: `Δ`, `μ`, `σ`, `λ`, `∈`
+  - Arrows & Logic: `→`, `⇒`, `↔`, `⇔`
+
+## 4. Currency vs. Math Collision Prevention
+- Dollar signs (`$`) must NEVER be used as LaTeX math delimiters.
+- When referencing currency, format values inside backtick code spans: `$10.00/hr`, `-$8.00`, `$5.00/yd`.
+
+## 5. Inline Variables & Expressions
+- Wrap variable names, parameters, and short inline formulas in backtick code spans: `x*`, `Δc_j`, `Q*`, `RiskTriang(100, 160, 220)`, `P* = 10/19 = 52.6%`.
+
+## 6. Fenced Mermaid Diagrams
+- Only use supported diagram types: `flowchart TD` / `flowchart LR` / `graph TD` / `graph LR`, `sequenceDiagram`, `stateDiagram-v2`, `classDiagram`, `erDiagram`.
+- To prevent syntax errors:
+  - Always quote node labels containing punctuation, parentheses, or brackets: `id["Label (Extra Info)"]`.
+  - NEVER use reserved keywords (`end`, `graph`, `subgraph`, `flowchart`) as unquoted node IDs.
+
+## 7. Fast File & Code Search (Use `rg` Instead of `find`)
+- NEVER use traditional UNIX `find` or slow shell directory recursion when searching for files, archives, or code.
+- ALWAYS use `rg` (Ripgrep) or `fd` for all file and directory discovery:
+  - Finding files by pattern/name: `rg --files -g "*pattern*"` (or `fd "pattern"`)
+  - Finding all files including hidden/ignored: `rg --files --hidden --no-ignore -g "*pattern*"` (or `fd -H -I "pattern"`)
+  - Searching file contents: `rg "query"` or `rg -i "query"`
+  - Listing matching file paths only: `rg -l "query"`
+- Ripgrep respects `.gitignore` by default and uses multi-threaded traversal, preventing background command hangs and slow searches.
+
+## 8. GitHub Namespace Layout & Shortcuts (mandatory)
+
+Local disk mirrors GitHub by owner. Primary account is `ne1cc`.
+
+```text
+~/Github/
+  ne1cc/                 # ONLY repos that exist on github.com/ne1cc/*
+  _local/projects/       # local WIP with no remote yet
+  _local/archive/        # old / non-synced trees
+  _local/worktrees/      # linked git worktrees
+  <other-owner>/         # reference clones (do not add to .mirror-owners)
+  .mirror-owners         # synced owners list (currently: ne1cc)
+```
+
+### Shell aliases (prefer these over raw git/gh for repo placement)
+
+| Alias | Command | Use when |
+|-------|---------|----------|
+| `gnn <name>` | `gh-ns-new` | Start a **local-only** project in `~/Github/_local/projects/<name>` (`--python` / `--node` optional) |
+| `gnp` | `gh-ns-promote` | Promote cwd (or path) → create `ne1cc/<name>` on GitHub, push, **move** into `~/Github/ne1cc/<name>` (`--public`, `--name`, `--owner`) |
+| `gns` | `gh-ns-status` | Show local WIP + mirror drift |
+| `gmc` | `gh-mirror-check` | Compare `ne1cc` remotes vs `~/Github/ne1cc` (`MISSING` / `ORPHAN`) |
+| `gnc owner/repo` | `gh-ns-clone` | Clone into `~/Github/<owner>/<repo>` |
+| `gnf owner/repo` | `gh-ns-fork` | Fork to your account, clone under your namespace; `origin`=fork, `upstream`=original |
+
+### Rules agents must follow
+1. Never invent a flat `~/Github/<repo>` path. Synced remotes live under `~/Github/ne1cc/<repo>`.
+2. New work with no GitHub remote yet → `gnn` / `_local/projects/`, then `gnp` when ready to publish.
+3. After `gnp`, the canonical path is `~/Github/ne1cc/<repo>`; do not leave promoted repos under `_local`.
+4. Do not add third-party orgs to `.mirror-owners`. Use `gnc` for read-only clones; `gnf` to contribute.
+5. Before promote/push: ensure `.gitignore` covers `.venv/`, `node_modules/`, `.env`, large data; never commit secrets.
 
 ## High-Signal Code Commenting & Walkthrough Standard
 
@@ -99,7 +232,7 @@ Do not restate syntax (`// calls foo()`). Structure comments in two concise tier
    - **Limits**: Non-obvious invariants, helper assumptions, concurrency bounds, or `shortcut: <limit>, <when to upgrade>`.
 2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
    - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
-   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+   - State the **why** the code cannot show: race-condition guards, conditional write invariants, or status-code rationale.
 
 ```js
 /**
