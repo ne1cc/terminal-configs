@@ -54,11 +54,8 @@ blur = true
 # SCROLLING
 # ==============================================================================
 [scrolling]
-
-# Zero scrollback forces all scrolling through tmux copy-mode.
-# This prevents Alacritty's buffer from desyncing with tmux pane history
-# when switching windows.
-history = 0
+# 10,000 lines scrollback (mirrors Ghostty's scrollback-limit = 10000)
+history = 10000
 multiplier = 3
 
 
@@ -173,31 +170,6 @@ save_to_clipboard = true
 [mouse]
 # Hide cursor while typing — mirrors Ghostty's mouse-hide-while-typing = true
 hide_when_typing = true
-
-
-# ==============================================================================
-# KEYBOARD HINTS (selection/copy shortcuts)
-# ==============================================================================
-[hints]
-# Alphabet used for hint label characters
-alphabet = "jfkdls;ahgurieowpq"
-
-[[hints.enabled]]
-command         = "open"
-hyperlinks      = true
-post_processing = true
-persist         = false
-mouse           = { enabled = true, mods = "Control" }
-binding         = { key = "U", mods = "Control|Shift" }
-regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
-
-[[hints.enabled]]
-command         = "open"
-hyperlinks      = true
-post_processing = true
-persist         = false
-mouse           = { enabled = true, mods = "Shift" }
-regex           = '(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^ <>"\\^`{|}]+'
 
 # ==============================================================================
 # KEYBOARD BINDINGS — FULL TMUX + TERMINAL CONFIGS PARITY
@@ -386,5 +358,3 @@ action = "ToggleFullscreen"
 [[keyboard.bindings]]
 key = "F11"
 action = "ToggleFullscreen"
-
-[terminal]
