@@ -203,6 +203,72 @@ To maintain high auditability, keep the human in the loop, and prevent rogue cha
   - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
 
 
+## 11. High-Signal Code Commenting & Walkthrough Standard
+
+When writing, documenting, or explaining non-trivial code (multi-step routines, async workflows, security/auth, state machines, or branching logic), structure comments and summaries to maximize architectural signal and eliminate syntax restatement.
+
+### 1. In-Source Code Comments (Writing & Refactoring Code)
+Do not restate syntax (`// calls foo()`). Structure comments in two concise tiers:
+
+1. **Boundary Docblock (Intent + Contract + Limits)**:
+   - **Intent**: 1 sentence stating what the function/module accomplishes.
+   - **Contract**: Bulleted return and throw behavior (`Returns <type> on success`, `Returns fallback on missing/stale`, `Throws/Rejects on ...`).
+   - **Limits**: Non-obvious invariants, helper assumptions, concurrency bounds, or `shortcut: <limit>, <when to upgrade>`.
+2. **Numbered Step Comments (`// 1.`, `// 2.`, ...)**:
+   - Group sequential blocks under numbered headings that fuse the action with the decision rule (`Condition → Action`).
+   - State the **why** the code cannot show: race-condition guards (e.g. session swaps during pending `await`), conditional write invariants, or status-code rationale (`401` vs transient error).
+
+```js
+/**
+ * Returns a usable access token, refreshing if expired.
+ *
+ * Contract:
+ * - Returns token string when valid or refreshed; "" when signed out, superseded, or refresh fails.
+ * - Rejects only if initial readSession() or catch-block cleanup throws.
+ *
+ * Limits: Does not deduplicate concurrent callers; relies on writeSession() enforcing CAS.
+ */
+async function refreshAccessToken() {
+  // 1. Load current session (missing session or token → bail without refresh)
+  const session = await readSession();
+  if (!session || !session.access) return "";
+
+  // 2. Reuse cached token if unexpired locally (avoids network round-trip)
+  if (session.accessExpiresAt > Date.now()) return session.access;
+
+  try {
+    // 3. Exchange refresh token for updated credentials (server may rotate token)
+    const refreshed = sessionFrom(
+      await api("/api/auth/refresh", { body: { refresh_token: session.refresh } }),
+      session
+    );
+
+    // 4. Guard against mid-flight sign-out or account switch while network await was pending
+    if ((await readSession())?.refresh !== session.refresh) return "";
+
+    // 5. Commit conditionally: save only if stored session still matches original { id, refresh }
+    const committed = await writeSession(refreshed, { id: session.id, refresh: session.refresh });
+    return committed ? committed.access : "";
+  } catch (err) {
+    // 6. Handle refresh failure:
+    // - 401 + same session → refresh token revoked/expired; clear session
+    // - Transient error (offline/5xx) → keep stored session for later retry
+    if (err.status === 401 && (await readSession())?.refresh === session.refresh) {
+      await clearSession(session.id);
+    }
+    return "";
+  }
+}
+```
+
+### 2. Code Walkthroughs & Summaries (Chat, PRs & Docs)
+When summarizing or explaining code to humans:
+1. **Executive Intent & Return Contract**: 1–2 sentences on purpose plus bulleted return/error outcomes.
+2. **Numbered Block-by-Block Walkthrough (`## 1. ...`)**: Isolate each block, explain data shapes, provide a monospace `Condition → Action` truth table, and detail the async/state transition sequence.
+3. **Control-Flow Tree**: Compact Unicode tree (`├─` / `└─`) showing the decision gates and exit points.
+4. **Important Limits**: Bulleted list of helper assumptions, concurrency gaps, and uncaught error boundaries.
+
+
 ## Ponytail by default
 
 For every coding task (writing, fixing, refactoring, reviewing, or choosing dependencies), read and follow `~/.gemini/config/skills/ponytail/SKILL.md` before starting work. Ponytail is active by default at full level. Honor explicit requests to change the level or disable Ponytail for the session.
