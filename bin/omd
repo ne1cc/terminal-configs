@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
+# ==============================================================================
 # omd - Open markdown file with One Markdown (macOS) or glow / xdg-open (Linux)
+#
+# Intent: Sanitizes target URI/path (stripping file:// schemes and #L line anchors)
+#         and launches the system Markdown reader.
+# Contract:
+#   - Exits 0 on successful launcher dispatch.
+#   - Exits 1 on missing target argument.
+# Limits: Does not jump to line anchors inside One Markdown GUI (unsupported by app).
+# ==============================================================================
 set -euo pipefail
 
 TARGET="${1:-}"
@@ -8,18 +17,40 @@ if [[ -z "$TARGET" ]]; then
   exit 1
 fi
 
+# 1. Normalize file URI scheme (file://localhost/path or file:///path -> /path)
+if [[ "$TARGET" =~ ^file://localhost(/.*)$ ]]; then
+  TARGET="${BASH_REMATCH[1]}"
+elif [[ "$TARGET" =~ ^file://(/.*)$ ]]; then
+  TARGET="${BASH_REMATCH[1]}"
+fi
+
+# 2. Strip fragment anchor (#L10, #L10-L25, etc.) to ensure valid filesystem path
+TARGET="${TARGET%%#*}"
+
+# 3. Decode URL-encoded characters (e.g. %20 -> space) if python3 is available
+if [[ "$TARGET" == *%* ]] && command -v python3 >/dev/null 2>&1; then
+  TARGET="$(python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$TARGET")"
+fi
+
+# 4. Expand tilde (~) to $HOME
+if [[ "$TARGET" == ~* ]]; then
+  TARGET="${TARGET/#\~/$HOME}"
+fi
+
+# 5. Launch platform-specific Markdown viewer
 if [[ "$OSTYPE" == darwin* ]]; then
   if [[ -d "/Applications/One Markdown.app" || -d "$HOME/Applications/One Markdown.app" ]]; then
-    open -a "One Markdown" "$TARGET"
+    exec open -a "One Markdown" "$TARGET"
   else
-    open "$TARGET"
+    exec open "$TARGET"
   fi
 else
   if command -v glow >/dev/null 2>&1; then
-    glow -p "$TARGET"
+    exec glow -p "$TARGET"
   elif command -v xdg-open >/dev/null 2>&1; then
     xdg-open "$TARGET" &>/dev/null &
+    exit 0
   else
-    cat "$TARGET"
+    exec cat "$TARGET"
   fi
 fi
