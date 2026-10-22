@@ -1,3 +1,4 @@
+agent: agy
 worktree_dir: .worktrees
 window_prefix: wm-
 files:
@@ -11,7 +12,6 @@ files:
 post_create:
 - git status --short
 panes:
-- focus: true
-- split: horizontal
-  focus: false
+- command: 'agy --dangerously-skip-permissions'
+  focus: true
 nerdfont: true

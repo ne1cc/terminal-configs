@@ -1,48 +1,204 @@
 #!/usr/bin/env bash
-# tmux-workmux-new — interactive modal launcher for workmux worktrees
+# ==============================================================================
+# tmux-workmux-new — Interactive & CLI launcher for single-pane agyy worktrees
+#
+# Prompts for feature intent, auto-derives clean branch names, assembles rich
+# context, whitelists workspace in Antigravity settings, and launches agyy in a
+# single full-screen pane.
+# ==============================================================================
 set -euo pipefail
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 
-# Resolve active pane directory if launched inside tmux
-if [[ -n "${TMUX_PANE:-}" ]]; then
-  TARGET_DIR=$(tmux display-message -p -t "$TMUX_PANE" "#{pane_current_path}" 2>/dev/null || true)
-  if [[ -n "${TARGET_DIR:-}" && -d "$TARGET_DIR" ]]; then
-    cd "$TARGET_DIR"
+# If current working directory is not a git repo, attempt fallback to active tmux pane
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [[ -n "${TMUX_PANE:-}" ]]; then
+    TARGET_DIR=$(tmux display-message -p -t "$TMUX_PANE" "#{pane_current_path}" 2>/dev/null || true)
+    if [[ -n "${TARGET_DIR:-}" && -d "$TARGET_DIR" ]]; then
+      cd "$TARGET_DIR"
+    fi
   fi
 fi
 
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "Error: Must be inside a git repository."
   echo "Current directory: $(pwd)"
-  read -n 1 -s -r -p "Press any key to exit..."
+  if [[ -t 0 && -t 1 ]]; then
+    read -n 1 -s -r -p "Press any key to exit..."
+  fi
   exit 1
 fi
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
+REPO_NAME=$(basename "$REPO_ROOT")
+BASE_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
+COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 cd "$REPO_ROOT"
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 🚀 LAUNCH NEW WORKTREE (workmux)"
-echo " Repo: $(basename "$REPO_ROOT")"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-printf "Enter new branch name (e.g. feat/auth, fix/styles):\n> "
-read -r branch
+# Helper to slugify a task description into a branch name
+slugify_task() {
+  local input="$1"
+  python3 -c '
+import re, sys
+
+task = sys.argv[1].strip()
+if not task:
+    print("feat/new-feature")
+    sys.exit(0)
+
+if re.match(r"^[a-zA-Z0-9_\-\./]+$", task) and "/" in task and " " not in task:
+    print(task)
+    sys.exit(0)
+
+m = re.match(r"^(feat|fix|chore|docs|refactor|test|perf|style|build|ci)(?:\([^)]+\))?:\s*(.*)", task, re.IGNORECASE)
+if m:
+    prefix = m.group(1).lower()
+    rest = m.group(2)
+else:
+    prefix = "feat"
+    rest = task
+
+words = re.findall(r"[a-zA-Z0-9]+", rest.lower())
+stop_words = {"a", "an", "the", "and", "or", "in", "on", "at", "to", "for", "of", "with", "by", "is", "it"}
+filtered = [w for w in words if w not in stop_words]
+if not filtered:
+    filtered = words
+slug = "-".join(filtered[:5])
+print(f"{prefix}/{slug}" if slug else f"{prefix}/feature")
+' "$input"
+}
+
+# Helper to auto-whitelist workspace directory in Antigravity settings
+whitelist_workspace() {
+  python3 -c '
+import json, os, sys
+
+def trust_workspaces(paths):
+    settings_file = os.path.expanduser("~/.gemini/antigravity-cli/settings.json")
+    if not os.path.exists(settings_file):
+        return
+    try:
+        with open(settings_file, "r") as f:
+            data = json.load(f)
+        tw = data.setdefault("trustedWorkspaces", [])
+        changed = False
+        for p in paths:
+            abs_p = os.path.abspath(os.path.expanduser(p))
+            if abs_p and abs_p not in tw:
+                tw.append(abs_p)
+                changed = True
+        if changed:
+            with open(settings_file, "w") as f:
+                json.dump(data, f, indent=2)
+    except Exception:
+        pass
+
+if __name__ == "__main__":
+    trust_workspaces(sys.argv[1:])
+' "$@"
+}
+
+task_prompt=""
+branch=""
+
+# Parse arguments
+if [[ $# -eq 0 ]]; then
+  # Full interactive mode
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo " 🚀 LAUNCH NEW WORKTREE · agyy"
+  echo " Repo: $REPO_NAME ($BASE_BRANCH @ $COMMIT_HASH)"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  printf "Enter feature or task description:\n> "
+  read -r task_prompt
+
+  if [[ -z "${task_prompt:-}" ]]; then
+    echo "Task description cannot be empty."
+    exit 0
+  fi
+
+  derived_branch=$(slugify_task "$task_prompt")
+  echo ""
+  printf "Branch name [default: %s]:\n> " "$derived_branch"
+  read -r branch_input
+
+  if [[ -n "${branch_input:-}" ]]; then
+    branch="$branch_input"
+  else
+    branch="$derived_branch"
+  fi
+
+elif [[ $# -eq 1 ]]; then
+  arg="$1"
+  # If argument looks like a branch name (e.g. feat/foo, fix-bar)
+  if [[ "$arg" =~ ^[a-zA-Z0-9_\-\./]+$ && ( "$arg" == *"/"* || "$arg" == *"-"* ) && "$arg" != *" "* ]]; then
+    branch="$arg"
+    if [[ -t 0 && -t 1 ]]; then
+      printf "Enter task description for '%s' (or press Enter to use branch name):\n> " "$branch"
+      read -r task_input
+      task_prompt="${task_input:-$branch}"
+    else
+      task_prompt="$branch"
+    fi
+  else
+    # Argument is a task description
+    task_prompt="$arg"
+    branch=$(slugify_task "$task_prompt")
+  fi
+
+else
+  branch="$1"
+  shift
+  task_prompt="$*"
+fi
+
+# Sanitize branch name
+branch="${branch// /-}"
+branch="${branch//[^a-zA-Z0-9_\-\.\/]/}"
 
 if [[ -z "${branch:-}" ]]; then
-  echo "Branch name cannot be empty."
-  exit 0
-fi
-
-# Sanitize branch name (spaces to hyphens)
-branch="${branch// /-}"
-
-echo ""
-echo "==> Creating worktree '$branch' with Neovim + clean terminal..."
-if ! workmux add "$branch"; then
-  echo ""
-  echo "Failed to create worktree. Press any key to close..."
-  read -n 1 -s -r
+  echo "Error: Invalid branch name."
   exit 1
 fi
+
+target_dir_hyphen="${branch//\//-}"
+wt_dir="$REPO_ROOT/.worktrees/$branch"
+wt_dir_hyphen="$REPO_ROOT/.worktrees/$target_dir_hyphen"
+
+# Pre-authorize workspace in Antigravity so agyy starts immediately
+whitelist_workspace "$wt_dir" "$wt_dir_hyphen"
+
+# Assemble rich feature context bundle
+context_bundle=$(cat <<EOF
+# Feature Task: ${task_prompt}
+
+## Environment & Workspace
+- Repository: ${REPO_NAME}
+- Base Branch: ${BASE_BRANCH} (${COMMIT_HASH})
+- Target Branch: ${branch}
+- Worktree Directory: ${wt_dir}
+
+## Directives for agyy:
+1. Carefully review repository instructions, coding guidelines, and domain conventions (e.g., AGENTS.md, GEMINI.md, CLAUDE.md, README.md).
+2. Implement the requested feature cleanly with minimal, surgical changes adhering strictly to existing patterns.
+3. Write and run tests covering new or modified functionality, ensuring all test suites pass.
+4. Verify everything thoroughly before concluding.
+EOF
+)
+
+tmp_prompt=$(mktemp /tmp/workmux-prompt-XXXXXX.md)
+echo "$context_bundle" > "$tmp_prompt"
+
+echo ""
+echo "==> Creating worktree '$branch' with agyy in single pane..."
+if ! workmux add "$branch" -P "$tmp_prompt"; then
+  rm -f "$tmp_prompt"
+  echo ""
+  echo "Failed to create worktree."
+  if [[ -t 0 && -t 1 ]]; then
+    read -n 1 -s -r -p "Press any key to close..."
+  fi
+  exit 1
+fi
+
+rm -f "$tmp_prompt"

@@ -1,3 +1,22 @@
 #!/usr/bin/env bash
 # agyy: Antigravity YOLO mode (auto-skip permissions)
-exec agy --dangerously-skip-permissions "$@"
+agy --dangerously-skip-permissions "$@"
+status=$?
+
+# If inside an interactive tmux session and not running print mode, keep window open
+if [[ -n "${TMUX:-}" && -t 0 && -t 1 ]]; then
+  is_print=0
+  for arg in "$@"; do
+    if [[ "$arg" == "-p" || "$arg" == "--print" || "$arg" == "--prompt" ]]; then
+      is_print=1
+      break
+    fi
+  done
+  if [[ $is_print -eq 0 ]]; then
+    echo ""
+    echo "━━━ agyy session ended (code $status) · Dropping into shell ━━━"
+    exec "${SHELL:-/bin/zsh}"
+  fi
+fi
+
+exit $status

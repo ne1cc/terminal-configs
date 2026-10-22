@@ -970,17 +970,25 @@ alias wmst='workmux sidebar on --position top'
 alias wmsl='workmux sidebar on --position left'
 alias wmsr='workmux reap-agents --hours 12'
 
-# wmux: Smart wrapper that forwards subcommands or creates worktrees directly
+# wmux: Smart wrapper for workmux active worktrees with agyy
 wmux() {
   if [ $# -eq 0 ]; then
-    workmux
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      "$HOME/bin/tmux-workmux-new"
+    else
+      workmux
+    fi
+  elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait|reap-agents) ]]; then
+    workmux "$@"
   elif [[ "$1" == "add" ]]; then
     shift
-    wma "$@"
-  elif [[ "$1" =~ ^(open|close|list|ls|remove|rm|merge|rebase|dashboard|sidebar|setup|config|resurrect|init|sync-files|run|capture|send|wait) ]]; then
-    workmux "$@"
+    if [ $# -eq 0 ]; then
+      "$HOME/bin/tmux-workmux-new"
+    else
+      workmux add "$@"
+    fi
   else
-    wma "$@"
+    "$HOME/bin/tmux-workmux-new" "$@"
   fi
 }
 
