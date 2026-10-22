@@ -1,5 +1,7 @@
+agent: agy
 status_tracking: false
 status_format: false
+confirm_unmerged_removal: false
 worktree_dir: .worktrees
 window_prefix: wm-
 files:
@@ -13,14 +15,8 @@ files:
 post_create:
 - git status --short
 panes:
-- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; agyy -i "$WT"'
+- command: 'agy --dangerously-skip-permissions'
   focus: true
-- command: 'command -v lg >/dev/null 2>&1 && lg -p . || lazygit -p .'
-  split: horizontal
-  focus: false
-- command: 'WT="${WM_HANDLE:-$(basename "$PWD")}"; command -v qodercli >/dev/null 2>&1 && qodercli -i "$WT" || qoder -i "$WT"'
-  split: vertical
-  focus: false
 nerdfont: true
 
 sidebar:

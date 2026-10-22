@@ -214,7 +214,7 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 ### C. Git Worktree & Workmux Workflows
 | Command / Alias | Action / Purpose |
 |---|---|
-| `wm` / `wmux` | Base command for `workmux` (or `wmux <branch>` to create worktree directly) |
+| `wm` / `wmux` | Launch interactive worktree modal with agyy, or `wmux <task/branch>` to launch feature worktree directly |
 | `wma <branch>` | **Workmux Add**: Create worktree branch without opening tmux windows/terminals |
 | `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and store prompt file |
 | `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM |
