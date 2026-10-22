@@ -1,34 +1,45 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# wma — Headless Workmux worktree launcher
-#
-# Creates a git worktree without switching focus or leaving open tmux windows/terminals.
-# Automatically injects --background and --no-pane-cmds, then closes the background
-# tmux window so the worktree remains headless until opened via `wmo <name>`.
+# wma — Workmux Add launcher (Active agyy by default, Headless with -b/--headless)
 #
 # Usage:
-#   wma <branch-name> [workmux-add-options...]
+#   wma                     -> Interactive modal with agyy in single pane
+#   wma <task>              -> Auto-names branch, injects context, starts agyy
+#   wma <branch> [task]     -> Creates worktree with branch and starts agyy
+#   wma <branch> -b         -> Creates headless worktree in background
 # ==============================================================================
 set -euo pipefail
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 
+cmd_args=("$@")
+
+has_bg=0
+for arg in "${cmd_args[@]}"; do
+  if [[ "$arg" == "-b" || "$arg" == "--background" || "$arg" == "--headless" || "$arg" == "-C" || "$arg" == "--no-pane-cmds" ]]; then
+    has_bg=1
+    break
+  fi
+done
+
+# If no headless flags were passed, launch active worktree with agyy
+if [[ $has_bg -eq 0 ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  exec "$SCRIPT_DIR/tmux-workmux-new" "${cmd_args[@]}"
+fi
+
+# Headless background creation
 if [[ $# -eq 0 ]]; then
   echo "Usage: wma <branch-name> [options]"
   echo "Run 'workmux add --help' for available options."
   exit 1
 fi
 
-cmd_args=("$@")
-
-has_bg=0
 has_no_pane_cmds=0
 for arg in "${cmd_args[@]}"; do
-  if [[ "$arg" == "-b" || "$arg" == "--background" ]]; then
-    has_bg=1
-  fi
   if [[ "$arg" == "-C" || "$arg" == "--no-pane-cmds" ]]; then
     has_no_pane_cmds=1
+    break
   fi
 done
 

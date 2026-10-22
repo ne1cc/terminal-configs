@@ -982,11 +982,7 @@ wmux() {
     workmux "$@"
   elif [[ "$1" == "add" ]]; then
     shift
-    if [ $# -eq 0 ]; then
-      "$HOME/bin/tmux-workmux-new"
-    else
-      workmux add "$@"
-    fi
+    wma "$@"
   else
     "$HOME/bin/tmux-workmux-new" "$@"
   fi

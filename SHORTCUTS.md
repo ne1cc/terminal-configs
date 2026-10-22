@@ -215,9 +215,9 @@ All commands use `Ctrl + Space` as the prefix key, unless marked as **(No Prefix
 | Command / Alias | Action / Purpose |
 |---|---|
 | `wm` / `wmux` | Launch interactive worktree modal with agyy, or `wmux <task/branch>` to launch feature worktree directly |
-| `wma <branch>` | **Workmux Add**: Create worktree branch without opening tmux windows/terminals |
-| `wma <branch> -p "<prompt>"` | **Workmux Add + Prompt**: Create worktree and store prompt file |
-| `wma -A -p "<prompt>"` | **Workmux Auto-Name**: Generate branch name from prompt with LLM |
+| `wma` / `wma <task>` | **Workmux Add**: Launch active worktree with single-pane agyy (auto-names branch from task, prompts if empty) |
+| `wma <branch> [task]` | **Workmux Add (Named)**: Launch active worktree with specific branch and rich context for agyy |
+| `wma <branch> -b` | **Workmux Add (Headless)**: Create worktree headlessly in background without switching windows |
 | `wmo [branch]` | **Workmux Open**: Open/switch to worktree window (fuzzy-picks via `fzf` if branch omitted!) |
 | `wml` / `wmls` | **Workmux List**: List all active worktrees with agent status and branch diffs |
 | `wmm` | **Workmux Merge**: Merge current worktree branch into main and clean up window/directory |
