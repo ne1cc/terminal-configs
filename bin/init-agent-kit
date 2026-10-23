@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# init-agent-kit — install the issue-driven agent workflow kit into the current repo.
+# Source of truth: ~/Github/ne1cc/.github (cloned if missing). Re-run to pick up template updates.
+#
+#   .github/ISSUE_TEMPLATE/{agent-task,epic}.md   overwritten (kit-owned)
+#   .github/pull_request_template.md              overwritten (kit-owned)
+#   .github/workflows/pr-template-check.yml       overwritten (kit-owned)
+#   AGENTS.md                                      created only if absent (repo-owned)
+#   labels: epic, exec:flash, exec:strong, no-issue
+set -euo pipefail
+
+KIT="${GITHUB_ROOT:-$HOME/Github}/ne1cc/.github"
+REPO="$(git rev-parse --show-toplevel)"
+
+# 1. Refresh the kit (missing → clone; offline → use local copy)
+if [[ -d "$KIT/.git" ]]; then
+  git -C "$KIT" pull --ff-only -q || echo "  warn: could not update $KIT, using local copy" >&2
+else
+  gh repo clone ne1cc/.github "$KIT"
+fi
+
+echo "==> agent kit -> $REPO"
+
+# 2. Kit-owned files: overwrite so every repo stays on the current templates
+mkdir -p "$REPO/.github/ISSUE_TEMPLATE" "$REPO/.github/workflows"
+cp "$KIT/ISSUE_TEMPLATE/agent-task.md" "$KIT/ISSUE_TEMPLATE/epic.md" "$REPO/.github/ISSUE_TEMPLATE/"
+cp "$KIT/pull_request_template.md" "$REPO/.github/"
+cp "$KIT/agent-kit/pr-template-check.yml" "$REPO/.github/workflows/"
+echo "  synced: issue templates, PR template, pr-template-check workflow"
+
+# 3. Repo-owned AGENTS.md: never clobber hand-trimmed content
+if [[ -f "$REPO/AGENTS.md" ]]; then
+  echo "  kept:   AGENTS.md (exists)"
+else
+  cp "$KIT/agent-kit/AGENTS.md" "$REPO/AGENTS.md"
+  echo "  created: AGENTS.md skeleton"
+fi
+
+# 4. Labels the plan-issues skill and the check rely on (--force = idempotent)
+gh label create epic        --force --color 5319e7 --description "Plan: sub-issues hang off this" >/dev/null
+gh label create exec:flash  --force --color 0e8a16 --description "Executor tier: GLM 5.3 Flash / Gemini 3.8 Flash" >/dev/null
+gh label create exec:strong --force --color d93f0b --description "Executor tier: Sonnet 5.5 / GPT Luna" >/dev/null
+gh label create no-issue    --force --color cccccc --description "PR not driven by an issue (skips Closes #N check)" >/dev/null
+echo "  labels: epic, exec:flash, exec:strong, no-issue"
+
+cat <<'EOF'
+
+Next:
+  1. Have Opus draft AGENTS.md (commands, architecture, conventions, do-not-touch), then trim it.
+  2. Commit .github/ + AGENTS.md on a branch and open a PR (label it no-issue).
+EOF
