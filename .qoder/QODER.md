@@ -142,6 +142,16 @@ To maintain high auditability, keep the human in the loop, and prevent rogue cha
   - Save detailed verification notes and file diff summaries into `.scratch/<feature-name>/walkthrough.md` for immediate review.
   - Bridge into the PR Lifecycle: populate the PR description and post the Development Retrospective (`~/.qoder/templates/pr-retrospective.md`) so the audit persists permanently after worktrees are pruned.
 
+## Issue-Driven Work
+
+When the task is a GitHub issue (an agent task filed by `plan-issues`), this section overrides the plan gate and the retrospective rule above:
+- The issue is the approved spec: skip the `.scratch` plan. Read the issue and the repo's `AGENTS.md` first; the issue body is all the context you get.
+- Stay inside **Scope** and never touch anything under "Out (do NOT touch)". If the issue is wrong, blocked, or unclear, stop and say so (ask the user, or note it on the PR) instead of guessing.
+- One branch and one PR per issue. End commit subjects with `(#N)`; start the PR body with `Closes #N`.
+- Fill every section of the repo's PR template. Verification holds real pasted command output; Deviations lists everything done differently from the issue, or "None".
+- No retrospective comment on issue PRs (the PR body is the record). Post one on the epic when its last sub-issue closes.
+- When changes are requested, keep pushing to the same branch and answer the review comments. New information goes on the PR, not the issue.
+
 # Markdown, Math & Diagram Formatting Rules
 
 When generating or editing Markdown (`.md`) documents, notes, cheat sheets, or responses:
