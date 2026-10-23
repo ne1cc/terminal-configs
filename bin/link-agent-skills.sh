@@ -93,6 +93,8 @@ verify_configs() {
     "$HOME/.t3/CLAUDE.md"
     "$HOME/.t3/GEMINI.md"
     "$HOME/.t3/skills"
+    "$HOME/.agents/skills/mermaid-lens/SKILL.md"
+    "$HOME/.t3/skills/mermaid-lens/SKILL.md"
   )
   for link in "${symlinks[@]}"; do
     if [[ -e "$link" ]]; then
@@ -117,7 +119,7 @@ assert sc.get("mode") == "custom", "sourceControlWritingStyle.mode not custom"
 assert sc.get("followChangeRequestTemplates") is True, "followChangeRequestTemplates not True"
 scripts = d.get("defaultProjectScripts", [])
 script_ids = [s.get("id") for s in scripts]
-for req in ["sync-agent-configs", "ponytail-debt-ledger", "verify-agent-configs"]:
+for req in ["sync-agent-configs", "ponytail-debt-ledger", "compile-mermaid-diagrams", "verify-agent-configs"]:
     assert req in script_ids, f"missing defaultProjectScript {req}"
 PY_EOF
     then
@@ -305,6 +307,13 @@ if [[ -f "$REPO_DIR/.gemini/hooks.json" ]]; then
   printf '  linked hooks.json (~/.gemini/config/hooks.json)\n'
 fi
 
+# Wire staged .mmd pre-commit validation hook into git repository hooks dir
+GIT_COMMON_DIR="$(git -C "$REPO_DIR" rev-parse --git-common-dir 2>/dev/null || true)"
+if [[ -n "$GIT_COMMON_DIR" && -d "$GIT_COMMON_DIR/hooks" && -x "$REPO_DIR/bin/pre-commit-mermaid.sh" ]]; then
+  ln -sfn "$REPO_DIR/bin/pre-commit-mermaid.sh" "$GIT_COMMON_DIR/hooks/pre-commit"
+  printf '  linked git pre-commit hook (%s/hooks/pre-commit -> bin/pre-commit-mermaid.sh)\n' "$GIT_COMMON_DIR"
+fi
+
 # ── 4. T3 Code Native Quality Engine Configuration (~/.t3/userdata/settings.json)
 T3_SETTINGS="$HOME/.t3/userdata/settings.json"
 if command -v python3 >/dev/null 2>&1 && [[ -d "$HOME/.t3/userdata" ]]; then
@@ -334,9 +343,10 @@ data["sourceControlWritingStyle"] = {
         "Use Conventional Commits (feat:, fix:, refactor:, docs:, test:, chore:) with a subject line under 70 characters. "
         "In PR descriptions, include: (1) Executive Intent & Return Contract, "
         "(2) Numbered Block-by-Block Walkthrough with monospace Condition -> Action truth tables and a compact Unicode control-flow tree (├─ / └─), "
-        "(3) Important Limits & Ponytail shortcuts (shortcut: <limit>, <when to upgrade>), and "
-        "(4) Verification & Test Plan. Format all file and symbol references as clickable [name](file:///absolute/path) links. "
-        "Never use raw LaTeX math delimiters ($$ or $...$); use fenced mermaid blocks with quoted punctuation labels."
+        "(3) mermaid-lens Architectural Delta Diagram (fenced mermaid block, <=12 nodes, <=3 subgraphs, alphanumeric IDs with double-quoted labels and [NEW]/[MODIFIED] tags) when the PR mutates cross-boundary I/O, state machines, complex DAGs, or 3+ entity schemas, "
+        "(4) Important Limits & Ponytail shortcuts (shortcut: <limit>, <when to upgrade>), and "
+        "(5) Verification & Test Plan. Format all file and symbol references as clickable [name](file:///absolute/path) links. "
+        "Never use raw LaTeX math delimiters ($$ or $...$)."
     ),
     "followChangeRequestTemplates": True
 }
@@ -344,10 +354,10 @@ data["sourceControlWritingStyle"] = {
 # 3. Review Guides
 data["reviewGuidesEnabled"] = True
 data["reviewGuideInstructions"] = (
-    "Structure every Review Guide using the High-Signal Walkthrough & Ponytail Standard: "
+    "Structure every Review Guide using the High-Signal Walkthrough, Ponytail & mermaid-lens Standard: "
     "(1) Executive Intent & Return Contract (1-2 sentences + bulleted outcomes), "
     "(2) Order review groups from highest architectural/behavioral risk to boilerplate, "
-    "(3) Include a monospace Condition -> Action table and compact Unicode control-flow tree (├─ / └─) for non-trivial branching or async logic, "
+    "(3) Include a monospace Condition -> Action table, compact Unicode control-flow tree (├─ / └─), and an inline mermaid-lens delta diagram (<=12 nodes, <=3 subgraphs, double-quoted labels, [NEW]/[MODIFIED] prefixes) whenever cross-boundary I/O, state machines, or DAGs are modified, "
     "(4) Audit for Ponytail compliance (flag unnecessary abstractions, dead code, missing Tier-1 boundary docblocks or Tier-2 numbered step comments, or unannotated shortcuts), and "
     "(5) Use clickable [name](file:///absolute/path#L10-L20) links and fenced mermaid diagrams with quoted labels (no raw LaTeX math)."
 )
@@ -369,6 +379,15 @@ custom_scripts = [
         "name": "Ponytail Debt",
         "command": "rg -n 'shortcut:|ponytail:' . || echo 'Zero Ponytail shortcuts or deferred debt found.'",
         "icon": "lint",
+        "runOnWorktreeCreate": False,
+        "runOnSettle": False,
+        "async": False
+    },
+    {
+        "id": "compile-mermaid-diagrams",
+        "name": "Compile Diagrams",
+        "command": "/Users/alex/Github/ne1cc/terminal-configs/bin/compile-mermaid.sh",
+        "icon": "build",
         "runOnWorktreeCreate": False,
         "runOnSettle": False,
         "async": False

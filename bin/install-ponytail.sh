@@ -54,6 +54,7 @@ PONYTAIL_SKILLS=(
   "ponytail-gain"
   "ponytail-help"
   "ponytail-review"
+  "mermaid-lens"
 )
 
 DEST_DIRS=(
