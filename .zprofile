@@ -26,6 +26,10 @@ export NE1CC_DIR="$GITHUB_ROOT/ne1cc"
 # repo-summarize AI backend (public default is `agy -p`; this setup keeps YOLO mode)
 export REPO_SUMMARIZE_CMD="agyy -p"
 
+# Claude Code Agent Teams & Autocompact Window
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW="200k"
+
 # Custom scripts (bin/ in the dotfiles repo, stow'd to ~/bin)
 export PATH="$HOME/Github/_tools:$HOME/bin:$HOME/.local/bin:$PATH"
 
