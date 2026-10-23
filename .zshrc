@@ -89,8 +89,9 @@ fi
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 [[ -d "$HOME/bin" ]]        && export PATH="$HOME/bin:$PATH"
 
-# Claude Code Agent Teams (Experimental Multi-Agent Orchestrator)
+# Claude Code Agent Teams (Experimental Multi-Agent Orchestrator) & Autocompact Window
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW="200k"
 
 # Mermaid CLI / Puppeteer Chrome Engine for high-res diagram rendering
 if [[ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then

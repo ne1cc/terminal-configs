@@ -128,6 +128,24 @@ PY_EOF
     fi
   fi
 
+  # 4. Verify Claude Code autoCompactWindow configuration
+  for c_settings in "$HOME/.claude/settings.json" "$HOME/.claude-secondary/settings.json"; do
+    if [[ -f "$c_settings" ]]; then
+      if python3 - "$c_settings" <<'PY_EOF' >/dev/null 2>&1
+import json, sys
+with open(sys.argv[1]) as f:
+    d = json.load(f)
+assert d.get("autoCompactWindow") == 200000, "autoCompactWindow != 200000"
+PY_EOF
+      then
+        printf '  [OK] %s autoCompactWindow verified (200000 tokens)\n' "$c_settings"
+      else
+        printf '  [FAIL] %s autoCompactWindow missing or invalid\n' "$c_settings"
+        errors=$((errors + 1))
+      fi
+    fi
+  done
+
   if [[ "$errors" -eq 0 ]]; then
     printf 'All verification checks PASSED.\n'
     return 0
@@ -406,14 +424,20 @@ print("  configured T3 Code native quality engine and toolbar scripts in ~/.t3/u
 PY_EOF
 fi
 
-# ── 5. Claude Code Settings Permissions ──────────────────────────────────────
-CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-if command -v python3 >/dev/null 2>&1 && [[ -f "$CLAUDE_SETTINGS" ]]; then
-  python3 - "$CLAUDE_SETTINGS" <<'PY_EOF'
+# ── 5. Claude Code Settings & Permissions ─────────────────────────────────────
+for settings_file in "$HOME/.claude/settings.json" "$HOME/.claude-secondary/settings.json"; do
+  if command -v python3 >/dev/null 2>&1 && [[ -f "$settings_file" ]]; then
+    python3 - "$settings_file" <<'PY_EOF'
 import json, sys
 path = sys.argv[1]
 with open(path) as f:
     data = json.load(f)
+
+changed = False
+if data.get("autoCompactWindow") != 200000:
+    data["autoCompactWindow"] = 200000
+    changed = True
+
 perms = data.setdefault("permissions", {})
 allow = perms.setdefault("allow", [])
 added = []
@@ -421,13 +445,21 @@ for entry in ["Bash(gh pr merge:*)"]:
     if entry not in allow:
         allow.append(entry)
         added.append(entry)
-with open(path, "w") as f:
-    json.dump(data, f, indent=2)
-    f.write("\n")
-if added:
-    print(f"  seeded ~/.claude/settings.json permissions: {added}")
+        changed = True
+
+if changed:
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    updates = []
+    if "autoCompactWindow" in data:
+        updates.append("autoCompactWindow: 200000")
+    if added:
+        updates.append(f"permissions: {added}")
+    print(f"  configured {path}: {', '.join(updates)}")
 PY_EOF
-fi
+  fi
+done
 
 # ── 6. Ponytail Package & Plugins Installation ──────────────────────────────
 if [[ -x "$REPO_DIR/bin/install-ponytail.sh" ]]; then

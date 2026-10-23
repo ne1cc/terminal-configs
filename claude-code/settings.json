@@ -3,6 +3,7 @@
   "permissions": {
     "defaultMode": "acceptEdits"
   },
+  "autoCompactWindow": 200000,
   "model": "opus",
   "hooks": {
     "Notification": [
