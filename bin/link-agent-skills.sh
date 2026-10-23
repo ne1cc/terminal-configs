@@ -358,12 +358,14 @@ data["branchNameInstructions"] = (
 data["sourceControlWritingStyle"] = {
     "mode": "custom",
     "customInstructions": (
-        "Use Conventional Commits (feat:, fix:, refactor:, docs:, test:, chore:) with a subject line under 70 characters. "
-        "In PR descriptions, include: (1) Executive Intent & Return Contract, "
-        "(2) Numbered Block-by-Block Walkthrough with monospace Condition -> Action truth tables and a compact Unicode control-flow tree (├─ / └─), "
-        "(3) mermaid-lens Architectural Delta Diagram (fenced mermaid block, <=12 nodes, <=3 subgraphs, alphanumeric IDs with double-quoted labels and [NEW]/[MODIFIED] tags) when the PR mutates cross-boundary I/O, state machines, complex DAGs, or 3+ entity schemas, "
-        "(4) Important Limits & Ponytail shortcuts (shortcut: <limit>, <when to upgrade>), and "
-        "(5) Verification & Test Plan. Format all file and symbol references as clickable [name](file:///absolute/path) links. "
+        "Use Conventional Commits (feat:, fix:, refactor:, docs:, test:, chore:) with a subject line under 70 characters; "
+        "when the work resolves an issue, end the subject with (#N). "
+        "Follow the repository's pull request template section by section, starting the body with Closes #N when an issue exists; "
+        "with no template, use these sections: Summary, Approach, Changes, Deviations from the issue, Verification, Limits. "
+        "Explain why, not just what. Use a monospace Condition -> Action truth table or a compact Unicode control-flow tree (├─ / └─) for non-trivial branching, "
+        "add a mermaid-lens Architectural Delta Diagram (fenced mermaid block, <=12 nodes, <=3 subgraphs, alphanumeric IDs with double-quoted labels and [NEW]/[MODIFIED] tags) when the PR mutates cross-boundary I/O, state machines, complex DAGs, or 3+ entity schemas, "
+        "list limits and Ponytail shortcuts (shortcut: <limit>, <when to upgrade>), and paste real command output under Verification. "
+        "Format all file and symbol references as clickable [name](file:///absolute/path) links. "
         "Never use raw LaTeX math delimiters ($$ or $...$)."
     ),
     "followChangeRequestTemplates": True
