@@ -12,7 +12,7 @@ Turn the plan already agreed in this conversation into a GitHub epic and sub-iss
 
 An executor sees only its issue and the repo's `AGENTS.md`. Anything not written in the issue does not exist for it, and later comments on the issue are not seen. Write every issue accordingly.
 
-## 1. Preconditions (any miss → stop and say what to run)
+## 1. Preconditions (miss → stop and say to run `gh auth login`)
 
 - `gh auth status` works and you are inside the target repo.
 - Nothing else is required. Repo templates, labels and `AGENTS.md` are optional.
@@ -34,7 +34,7 @@ One epic and one issue per agreed item, using exactly the sections below (repo t
 
 ## 3. Quality gate
 
-Do not file an issue that has an empty section, a vague criterion, no verify command, or a file path you did not confirm exists (check with `rg --files`). Fix it, or go back to the user.
+Do not file an issue that has an empty section, a vague criterion, no verify command, or a file path you did not confirm exists (check with `rg --files`; files the issue itself creates are exempt). Fix it, or go back to the user.
 
 **Size is guidance, not a cap.** The target is one verifiable outcome with every file the executor must touch listed. Past about 5 files, or with unrelated criteria, suggest a split, but file it as written if the user says so. A wide mechanical change (rename, bulk migration) is fine as one issue when the check is objective.
 
@@ -44,7 +44,7 @@ Do not file an issue that has an empty section, a vague criterion, no verify com
 
 ## 4. Confirm, then file
 
-Filing is outward-facing. Show the user all drafts as one list (order, title, tier, blockers, files) plus the epic body, and wait for approval. Apply any edits they ask for before filing.
+Filing is outward-facing. Show the user all drafts as one list (order, title, tier, blockers, files) plus the epic body, and wait for approval. Say plainly that approval also starts the work: after filing, every unblocked issue is delegated at once. Apply any edits they ask for before filing.
 
 File with bodies in temp files (use the session scratchpad, never the repo):
 
