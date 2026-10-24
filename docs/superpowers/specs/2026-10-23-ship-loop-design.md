@@ -110,7 +110,7 @@ Invoked by plan-issues, by the schedule (prompt: `Use the ship-issues skill for 
 ```text
 1. Read epic E, its sub-issues (gh api …/issues/E/sub_issues), labels, and PRs whose body has "Closes #N"
 2. Schedule: none bound to this thread for E → schedule_task (interval 15 min, GLM 5.3 Flash, wake prompt above)
-3. Each open sub-issue without shipped / ship-failed, every "Blocked by #N" closed:
+3. Each open sub-issue without shipped / ship-failed, every "Blocked by #N" closed as completed:
      no exec:* label → ship-failed
      else → label shipped → delegate_task (isolation worktree, async, model from label, executor brief)
      delegation error → swap shipped for ship-failed, say so in the thread
