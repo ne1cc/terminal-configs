@@ -15,7 +15,7 @@ One conversation with a strong model (Opus 5.5) in any `ne1cc` repo turns into r
 2. You approve the issue list. This is the only gate before work starts.
 3. The same thread becomes the orchestrator. Every unblocked issue starts at once as a T3 delegated task in its own worktree, on the model its label names.
 4. Each executor opens a PR (`Closes #N`) with a retrospective comment.
-5. A Sonnet 5.5 reviewer reviews each PR. Up to two automatic fix rounds; then the PR is yours.
+5. A Sonnet 5.5 reviewer reviews each PR. Two review rounds with one automatic fix round between them; then the PR is yours.
 6. You merge. The orchestrator notices within 15 minutes and starts the issues that merge unblocked.
 7. When the last sub-issue closes, the orchestrator posts the roll-up retrospective, closes the epic and turns its schedule off.
 
