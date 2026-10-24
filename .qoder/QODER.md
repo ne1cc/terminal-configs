@@ -85,7 +85,7 @@ Read `~/.qoder/skills/using-superpowers/references/qoder-tools.md` for Qoder-spe
 All development happens in workmux-managed git worktrees (`.worktrees/`, one branch and one tmux window per worktree; manage with `wmux`). At the end of development:
 1. Commit all work on the worktree's branch (Conventional Commits).
 2. Push and open a PR: `git push -u origin <branch>`, then `gh pr create` with a title under 70 characters, a summary body, and a test plan.
-3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL. Skip for one-commit chore/fix PRs where the PR body already tells the whole story.
+3. Post a development retrospective as a PR comment: `gh pr comment <n> --body-file <file>`, using the template at `~/.qoder/templates/pr-retrospective.md` (problem → structure → what changed with why → verification → what it adds → honest ledger). Keep the draft in `/tmp`; post the comment URL alongside the PR URL.
 4. Report the PR URL (and retrospective comment URL). Done = PR URL reported.
 5. After PR merge (or when the user requests merging): merge the PR, pull/fast-forward `main`, and clean up by running `wmr <branch>` (or `workmux remove <branch>`) and `git worktree prune`.
 
@@ -144,12 +144,12 @@ To maintain high auditability, keep the human in the loop, and prevent rogue cha
 
 ## Issue-Driven Work
 
-When the task is a GitHub issue (an agent task filed by `plan-issues`), this section overrides the plan gate and the retrospective rule above:
+When the task is a GitHub issue (an agent task filed by `plan-issues`), this section overrides the plan gate above:
 - The issue is the approved spec: skip the `.scratch` plan. Read the issue and the repo's `AGENTS.md` first; the issue body is all the context you get.
 - Stay inside **Scope** and never touch anything under "Out (do NOT touch)". If the issue is wrong, blocked, or unclear, stop and say so (ask the user, or note it on the PR) instead of guessing.
 - One branch and one PR per issue. End commit subjects with `(#N)`; start the PR body with `Closes #N`.
 - Fill every section of the repo's PR template. Verification holds real pasted command output; Deviations lists everything done differently from the issue, or "None".
-- No retrospective comment on issue PRs (the PR body is the record). Post one on the epic when its last sub-issue closes.
+- Post a retrospective comment on every issue PR covering your plan, actions, edits and deviations. When the epic's last sub-issue closes, post a roll-up retrospective on the epic that links each PR's retrospective.
 - When changes are requested, keep pushing to the same branch and answer the review comments. New information goes on the PR, not the issue.
 
 # Markdown, Math & Diagram Formatting Rules
