@@ -29,19 +29,19 @@ T3 tools may carry a prefix such as `mcp__t3_code__`. Use `delegate_task` (not n
 gh issue view E -R owner/repo --json state,labels
 gh api repos/owner/repo/issues/E/sub_issues --paginate --jq '.[] | {number,state,title,labels:[.labels[].name],body}'
 gh pr list -R owner/repo --state all --json number,state,labels,body,url,comments,createdAt --limit 200
-gh issue view N -R owner/repo --json comments   # each sub-issue with shipped
+gh issue view N -R owner/repo --json comments   # each open sub-issue without ship-failed
 ```
 
 A sub-issue #N's PR is the one whose body contains `Closes #N` as a whole word (`Closes #1` does not match `Closes #12`). Round `k` of a PR = 1 + the number of its comments that start with `AI review round`. Epic closed → disable this thread's schedule for E and stop. Epic without the `epic` label, or with no sub-issues → say so and stop.
 
 ## 2. Schedule
 
-If this thread has no enabled scheduled task for E, call `schedule_task` bound to this thread: every 15 minutes, model GLM 5.3 Flash, prompt `Use the ship-issues skill for epic #E in owner/repo.` with E and owner/repo filled in. Keep its id in your reply so later passes can disable it.
+A pass started by the scheduled prompt means the schedule exists; skip this step. Otherwise check this thread's scheduled tasks, and if none is enabled for E, call `schedule_task` bound to this thread: every 15 minutes, model GLM 5.3 Flash, prompt `Use the ship-issues skill for epic #E in owner/repo.` with E and owner/repo filled in. Keep its id in your reply so later passes can disable it.
 
 ## 3. Start unblocked issues
 
 For each **open** sub-issue without `shipped` or `ship-failed`:
-- Any `Blocked by #M` where #M is not closed → skip it (it waits).
+- Any `Blocked by #M` where #M is not closed as completed (`gh issue view M --json stateReason`) → skip it (it waits).
 - No `exec:*` label, or both → add `ship-failed`, say so.
 - Otherwise add `shipped`, post the issue comment `Ship attempt <a>` (`a` = 1 + earlier `Ship attempt` comments on #N), then `delegate_task` with the issue's model, `clientRequestId` `<repo>-<E>-impl-<N>-<a>` and this task text:
 
@@ -96,7 +96,7 @@ The fixer's own label removal is what lets step 4 review the new head as round 2
 
 ## 6. Finish the epic
 
-All sub-issues closed and the epic lacks `retro-posted`: add `retro-posted` first, then post one roll-up retrospective comment on E (template `~/.qoder/templates/pr-retrospective.md`): each sub-issue with its PR and retrospective link, what review rounds caught, what each model did well or badly. Then close E and disable this thread's schedule for E.
+All sub-issues closed: if the epic lacks `retro-posted`, add `retro-posted` first, then post one roll-up retrospective comment on E (template `~/.qoder/templates/pr-retrospective.md`): each sub-issue with its PR and retrospective link, what review rounds caught, what each model did well or badly. Then close E and disable this thread's schedule for E.
 
 ## 7. Report
 

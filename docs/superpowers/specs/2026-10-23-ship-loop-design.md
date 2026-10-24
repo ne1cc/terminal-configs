@@ -1,7 +1,7 @@
 # Ship Issues: Plan Once, T3 Orchestrates Every Issue — Design Specification
 
-- **Date**: 2026-10-23 (revised same day: T3-native orchestration replaces the launchd/RPC design)
-- **Status**: Approved in chat, awaiting written-spec review
+- **Date**: 2026-10-23 (revised same day: T3-native orchestration replaces the launchd/RPC design; 2026-10-24: executor attempts numbered by `Ship attempt <a>` issue comments so a failed issue can be retried)
+- **Status**: Approved; implemented on this branch
 - **Branch**: `docs/ship-loop-design`
 - **Replaces**: the manual `wma` hand-off and the per-repo setup steps (`init-agent-kit`, hand-written `AGENTS.md`) in the agent workflow guide
 
@@ -78,8 +78,8 @@ flowchart LR
 | :--- | :--- | :--- | :--- |
 | `epic` | issue | plan-issues | The plan |
 | `exec:flash` / `exec:strong` | issue | plan-issues | Executor model: GLM 5.3 Flash / Sonnet 5.5 |
-| `shipped` | issue | ship-issues | Executor delegated; never delegate again |
-| `ship-failed` | issue or epic | ship-issues | Delegation failed; skipped until you remove it |
+| `shipped` | issue | ship-issues | Executor delegated for the current attempt |
+| `ship-failed` | issue | ship-issues | Delegation failed; skipped until you remove it |
 | `ai-reviewed` | PR | ship-issues | Reviewer delegated for the PR's current head |
 | `retro-posted` | epic | ship-issues | Roll-up retro done |
 
@@ -118,7 +118,7 @@ Invoked by plan-issues, by the schedule (prompt: `Use the ship-issues skill for 
 5. Finished reviewer said CHANGES and rounds < 2 → delegate fixer (issue's model) on the PR branch;
    when the fixer pushes, remove ai-reviewed so step 4 reviews the new head
    APPROVE, or 2 rounds done → post "Ready for you: PR #P" in the thread
-6. Every sub-issue closed and no retro-posted → write and post the roll-up on E, label retro-posted,
+6. Every sub-issue closed → if no retro-posted, label retro-posted then post the roll-up on E;
    close E, disable the schedule
 7. Nothing changed → end the turn with no message
 ```
