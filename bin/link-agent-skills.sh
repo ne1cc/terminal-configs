@@ -116,7 +116,8 @@ assert d.get("reviewGuidesEnabled") is True, "reviewGuidesEnabled not True"
 assert "reviewGuideInstructions" in d, "missing reviewGuideInstructions"
 sc = d.get("sourceControlWritingStyle", {})
 assert sc.get("mode") == "custom", "sourceControlWritingStyle.mode not custom"
-assert sc.get("followChangeRequestTemplates") is True, "followChangeRequestTemplates not True"
+# T3 omits this key when saving from the UI; its schema defaults a missing value to true
+assert sc.get("followChangeRequestTemplates", True) is True, "followChangeRequestTemplates not True"
 scripts = d.get("defaultProjectScripts", [])
 script_ids = [s.get("id") for s in scripts]
 for req in ["sync-agent-configs", "ponytail-debt-ledger", "compile-mermaid-diagrams", "verify-agent-configs"]:
