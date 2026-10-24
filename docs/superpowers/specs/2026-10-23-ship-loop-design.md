@@ -1,7 +1,7 @@
-# Ship Loop: Plan Once, Agents Ship Every Issue — Design Specification
+# Ship Issues: Plan Once, T3 Orchestrates Every Issue — Design Specification
 
-- **Date**: 2026-10-23
-- **Status**: Approved in chat (sections 1–4), awaiting written-spec review
+- **Date**: 2026-10-23 (revised same day: T3-native orchestration replaces the launchd/RPC design)
+- **Status**: Approved in chat, awaiting written-spec review
 - **Branch**: `docs/ship-loop-design`
 - **Replaces**: the manual `wma` hand-off and the per-repo setup steps (`init-agent-kit`, hand-written `AGENTS.md`) in the agent workflow guide
 
@@ -9,177 +9,160 @@
 
 ## 1. Goal
 
-One conversation with a strong model (Opus 5.5) in any `ne1cc` repo turns into finished, documented PRs with no further hand-offs:
+One conversation with a strong model (Opus 5.5) in any `ne1cc` repo turns into reviewed, documented PRs with no further hand-offs:
 
 1. You review the repo with Opus and agree on the direction and the list of changes.
 2. You approve the issue list. This is the only gate before work starts.
-3. Every unblocked issue starts at once, each in its own T3 thread and worktree, on a cheap or strong model chosen by its label.
-4. Each executor opens a PR (`Closes #N`) and posts a retrospective comment.
-5. You review each PR (T3 Guide tab + retro), merge it, and delete the thread with its worktree.
-6. Merging releases the issues that were blocked by it within 5 minutes.
-7. When the last sub-issue closes, a strong model posts the roll-up retrospective on the epic and closes it.
-
-No per-repo setup. No commands to remember between steps 2 and 5.
+3. The same thread becomes the orchestrator. Every unblocked issue starts at once as a T3 delegated task in its own worktree, on the model its label names.
+4. Each executor opens a PR (`Closes #N`) with a retrospective comment.
+5. A Sonnet 5.5 reviewer reviews each PR. Up to two automatic fix rounds; then the PR is yours.
+6. You merge. The orchestrator notices within 15 minutes and starts the issues that merge unblocked.
+7. When the last sub-issue closes, the orchestrator posts the roll-up retrospective, closes the epic and turns its schedule off.
 
 ### Non-goals
 
 - Repos outside the `ne1cc` owner.
-- Detecting a stalled agent that never opens a PR.
-- A cap on parallel runs.
-- Cross-repo dependencies (`Blocked by owner/repo#N`).
-- Automating PR review or merge.
+- Automatic merging.
+- Cross-repo dependencies.
+- A cap on parallel tasks.
 
 ---
 
-## 2. Architecture
+## 2. Why T3-native
 
-```text
-YOU ── Opus thread in any repo ── "review this, I want X" … "file it"
-plan-issues (changed)  files epic + sub-issues (exec:* label, "Blocked by #N" lines), then runs ship-loop once
-bin/ship-loop (new)    one pass; also every 5 min via launchd; for every ne1cc repo with an open epic:
-   ├─ sub-issue open, not shipped/ship-failed, all blockers closed → label shipped → t3-run (model from label)
-   └─ epic: every sub-issue closed, no retro-posted → label retro-posted → t3-run (strong, retro prompt)
-bin/t3-run (new)       token → project add if missing → upsert one-off task → runNow → delete task
-T3 thread per issue    executor follows Issue-Driven Work: build → test → PR (Closes #N) → retrospective comment
-YOU ── Guide tab + retro → merge → delete thread (+ worktree); next pass releases unblocked issues
-```
+T3 gives every agent thread orchestration tools. A live loop in `ne1cc/cti-dashboard` already uses them (83 scheduled wakes, delegated fix and review tasks). Building our own dispatcher would duplicate them.
+
+| Need | T3 tool |
+| :--- | :--- |
+| Start a child in its own worktree on a chosen model | `delegate_task` with `isolation: "worktree"`, `target: {providerInstanceId, model, options}`, `mode: "async"`, stable `clientRequestId` |
+| Find the model IDs | `orchestrator_capabilities` |
+| Know when a child finishes | Automatic: T3 wakes the parent thread; `task_status` to read the result |
+| Notice merges between child completions | `schedule_task` bound to the current thread (interval) |
+| Show PRs in the T3 PR panel and Guide tab | `link_pull_request` |
+
+Lessons taken from the CTI loop:
+
+- Its wake prompt was a 6.7 KB one-off written by an agent. Here the wake prompt is one line that runs a skill, so every repo behaves the same.
+- It woke at gpt-6.1-sol xhigh every 15 minutes, mostly to find nothing. Here scheduled wakes run on GLM 5.3 Flash.
+- It kept state in a `.scratch` ledger inside one worktree. Here state is GitHub labels, visible anywhere and safe across thread restarts.
+- It capped itself at one active task. Here every unblocked issue runs in parallel.
+
+Dropped from the earlier design: `bin/ship-loop`, `bin/t3-run`, the launchd job and the RPC spike.
+
+---
+
+## 3. Pieces
 
 ```mermaid
 flowchart LR
-  P["plan-issues [MODIFIED]"] -->|"files issues"| GH["GitHub issues + labels"]
-  P -->|"runs once"| SL["ship-loop [NEW]"]
-  LD["launchd 5 min [NEW]"] --> SL
-  SL -->|"reads / labels"| GH
-  SL --> TR["t3-run [NEW]"]
-  TR -->|"WebSocket RPC"| T3["T3 server 127.0.0.1:3773"]
-  T3 --> TH["Thread + worktree per issue"]
-  TH -->|"PR Closes #N + retro"| GH
+  P["plan-issues [MODIFIED]"] -->|"files epic + sub-issues"| GH["GitHub issues + labels"]
+  P -->|"invokes once"| S["ship-issues skill [NEW]"]
+  SCH["schedule_task, 15 min, GLM Flash"] -->|"wakes thread"| S
+  S -->|"delegate_task worktree"| EX["Executor per issue"]
+  S -->|"delegate_task"| RV["Sonnet reviewer per PR"]
+  EX -->|"PR Closes #N + retro"| GH
+  RV -->|"review comment"| GH
+  EX -->|"completion wakes"| S
+  RV -->|"completion wakes"| S
 ```
+
+| Piece | Change |
+| :--- | :--- |
+| `.gemini/skills/plan-issues/SKILL.md` | Zero-setup preconditions, creates labels, proven verify commands, then invokes `ship-issues` |
+| `.gemini/skills/ship-issues/SKILL.md` | New: one orchestration pass, safe to run any number of times |
+| `bin/link-agent-skills.sh` | No change: it already links every folder under `.gemini/skills` to all runtimes |
 
 ### State
 
-GitHub labels are the only state. Nothing is stored locally.
+| Label | On | Set by | Meaning |
+| :--- | :--- | :--- | :--- |
+| `epic` | issue | plan-issues | The plan |
+| `exec:flash` / `exec:strong` | issue | plan-issues | Executor model: GLM 5.3 Flash / Sonnet 5.5 |
+| `shipped` | issue | ship-issues | Executor delegated; never delegate again |
+| `ship-failed` | issue or epic | ship-issues | Delegation failed; skipped until you remove it |
+| `ai-reviewed` | PR | ship-issues | Reviewer delegated for the PR's current head |
+| `retro-posted` | epic | ship-issues | Roll-up retro done |
 
-| Label | Set by | Meaning |
-| :--- | :--- | :--- |
-| `epic` | plan-issues | The plan; its sub-issues are the work |
-| `exec:flash` | plan-issues | Run on GLM 5.3 Flash |
-| `exec:strong` | plan-issues | Run on Sonnet 5.5 |
-| `shipped` | ship-loop | A thread was started for this issue; never dispatch again |
-| `ship-failed` | ship-loop | Dispatch failed; skipped until you remove the label |
-| `retro-posted` | ship-loop | The epic roll-up run was started |
+Review rounds are counted from PR comments that start with `AI review round`.
 
 ---
 
-## 3. `plan-issues` changes
+## 4. `plan-issues` changes
 
-File: `.gemini/skills/plan-issues/SKILL.md`. The issue sections (Goal, Context, Scope, Acceptance criteria, Verify with, Dependencies) and the quality gate stay as they are.
+The issue sections (Goal, Context, Scope, Acceptance criteria, Verify with, Dependencies) and the quality gate stay as they are.
 
 | Part | Today | New |
 | :--- | :--- | :--- |
-| Preconditions | Templates, labels and a filled `AGENTS.md` must exist, else stop and run `init-agent-kit` | Only `gh auth status` works and the repo is at `~/Github/ne1cc/<repo>` |
-| Labels | Must already exist | Created before filing with `gh label create --force` (all six labels; idempotent) |
-| Issue structure | From the repo's template files | Written directly from the section list in the skill |
-| "Verify with" commands | Copied from `AGENTS.md` | Planner runs each command once before filing. It must run; a failure is allowed only when the issue's change is what fixes it. Never run a command that deploys, migrates, or writes outside the repo; mark those "not pre-checked" in the issue |
-| Missing `AGENTS.md` | Hard stop | Planner drafts one (Commands, Architecture ≤5 lines, Conventions, Do not touch) and files it as an ordinary `exec:flash` sub-issue with the full text in the body |
-| Dependencies | `Blocked by #N` per blocker | Same syntax, now machine-read by ship-loop; blockers filed first so numbers are real |
-| After filing | Reminder to hand off each issue | Runs `ship-loop --repo owner/repo` and reports "Shipping: N started, M waiting on #a, #b" |
-
-`init-agent-kit` stays for repos that want the optional PR-body CI check; the workflow no longer needs it. The skill description gains a line saying planning works in any repo.
+| Preconditions | Templates, labels and a filled `AGENTS.md` must exist, else stop and run `init-agent-kit` | Only `gh auth status` works |
+| Labels | Must already exist | Created before filing with `gh label create --force` (all seven; idempotent) |
+| Issue structure | From the repo's template files | Written from the section list in the skill |
+| "Verify with" commands | Copied from `AGENTS.md` | Run once before filing. Must run; may fail only where the issue's change fixes it. Never run deploy, migrate, or outside-the-repo commands; mark those "(not pre-checked)" |
+| Missing `AGENTS.md` | Hard stop | Drafted and filed as an ordinary `exec:flash` sub-issue with the full text |
+| Dependencies | `Blocked by #N` | Same, machine-read by ship-issues; blockers filed first |
+| After filing | Reminder to hand off | Invoke `ship-issues` for the new epic |
 
 ---
 
-## 4. `bin/ship-loop` (bash, `gh`, `jq`)
+## 5. `ship-issues` pass
+
+Invoked by plan-issues, by the schedule (prompt: `Use the ship-issues skill for epic #E in owner/repo.`), by T3 when a child finishes, or by you. Every pass reads GitHub fresh and acts only on what changed, so repeated or overlapping wakes cannot duplicate work.
 
 ```text
-ship-loop [--repo owner/repo] [--dry-run]
-
-pass:
-  1. Lock: mkdir lock dir; already held → exit 0 (plan-issues and launchd can overlap)
-  2. T3 server unreachable on 127.0.0.1:3773 → log, exit 0, label nothing, no notification
-  3. Repos: --repo, else gh search issues --owner ne1cc --label epic --state open
-  4. Repo not at ~/Github/ne1cc/<repo> → gh-ns-clone it
-  5. For each open epic E:
-       sub-issues = gh api repos/<o>/<r>/issues/E/sub_issues
-       each open sub-issue without shipped / ship-failed:
-         any "Blocked by #N" still open → wait
-         no exec:* label → ship-failed + notification
-         else → label shipped → t3-run <path> <tier> "#N <title>" "<executor prompt>"
-                t3-run non-zero → remove shipped, add ship-failed, notification
-       every sub-issue closed and no retro-posted → label retro-posted → t3-run <path> retro …
-  6. Release lock
+1. Read epic E, its sub-issues (gh api …/issues/E/sub_issues), labels, and PRs whose body has "Closes #N"
+2. Schedule: none bound to this thread for E → schedule_task (interval 15 min, GLM 5.3 Flash, wake prompt above)
+3. Each open sub-issue without shipped / ship-failed, every "Blocked by #N" closed:
+     no exec:* label → ship-failed
+     else → label shipped → delegate_task (isolation worktree, async, model from label, executor brief)
+     delegation error → swap shipped for ship-failed, say so in the thread
+4. Each open PR for a sub-issue, no ai-reviewed → label ai-reviewed → delegate_task reviewer (Sonnet 5.5)
+5. Finished reviewer said CHANGES and rounds < 2 → delegate fixer (issue's model) on the PR branch;
+   when the fixer pushes, remove ai-reviewed so step 4 reviews the new head
+   APPROVE, or 2 rounds done → post "Ready for you: PR #P" in the thread
+6. Every sub-issue closed and no retro-posted → write and post the roll-up on E, label retro-posted,
+   close E, disable the schedule
+7. Nothing changed → end the turn with no message
 ```
 
-- **Executor prompt**: `Implement GitHub issue #N in owner/repo, following Issue-Driven Work.`
-- **Retro prompt**: `Post the roll-up retrospective on epic #E in owner/repo: link each sub-issue PR and its retrospective, note what was kicked back and what each model did well or badly, then close the epic.`
-- **Closed counts as done**: a blocker closed as "not planned" also releases its dependents.
-- **Notification**: `osascript -e 'display notification …'`, once per failure, because `ship-failed` stops retries.
-- **`--dry-run`**: prints every label change and dispatch without making them.
+- **Executor brief** (`delegate_task.task`): the full issue body, then: `Implement GitHub issue #N in owner/repo following the Issue-Driven Work section of your instructions: one branch, PR body starts "Closes #N", fill every PR template section, post the retrospective comment, call link_pull_request. Return the PR URL, retro comment URL and head SHA. Do not watch or poll the PR.`
+- **Reviewer brief**: PR URL, the issue body, `gh pr diff`. Post one PR comment starting `AI review round <k>: APPROVE` or `AI review round <k>: CHANGES` followed by numbered findings tied to the issue's acceptance criteria. Change no code.
+- **Fixer brief**: PR URL, the issue body, every `AI review round` comment. `gh pr checkout <P>`, address each finding or reply why not, push to the same branch, return the new head SHA.
+- **Base commit**: delegated worktrees start from the parent thread's local commit. Executors fetch and rebase onto `origin/main` first (Worktree Git Sync rule), so a stale parent is harmless.
+- **Models**: resolve `providerInstanceId` and `model` for GLM 5.3 Flash and Sonnet 5.5 from `orchestrator_capabilities` each pass; never hardcode IDs.
 
 | Situation | Behavior |
 | :--- | :--- |
-| You request changes on a PR | Reply in that issue's T3 thread; the loop is not involved |
-| You merge a PR | `Closes #N` closes the issue; next pass (≤5 min) releases dependents |
-| You close an epic by hand | Ignored from then on (only open epics are read) |
-| Retry a failed issue | Remove `ship-failed` in GitHub |
+| You want changes on a PR yourself | Comment on the PR and reply in the executor's child thread, or ask the orchestrator for a fix round |
+| You close the epic by hand | Next wake sees it closed and disables the schedule |
+| Thread deleted | The schedule bound to it stops; run `/ship-issues owner/repo#E` from a new thread to resume (labels hold the state) |
+| Retry a failed issue | Remove `ship-failed`; the next pass picks it up |
 
 ---
 
-## 5. `bin/t3-run` (Node 24, built-in WebSocket, no dependencies)
-
-```text
-t3-run <repo-path> <exec:flash|exec:strong|retro> <title> <prompt>
-```
-
-1. Token: `t3 auth session issue`.
-2. Project: `t3 project add <repo-path>` if the project is not listed.
-3. `scheduledTasks.upsert`: one-off task, new worktree from `origin/main`, model for the tier, the prompt, the title.
-4. `scheduledTasks.runNow`.
-5. `scheduledTasks.delete` (or after the thread starts, if the spike shows delete-before-start cancels it).
-
-Exit non-zero on any error. Model constants live at the top of the script: `exec:flash` → GLM 5.3 Flash, `exec:strong` and `retro` → Sonnet 5.5. Instance IDs and payload shapes come from the spike.
-
-**Fallback** if the RPC route does not work: `t3-run` sends a "#N ready" notification and copies the prompt to the clipboard; you paste it into a new thread. ship-loop is unchanged.
-
----
-
-## 6. launchd job
-
-- `launchd/com.ne1cc.ship-loop.plist`: runs `bin/ship-loop` every 300 s, `PATH` includes `/opt/homebrew/bin`, logs to `~/Library/Logs/ship-loop.log`.
-- `bin/link-agent-skills.sh` symlinks it into `~/Library/LaunchAgents/` and loads it (`launchctl bootstrap gui/$UID`) if not loaded; `--verify` checks it is loaded.
-- Rollback: `launchctl bootout gui/$UID/com.ne1cc.ship-loop`.
-
----
-
-## 7. Testing
+## 6. Testing
 
 | Piece | Test |
 | :--- | :--- |
-| ship-loop | `tests/ship-loop.test.sh`: stub `gh` and `t3-run` on `PATH` + JSON fixtures. Cases: blocked issue waits; unblocked issue ships; t3-run failure → `ship-failed`; closed epic gets its retro once; held lock exits 0 |
-| t3-run | Spike + one live run (thin wrapper over 4 calls) |
-| plan-issues | End-to-end trial |
-| launchd | `link-agent-skills.sh --verify` |
+| Skills | `rg` checks that required phrases exist and old ones are gone; `bin/link-agent-skills.sh --verify` passes and `~/.claude/skills/ship-issues` resolves |
+| Whole loop | End-to-end trial (below) |
+
+There is no new code, so no unit tests.
 
 ---
 
-## 8. Rollout (one branch, one PR, in order)
+## 7. Rollout
 
-1. **Spike** (throwaway; asks first): issue a token, list projects/providers over WebSocket, upsert a "reply OK, change nothing" task in terminal-configs, `runNow`, confirm exactly one thread and one worktree appear, delete the task. Records payload shapes, model instance IDs, the worktree-from-`origin/main` setting, and delete-after-run behavior.
-2. `bin/t3-run` from the spike's findings.
-3. `bin/ship-loop` + `tests/ship-loop.test.sh`.
-4. `plan-issues` changes.
-5. launchd plist + `link-agent-skills.sh` wiring.
-6. **End-to-end trial** (asks first): new private `ne1cc/agent-sandbox` repo, epic with issues A and B where B is `Blocked by` A. Pass when A dispatches at once, B waits, merging A releases B within 5 min, and merging B triggers the roll-up retro and closes the epic.
-7. Enable the timer only after the trial passes.
-8. Rewrite the agent workflow guide: drop `wma` and per-repo setup.
+1. Write `ship-issues`, change `plan-issues`, run `bin/link-agent-skills.sh`.
+2. **End-to-end trial** (asks first): new private `ne1cc/agent-sandbox`, epic with A and B where B is `Blocked by` A. Pass when: A starts at once and B waits; A's PR gets a reviewer comment; merging A starts B within 15 minutes; merging B produces the roll-up, closes the epic and disables the schedule.
+3. Rewrite the agent workflow guide: drop `wma` and per-repo setup.
 
 ---
 
-## 9. Risks
+## 8. Risks
 
 | Risk | Mitigation |
 | :--- | :--- |
-| T3 RPC is undocumented and may change between versions (bundle 0.1.1, server 0.1.2) | t3-run fails loud → `ship-failed`; notify-only fallback |
-| Private repos may not inherit templates from public `ne1cc/.github` | plan-issues writes sections itself; templates not required |
-| A wrong `Blocked by` line starts an issue early | Planner files blockers first; you approve the list before filing |
-| Many issues start at once and cost adds up | You see the count when approving; add a cap later if needed |
+| Child-completion wakes run on the thread's own model (Opus) | Few and only on real events; switch the thread to Sonnet after filing if cost matters |
+| Orchestration tool names or arguments change in a T3 update | The skill names intents; agents read live tool schemas; the trial catches breakage |
+| A wrong `Blocked by` line starts an issue early | Blockers filed first; you approve the list before filing |
+| Many issues at once cost more | You see the count when approving |
+| Private repos may not inherit `ne1cc/.github` templates | plan-issues writes sections itself |
